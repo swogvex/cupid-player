@@ -1,0 +1,119 @@
+/* All sizes are logical pixels multiplied by --s. */
+
+.px-sprite {
+  display: inline-block;
+  flex: none;
+  image-rendering: pixelated;
+}
+
+/* ---------- Panel (9-slice 12x12, corner 4) ---------- */
+.px-panel {
+  box-sizing: border-box;
+  border: calc(var(--s) * 4px) solid transparent;
+  border-image: url("/assets/sprites/panel.png") 4 fill / calc(var(--s) * 4px) stretch;
+  image-rendering: pixelated;
+  padding: calc(var(--s) * 2px);
+  color: var(--ink);
+}
+
+/* ---------- Button (9-slice 8x8, corner 3) ---------- */
+.px-btn {
+  box-sizing: border-box;
+  border: calc(var(--s) * 3px) solid transparent;
+  border-image: url("/assets/sprites/button-normal.png") 3 fill / calc(var(--s) * 3px) stretch;
+  image-rendering: pixelated;
+  background: none;
+  padding: calc(var(--s) * 1px) calc(var(--s) * 4px);
+  font: inherit;
+  font-size: calc(var(--s) * 8px);
+  line-height: 1;
+  color: var(--ink);
+  cursor: pointer;
+}
+.px-btn:hover:not(:disabled) {
+  border-image-source: url("/assets/sprites/button-hover.png");
+}
+.px-btn:active:not(:disabled),
+.px-btn.is-active {
+  border-image-source: url("/assets/sprites/button-pressed.png");
+}
+.px-btn:disabled {
+  border-image-source: url("/assets/sprites/button-disabled.png");
+  color: var(--ink-soft);
+  cursor: not-allowed;
+}
+.px-btn:focus-visible {
+  outline: calc(var(--s) * 1px) solid var(--ink);
+  outline-offset: calc(var(--s) * 1px);
+}
+.px-btn--icon {
+  padding: calc(var(--s) * 2px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.px-btn--nav {
+  width: 100%;
+  text-align: left;
+}
+
+/* ---------- Input (9-slice 8x8, corner 3) ---------- */
+.px-input {
+  box-sizing: border-box;
+  border: calc(var(--s) * 3px) solid transparent;
+  border-image: url("/assets/sprites/input-normal.png") 3 fill / calc(var(--s) * 3px) stretch;
+  image-rendering: pixelated;
+  background: none;
+  padding: calc(var(--s) * 1px) calc(var(--s) * 2px);
+  font: inherit;
+  font-size: calc(var(--s) * 8px);
+  line-height: 1;
+  color: var(--ink);
+  outline: none;
+}
+.px-input:focus {
+  border-image-source: url("/assets/sprites/input-focus.png");
+}
+.px-input::placeholder {
+  color: var(--ink-soft);
+}
+
+/* ---------- Progress + draggable star ---------- */
+.px-progress {
+  position: relative;
+  height: calc(var(--s) * 9px);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+.px-progress[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.px-progress:focus-visible {
+  outline: calc(var(--s) * 1px) solid var(--ink);
+  outline-offset: calc(var(--s) * 1px);
+}
+.px-progress__track,
+.px-progress__fill {
+  position: absolute;
+  left: 0;
+  top: calc(var(--s) * 2px);
+  height: calc(var(--s) * 6px);
+  background-repeat: repeat-x;
+  background-size: calc(var(--s) * 2px) calc(var(--s) * 6px);
+  image-rendering: pixelated;
+}
+.px-progress__track {
+  right: 0;
+  background-image: url("/assets/sprites/track.png");
+}
+.px-progress__fill {
+  background-image: url("/assets/sprites/fill.png");
+}
+.px-progress__star {
+  position: absolute;
+  top: 0;
+  margin-left: calc(var(--s) * -4px);
+  pointer-events: none;
+}

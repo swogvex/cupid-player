@@ -1,6 +1,5 @@
 :root {
-  --s: 2; /* logical pixel size, overwritten by scale.ts */
-
+  /* Paleta (04-DISENO.md). Los temas alternativos redefinen solo estas. */
   --bg: #f9cfd8;
   --panel: #fbd8df;
   --panel-2: #fde6ea;
@@ -11,4 +10,9 @@
   --ink-soft: #b04a7c;
   --star: #f6d365;
   --ambient-bg: #2a2340;
+
+  /* Escala entera. scale.ts la sustituye con un estilo en línea; esto es solo el valor por defecto. */
+  --s: 2;
+
+  --font-pixel: "Pixelify Sans", ui-monospace, monospace;
 }
