@@ -12,9 +12,15 @@
   "app": {
     "windows": [
       {
-        "title": "cupid-player",
-        "width": 800,
-        "height": 600
+        "label": "main",
+        "title": "cupid player",
+        "width": 704,
+        "height": 416,
+        "minWidth": 704,
+        "minHeight": 416,
+        "decorations": false,
+        "resizable": true,
+        "center": true
       }
     ],
     "security": {

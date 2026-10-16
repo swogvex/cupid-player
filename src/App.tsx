@@ -1,51 +1,44 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useEffect } from "react";
+import { TitleBar } from "./components/TitleBar";
+import { startScaleTracking, type Scale } from "./lib/scale";
+import { useSettingsStore } from "./state/settingsStore";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+const SCALES: Scale[] = [2, 3, 4];
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+export default function App() {
+  const init = useSettingsStore((s) => s.init);
+  const scale = useSettingsStore((s) => s.scale);
+  const alwaysOnTop = useSettingsStore((s) => s.alwaysOnTop);
+  const setScale = useSettingsStore((s) => s.setScale);
+
+  useEffect(() => {
+    void init();
+    return startScaleTracking((n) => void useSettingsStore.getState().setScale(n));
+  }, [init]);
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="letterbox">
+      <div className="frame">
+        <TitleBar />
+        <main className="content">
+          {/* TEMPORARY test UI: replaced by Settings in H4 */}
+          <p>
+            H2 test - scale x{scale} - always on top: {alwaysOnTop ? "yes" : "no"}
+          </p>
+          <div className="scale-row">
+            {SCALES.map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={n === scale ? "tb-btn tb-btn--on" : "tb-btn"}
+                onClick={() => void setScale(n)}
+              >
+                x{n}
+              </button>
+            ))}
+          </div>
+        </main>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    </div>
   );
 }
-
-export default App;

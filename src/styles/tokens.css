@@ -1,0 +1,14 @@
+:root {
+  --s: 2; /* logical pixel size, overwritten by scale.ts */
+
+  --bg: #f9cfd8;
+  --panel: #fbd8df;
+  --panel-2: #fde6ea;
+  --line: #e8a0b4;
+  --accent: #e8609a;
+  --accent-hi: #ff8cc0;
+  --ink: #6b1f4a;
+  --ink-soft: #b04a7c;
+  --star: #f6d365;
+  --ambient-bg: #2a2340;
+}
