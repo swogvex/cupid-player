@@ -1,0 +1,67 @@
+{
+  "app": { "title": "cupid player" },
+  "common": { "back": "Back", "on": "On", "off": "Off" },
+  "nav": {
+    "library": "Library",
+    "playlists": "Playlists",
+    "stats": "Stats",
+    "settings": "Settings"
+  },
+  "import": {
+    "placeholder": "Paste a link",
+    "button": "Import",
+    "idle": "Waiting",
+    "progress": "Importing {{done}}/{{total}}",
+    "done": "Completed!",
+    "needsReview": "{{count}} tracks need review"
+  },
+  "player": {
+    "nowPlaying": "Now playing",
+    "previous": "Previous",
+    "next": "Next",
+    "play": "Play",
+    "pause": "Pause",
+    "seek": "Seek",
+    "volume": "Volume",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "nothing": "Nothing playing"
+  },
+  "library": {
+    "title": "Library",
+    "search": "Search songs",
+    "empty": "No songs found",
+    "columns": {
+      "title": "Title",
+      "artist": "Artist",
+      "album": "Album",
+      "duration": "Duration"
+    }
+  },
+  "playlists": {
+    "title": "Playlists",
+    "tracks_one": "{{count}} song",
+    "tracks_other": "{{count}} songs",
+    "empty": "No playlists yet"
+  },
+  "stats": {
+    "title": "Stats",
+    "minutes": "Minutes",
+    "topArtist": "Top artist",
+    "topSong": "Top song",
+    "topSongs": "Top songs"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "alwaysOnTop": "Always on top"
+  },
+  "status": {
+    "done": "ok",
+    "queued": "queued",
+    "needs_review": "needs review"
+  },
+  "ambient": { "toggle": "Heart view" },
+  "window": { "minimize": "Minimize", "maximize": "Maximize", "close": "Close" }
+}

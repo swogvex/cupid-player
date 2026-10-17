@@ -4,7 +4,6 @@ import { PixelInput } from "../components/PixelInput";
 import { PixelPanel } from "../components/PixelPanel";
 import { ProgressStar } from "../components/ProgressStar";
 import { Sprite } from "../components/Sprite";
-import "../styles/pixel.css";
 
 const SCALES = [2, 3, 4] as const;
 

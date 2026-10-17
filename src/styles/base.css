@@ -32,42 +32,83 @@ body {
   background: var(--bg);
   color: var(--ink);
   overflow: hidden;
-  font-family: ui-monospace, Consolas, monospace; /* pixel font arrives in H3 */
   font-size: calc(var(--s) * 8px);
   image-rendering: pixelated;
   user-select: none;
 }
 
-/* Letterbox: bars use --bg, the 352x208 logical frame is centred */
+/* Bars (if any) use --bg; the frame is centred. */
 .letterbox {
   width: 100%;
   height: 100%;
   display: grid;
   place-items: center;
   background: var(--bg);
+  overflow: hidden;
 }
 
+/* --lw/--lh are unitless logical sizes set by scale.ts (352x208 unless maximized). */
 .frame {
-  width: calc(var(--s) * 352px);
-  height: calc(var(--s) * 208px);
+  position: relative;
+  width: calc(var(--s) * var(--lw) * 1px);
+  height: calc(var(--s) * var(--lh) * 1px);
   display: flex;
   flex-direction: column;
   background: var(--panel);
   border: calc(var(--s) * 1px) solid var(--line);
 }
 
+/* ---------- Title bar (24 logical px) ---------- */
 .titlebar {
-  height: calc(var(--s) * 20px);
+  position: relative;
+  z-index: 2;
   flex: none;
+  height: calc(var(--s) * 24px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 calc(var(--s) * 4px);
-  background: var(--line);
+  background: var(--titlebar-bg, var(--line));
+  box-shadow: inset 0 calc(var(--s) * 1px) 0 var(--titlebar-hi, var(--panel-2));
+  color: var(--titlebar-ink, var(--ink));
+  font-size: calc(var(--s) * 8px);
+  line-height: 1;
+}
+
+/* Picot-lace edge hanging below the bar */
+.titlebar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: calc(var(--s) * 3px);
+  background: var(--spr-lace-6x3) repeat-x left top / calc(var(--s) * 6px) calc(var(--s) * 3px);
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.titlebar .px-sprite {
+  pointer-events: none;
 }
 
 .titlebar__title {
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--s) * 3px);
+  text-shadow: calc(var(--s) * 1px) calc(var(--s) * 1px) 0 var(--titlebar-shadow, var(--panel-2));
+}
+
+.titlebar__center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--s) * 3px);
+  pointer-events: none;
 }
 
 .titlebar__buttons {
@@ -75,40 +116,35 @@ body {
   gap: calc(var(--s) * 2px);
 }
 
-.tb-btn {
-  height: calc(var(--s) * 12px);
-  min-width: calc(var(--s) * 12px);
-  padding: 0 calc(var(--s) * 3px);
-  font: inherit;
-  color: var(--ink);
-  background: var(--panel-2);
-  border: calc(var(--s) * 1px) solid var(--ink-soft);
-  cursor: pointer;
-}
-
-.tb-btn:hover {
-  background: var(--accent-hi);
-}
-
-.tb-btn--on {
-  background: var(--accent);
-  color: var(--panel-2);
-}
-
-.tb-btn:focus-visible {
-  outline: calc(var(--s) * 1px) solid var(--ink);
-  outline-offset: calc(var(--s) * 1px);
-}
-
-.content {
-  flex: 1;
-  padding: calc(var(--s) * 8px);
+/* ---------- Lazo con destellos ---------- */
+.bow {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: calc(var(--s) * 6px);
+}
+.bow__glint {
+  position: absolute;
+  top: 0;
+}
+.bow__glint--l { left: calc(var(--s) * 1px); }
+.bow__glint--r { left: calc(var(--s) * 33px); }
+
+/* ---------- Vaivén suave del corazón con alas (8 posiciones en 1 s = 8 fps) ---------- */
+@keyframes bob {
+  0%, 12.49% { transform: translateY(0); }
+  12.5%, 24.99% { transform: translateY(0); }
+  25%, 37.49% { transform: translateY(calc(var(--s) * -1px)); }
+  37.5%, 49.99% { transform: translateY(calc(var(--s) * -1px)); }
+  50%, 62.49% { transform: translateY(calc(var(--s) * -2px)); }
+  62.5%, 74.99% { transform: translateY(calc(var(--s) * -1px)); }
+  75%, 87.49% { transform: translateY(calc(var(--s) * -1px)); }
+  87.5%, 100% { transform: translateY(0); }
+}
+.bob {
+  animation: bob 1s steps(1, end) infinite;
 }
 
-.scale-row {
-  display: flex;
-  gap: calc(var(--s) * 4px);
+@media (prefers-reduced-motion: reduce) {
+  .bob {
+    animation: none;
+  }
 }

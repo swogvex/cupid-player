@@ -1,53 +1,48 @@
-import { isWindowMaximized } from "../ipc/commands";
-
 export const BASE_W = 352;
 export const BASE_H = 208;
-export const MIN_SCALE = 2;
-export const MAX_SCALE = 4;
 
+const MIN_SCALE = 2;
+/** Absorbs sub-pixel rounding of the window size (415.6 px must still count as 416). */
+const TOLERANCE_PX = 2;
+
+/**
+ * Only kept so ipc/commands.ts keeps compiling while set_window_scale exists.
+ * It disappears together with that command (H13 cleanup).
+ */
 export type Scale = 2 | 3 | 4;
 
-/** Integer scale that fits the viewport (floor => letterbox, never blurry). */
+/** Largest integer scale at which the 352x208 design still fits. Never below 2. */
 export function fitScale(width: number, height: number): number {
-  return Math.max(1, Math.floor(Math.min(width / BASE_W, height / BASE_H)));
-}
-
-/** Nearest allowed scale (2..4) for a free-resized window. */
-export function snapScale(width: number, height: number): Scale {
-  const raw = Math.round(Math.min(width / BASE_W, height / BASE_H));
-  return Math.min(MAX_SCALE, Math.max(MIN_SCALE, raw)) as Scale;
-}
-
-export function applyCssScale(): void {
-  const s = fitScale(window.innerWidth, window.innerHeight);
-  document.documentElement.style.setProperty("--s", String(s));
+  const raw = Math.min((width + TOLERANCE_PX) / BASE_W, (height + TOLERANCE_PX) / BASE_H);
+  return Math.max(MIN_SCALE, Math.floor(raw));
 }
 
 /**
- * Keeps --s in sync with the window and, 200 ms after the last resize,
- * asks `onSnap` to snap the window to the nearest integer scale.
- * Returns a cleanup function.
+ * Integer --s plus the logical size of the frame (--lw x --lh).
+ * The layout is fluid: any extra space is given to the layout, not to a bigger scale.
  */
-export function startScaleTracking(onSnap: (n: Scale) => void): () => void {
-  let timer: number | undefined;
+export function applyCssScale(): void {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const s = fitScale(w, h);
+  const root = document.documentElement.style;
+  root.setProperty("--s", String(s));
+  root.setProperty("--lw", String(Math.max(BASE_W, Math.floor(w / s))));
+  root.setProperty("--lh", String(Math.max(BASE_H, Math.floor(h / s))));
+}
 
+/** Keeps the CSS scale in sync with the window (once per frame). Returns a cleanup function. */
+export function startScaleTracking(): () => void {
+  let raf = 0;
   const onResize = () => {
-    applyCssScale();
-    window.clearTimeout(timer);
-    timer = window.setTimeout(async () => {
-      if (await isWindowMaximized()) return; // maximized => letterbox only
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const n = snapScale(w, h);
-      const aligned = Math.abs(w - BASE_W * n) <= 1 && Math.abs(h - BASE_H * n) <= 1;
-      if (!aligned) onSnap(n);
-    }, 150);
+    window.cancelAnimationFrame(raf);
+    raf = window.requestAnimationFrame(applyCssScale);
   };
 
   applyCssScale();
   window.addEventListener("resize", onResize);
   return () => {
-    window.clearTimeout(timer);
+    window.cancelAnimationFrame(raf);
     window.removeEventListener("resize", onResize);
   };
 }

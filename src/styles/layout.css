@@ -1,0 +1,400 @@
+/* H4 layout. Logical px (352x208 base) multiplied by --s via --px. */
+
+.shell {
+  --px: calc(var(--s) * 1px);
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: calc(var(--px) * 4);
+  padding: calc(var(--px) * 4);
+  overflow: hidden;
+  font-family: var(--font-pixel);
+  font-size: calc(var(--px) * 8);
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+.ellipsis {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Sidebar (84 wide) ---------- */
+.sidebar {
+  flex: none;
+  width: calc(var(--px) * 84);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--px) * 4);
+  min-height: 0;
+}
+
+.nav {
+  display: grid;
+  gap: calc(var(--px) * 2);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 3);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 2);
+  height: calc(var(--px) * 8);
+}
+
+.divider__line {
+  flex: 1;
+  height: calc(var(--px) * 1);
+  background: var(--spr-dash-4x1) repeat-x left top / calc(var(--px) * 4) calc(var(--px) * 1);
+  image-rendering: pixelated;
+}
+
+.import {
+  display: grid;
+  gap: calc(var(--px) * 2);
+  min-width: 0;
+}
+
+.import .px-input {
+  width: 100%;
+}
+
+.import .px-btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* Import bar: 9 px tall, 8 px heart knob, 1 px extra stop at each end */
+.import__bar {
+  --pad: 5;
+  height: calc(var(--px) * 9);
+  cursor: default;
+}
+
+.import__bar .px-progress__track,
+.import__bar .px-progress__fill {
+  top: calc(var(--px) * 1);
+}
+
+.import__bar .px-progress__star {
+  margin-left: calc(var(--px) * -4);
+}
+
+.import__status {
+  line-height: calc(var(--px) * 10);
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+/* Winged heart: takes the free space under the status and sits in the middle of it */
+.sidebar__wings {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.winged {
+  display: flex;
+  align-items: center;
+}
+
+.winged__heart {
+  margin: calc(var(--px) * 2) calc(var(--px) * -3) 0;
+}
+
+/* ---------- Main column ---------- */
+.main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--px) * 4);
+}
+
+.content-panel {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.heart-toggle {
+  position: absolute;
+  top: calc(var(--px) * 3);
+  right: calc(var(--px) * 4);
+  z-index: 2;
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.heart-toggle:focus-visible {
+  outline: calc(var(--px) * 1) solid var(--ink);
+  outline-offset: calc(var(--px) * 1);
+}
+
+/* ---------- Views ---------- */
+.view {
+  position: relative;
+  z-index: 1;
+  /* above the corner ornaments */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--px) * 2);
+}
+
+.view__head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 4);
+  min-height: calc(var(--px) * 10);
+  padding-right: calc(var(--px) * 12);
+  /* room for the heart button */
+}
+
+/* Back button: a little air so it does not touch the corner ornament */
+.view__head--back {
+  min-height: calc(var(--px) * 16);
+  padding-top: calc(var(--px) * 2);
+  padding-left: calc(var(--px) * 2);
+}
+
+.view__title,
+.view__sub {
+  margin: 0;
+  font: inherit;
+  font-weight: 400;
+  line-height: calc(var(--px) * 10);
+}
+
+.view__sub {
+  color: var(--ink-soft);
+}
+
+.view__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) auto;
+  gap: calc(var(--px) * 4);
+  line-height: calc(var(--px) * 10);
+}
+
+.row:hover {
+  background: var(--panel-2);
+}
+
+.row__end {
+  display: flex;
+  gap: calc(var(--px) * 2);
+}
+
+.row__flag {
+  color: var(--accent);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--px) * 72), 1fr));
+  gap: calc(var(--px) * 4);
+  align-content: start;
+}
+
+.card-text {
+  display: block;
+  line-height: calc(var(--px) * 10);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(var(--px) * 4);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: calc(var(--px) * 2) calc(var(--px) * 3);
+  background: var(--panel-2);
+  border: calc(var(--px) * 1) solid var(--line);
+  line-height: calc(var(--px) * 10);
+}
+
+.stat strong {
+  font-weight: 400;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--px) * 4);
+}
+
+.btn-group {
+  display: flex;
+  gap: calc(var(--px) * 2);
+}
+
+/* ---------- Player (60 tall: 46 usable inside border 4 + padding 3) ---------- */
+.player {
+  flex: none;
+  height: calc(var(--px) * 60);
+}
+
+.player> :not(.px-corner) {
+  position: relative;
+  z-index: 1;
+}
+
+.player__top {
+  display: grid;
+  grid-template-columns: calc(var(--px) * 32) minmax(0, 1fr) auto minmax(calc(var(--px) * 47), 1fr);
+  align-items: center;
+  column-gap: calc(var(--px) * 4);
+  height: calc(var(--px) * 32);
+}
+
+.player__cover {
+  box-sizing: border-box;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--px) * 32);
+  height: calc(var(--px) * 32);
+  background: var(--panel-2);
+  border: calc(var(--px) * 1) solid var(--line);
+}
+
+.player__info {
+  min-width: 0;
+  line-height: calc(var(--px) * 10);
+}
+
+.player__info>* {
+  display: block;
+}
+
+.player__controls {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 6);
+}
+
+/* Fixed time columns: the bar never moves when the digits change */
+.player__bottom {
+  display: grid;
+  grid-template-columns: calc(var(--px) * 22) 1fr calc(var(--px) * 22);
+  align-items: center;
+  gap: calc(var(--px) * 3);
+  height: calc(var(--px) * 11);
+  margin-top: calc(var(--px) * 2);
+  line-height: calc(var(--px) * 11);
+}
+
+.player__time {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.player__time--end {
+  text-align: right;
+}
+
+/* ---------- Volume ---------- */
+.volume {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: calc(var(--px) * 3);
+}
+
+.volume__bar {
+  width: calc(var(--px) * 28);
+}
+
+/* ---------- Real cover (covers the theme's placeholder art) ---------- */
+.cover__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: auto;
+}
+
+/* ---------- Settings ---------- */
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--px) * 3);
+}
+
+.setting--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: calc(var(--px) * 2);
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--px) * 66), 1fr));
+  gap: calc(var(--px) * 2);
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 3);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.swatches {
+  display: flex;
+  flex: none;
+  gap: calc(var(--px) * 1);
+}
+
+.swatch {
+  box-sizing: border-box;
+  width: calc(var(--px) * 5);
+  height: calc(var(--px) * 5);
+  border: calc(var(--px) * 1) solid var(--ink);
+}

@@ -1,43 +1,58 @@
-import { useEffect } from "react";
+import { useEffect, type ComponentType } from "react";
+import { useTranslation } from "react-i18next";
+import { PixelPanel } from "./components/PixelPanel";
+import { PlayerBar } from "./components/PlayerBar";
+import { Sidebar } from "./components/Sidebar";
+import { Sprite } from "./components/Sprite";
 import { TitleBar } from "./components/TitleBar";
-import { startScaleTracking, type Scale } from "./lib/scale";
+import { startScaleTracking } from "./lib/scale";
+import { useNavStore, type View } from "./state/navStore";
 import { useSettingsStore } from "./state/settingsStore";
+import { LibraryView } from "./views/LibraryView";
+import { PlaylistsView } from "./views/PlaylistsView";
+import { SettingsView } from "./views/SettingsView";
+import { StatsView } from "./views/StatsView";
 
-const SCALES: Scale[] = [2, 3, 4];
+const VIEWS: Record<View, ComponentType> = {
+  library: LibraryView,
+  playlists: PlaylistsView,
+  stats: StatsView,
+  settings: SettingsView,
+};
 
 export default function App() {
+  const { t } = useTranslation();
   const init = useSettingsStore((s) => s.init);
-  const scale = useSettingsStore((s) => s.scale);
-  const alwaysOnTop = useSettingsStore((s) => s.alwaysOnTop);
-  const setScale = useSettingsStore((s) => s.setScale);
+  const language = useSettingsStore((s) => s.language);
+  const view = useNavStore((s) => s.view);
+  const ActiveView = VIEWS[view];
 
   useEffect(() => {
     void init();
-    return startScaleTracking((n) => void useSettingsStore.getState().setScale(n));
+    return startScaleTracking();
   }, [init]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   return (
     <div className="letterbox">
       <div className="frame">
         <TitleBar />
-        <main className="content">
-          {/* TEMPORARY test UI: replaced by Settings in H4 */}
-          <p>
-            H2 test - scale x{scale} - always on top: {alwaysOnTop ? "yes" : "no"}
-          </p>
-          <div className="scale-row">
-            {SCALES.map((n) => (
-              <button
-                key={n}
-                type="button"
-                className={n === scale ? "tb-btn tb-btn--on" : "tb-btn"}
-                onClick={() => void setScale(n)}
-              >
-                x{n}
+        <div className="shell">
+          <Sidebar />
+          <div className="main-col">
+            <PixelPanel className="content-panel" deco>
+              {/* No action yet: the ambient view arrives in H10. */}
+              <button type="button" className="heart-toggle" aria-label={t("ambient.toggle")}>
+                <Sprite name="deco-heart" w={9} h={8} />
               </button>
-            ))}
+              <ActiveView />
+            </PixelPanel>
+            <PlayerBar />
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

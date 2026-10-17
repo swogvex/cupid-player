@@ -1,0 +1,9 @@
+.........
+dd....dd.
+dd...ddd.
+dd..dddd.
+dd.ddddd.
+dd..dddd.
+dd...ddd.
+dd....dd.
+.........

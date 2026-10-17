@@ -14,10 +14,10 @@
       {
         "label": "main",
         "title": "cupid player",
-        "width": 704,
-        "height": 416,
-        "minWidth": 704,
-        "minHeight": 416,
+        "width": 880,
+        "height": 520,
+        "minWidth": 736,
+        "minHeight": 432,
         "decorations": false,
         "resizable": true,
         "center": true

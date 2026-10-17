@@ -1,0 +1,34 @@
+{
+  "name": "Midnight",
+  "order": 1,
+  "sprites": {
+    "a": "#6C5CE0",
+    "h": "#9A8CFF",
+    "d": "#0B0920",
+    "s": "#3A3290",
+    "l": "#4B43A8",
+    "p": "#17143A",
+    "q": "#221E55",
+    "b": "#0F0D24",
+    "y": "#FFD97A",
+    "w": "#FFFFFF",
+    "t": "#2A2468",
+    "i": "#EDE6FF"
+  },
+  "tokens": {
+    "bg": "#0F0D24",
+    "panel": "#17143A",
+    "panel-2": "#221E55",
+    "line": "#4B43A8",
+    "accent": "#6C5CE0",
+    "accent-hi": "#9A8CFF",
+    "ink": "#EDE6FF",
+    "ink-soft": "#A99BEA",
+    "star": "#FFD97A",
+    "ambient-bg": "#05040F",
+    "titlebar-bg": "#2A2468",
+    "titlebar-ink": "#EDE6FF",
+    "titlebar-shadow": "#0B0920",
+    "titlebar-hi": "#4B43A8"
+  }
+}

@@ -19,7 +19,7 @@ pub fn run() {
         // Only remember position; size is governed by the integer scale.
         .plugin(
             tauri_plugin_window_state::Builder::default()
-                .with_state_flags(StateFlags::POSITION)
+                .with_state_flags(StateFlags::POSITION | StateFlags::SIZE)
                 .build(),
         )
         .plugin(tauri_plugin_store::Builder::new().build())

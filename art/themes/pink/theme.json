@@ -1,0 +1,34 @@
+{
+  "name": "Cupid Pink",
+  "order": 0,
+  "sprites": {
+    "a": "#E8609A",
+    "h": "#FF8CC0",
+    "d": "#6B1F4A",
+    "s": "#B04A7C",
+    "l": "#E8A0B4",
+    "p": "#FBD8DF",
+    "q": "#FDE6EA",
+    "b": "#F9CFD8",
+    "y": "#F6D365",
+    "w": "#FFFFFF",
+    "t": "#E8A0B4",
+    "i": "#6B1F4A"
+  },
+  "tokens": {
+    "bg": "#F9CFD8",
+    "panel": "#FBD8DF",
+    "panel-2": "#FDE6EA",
+    "line": "#E8A0B4",
+    "accent": "#E8609A",
+    "accent-hi": "#FF8CC0",
+    "ink": "#6B1F4A",
+    "ink-soft": "#B04A7C",
+    "star": "#F6D365",
+    "ambient-bg": "#2A2340",
+    "titlebar-bg": "#E8A0B4",
+    "titlebar-ink": "#6B1F4A",
+    "titlebar-shadow": "#FDE6EA",
+    "titlebar-hi": "#FDE6EA"
+  }
+}

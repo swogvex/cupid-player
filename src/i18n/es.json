@@ -1,0 +1,71 @@
+{
+  "app": { "title": "cupid player" },
+  "common": { "back": "Volver", "on": "Sí", "off": "No" },
+  "nav": {
+    "library": "Biblioteca",
+    "playlists": "Playlists",
+    "stats": "Stats",
+    "settings": "Ajustes"
+  },
+  "import": {
+    "placeholder": "Pega un enlace",
+    "button": "Importar",
+    "idle": "En espera",
+    "progress": "Importando {{done}}/{{total}}",
+    "done": "¡Completado!",
+    "needsReview": "{{count}} pistas necesitan revisión"
+  },
+  "player": {
+    "nowPlaying": "Ahora suena",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "seek": "Posición",
+    "volume": "Volumen",
+    "mute": "Silenciar",
+    "unmute": "Activar sonido",
+    "nothing": "Nada en reproducción"
+  },
+  "library": {
+    "title": "Biblioteca",
+    "search": "Buscar canciones",
+    "empty": "No hay canciones",
+    "columns": {
+      "title": "Título",
+      "artist": "Artista",
+      "album": "Álbum",
+      "duration": "Duración"
+    }
+  },
+  "playlists": {
+    "title": "Playlists",
+    "tracks_one": "{{count}} canción",
+    "tracks_other": "{{count}} canciones",
+    "empty": "Aún no hay playlists"
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "minutes": "Minutos",
+    "topArtist": "Top artista",
+    "topSong": "Top canción",
+    "topSongs": "Top canciones"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "language": "Idioma",
+    "theme": "Tema",
+    "alwaysOnTop": "Siempre encima"
+  },
+  "status": {
+    "done": "ok",
+    "queued": "pendiente",
+    "needs_review": "necesita revisión"
+  },
+  "ambient": { "toggle": "Vista corazón" },
+  "window": {
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "close": "Cerrar"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Mint",
+  "order": 3,
+  "sprites": {
+    "a": "#4DBE8C",
+    "h": "#8BE3B8",
+    "d": "#1D5A45",
+    "s": "#3A8A68",
+    "l": "#8ED3B3",
+    "p": "#DDF3E4",
+    "q": "#EDF9EB",
+    "b": "#A9E0C9",
+    "y": "#F6D365",
+    "w": "#FFFFFF",
+    "t": "#8ED3B3",
+    "i": "#1D5A45"
+  },
+  "tokens": {
+    "bg": "#A9E0C9",
+    "panel": "#DDF3E4",
+    "panel-2": "#EDF9EB",
+    "line": "#8ED3B3",
+    "accent": "#4DBE8C",
+    "accent-hi": "#8BE3B8",
+    "ink": "#1D5A45",
+    "ink-soft": "#3A8A68",
+    "star": "#F6D365",
+    "ambient-bg": "#123D2E",
+    "titlebar-bg": "#8ED3B3",
+    "titlebar-ink": "#1D5A45",
+    "titlebar-shadow": "#EDF9EB",
+    "titlebar-hi": "#EDF9EB"
+  }
+}

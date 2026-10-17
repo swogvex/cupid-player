@@ -1,0 +1,34 @@
+{
+  "name": "Classic",
+  "order": 4,
+  "sprites": {
+    "a": "#E3B9A0",
+    "h": "#F3D5C3",
+    "d": "#5A3328",
+    "s": "#8B5A48",
+    "l": "#C79A84",
+    "p": "#F4E3D3",
+    "q": "#FAF0E4",
+    "b": "#EAD2C2",
+    "y": "#E8B84A",
+    "w": "#FFFFFF",
+    "t": "#6B4034",
+    "i": "#5A3328"
+  },
+  "tokens": {
+    "bg": "#EAD2C2",
+    "panel": "#F4E3D3",
+    "panel-2": "#FAF0E4",
+    "line": "#C79A84",
+    "accent": "#E3B9A0",
+    "accent-hi": "#F3D5C3",
+    "ink": "#5A3328",
+    "ink-soft": "#8B5A48",
+    "star": "#E8B84A",
+    "ambient-bg": "#2B1B16",
+    "titlebar-bg": "#6B4034",
+    "titlebar-ink": "#F6E7D8",
+    "titlebar-shadow": "#3E241C",
+    "titlebar-hi": "#8B5A48"
+  }
+}

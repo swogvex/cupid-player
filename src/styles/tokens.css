@@ -1,18 +1,8 @@
 :root {
-  /* Paleta (04-DISENO.md). Los temas alternativos redefinen solo estas. */
-  --bg: #f9cfd8;
-  --panel: #fbd8df;
-  --panel-2: #fde6ea;
-  --line: #e8a0b4;
-  --accent: #e8609a;
-  --accent-hi: #ff8cc0;
-  --ink: #6b1f4a;
-  --ink-soft: #b04a7c;
-  --star: #f6d365;
-  --ambient-bg: #2a2340;
-
-  /* Escala entera. scale.ts la sustituye con un estilo en línea; esto es solo el valor por defecto. */
+  /* Integer scale and logical frame size. scale.ts overrides them with inline styles. */
   --s: 2;
+  --lw: 352;
+  --lh: 208;
 
   --font-pixel: "Pixelify Sans", ui-monospace, monospace;
 }

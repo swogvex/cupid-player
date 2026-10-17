@@ -1,4 +1,5 @@
-/* All sizes are logical pixels multiplied by --s. */
+/* All sizes are logical pixels multiplied by --s.
+   Sprite images come from --spr-<name> variables (generated per theme in themes.css). */
 
 .px-sprite {
   display: inline-block;
@@ -6,21 +7,63 @@
   image-rendering: pixelated;
 }
 
+/* ---------- Frame animation: a horizontal strip + steps() ----------
+   AnimSprite sets --sheet-w (strip width in logical px), --frames and the duration. */
+.px-anim {
+  display: inline-block;
+  flex: none;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: calc(var(--s) * var(--sheet-w) * 1px) 100%;
+  image-rendering: pixelated;
+  animation-name: px-sheet;
+  animation-timing-function: steps(var(--frames));
+  animation-iteration-count: infinite;
+}
+@keyframes px-sheet {
+  from { background-position: 0 0; }
+  to { background-position: calc(var(--s) * var(--sheet-w) * -1px) 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .px-anim {
+    animation: none; /* shows the first frame */
+  }
+}
+
 /* ---------- Panel (9-slice 12x12, corner 4) ---------- */
 .px-panel {
   box-sizing: border-box;
   border: calc(var(--s) * 4px) solid transparent;
-  border-image: url("/assets/sprites/panel.png") 4 fill / calc(var(--s) * 4px) stretch;
+  border-image: var(--spr-panel) 4 fill / calc(var(--s) * 4px) stretch;
   image-rendering: pixelated;
   padding: calc(var(--s) * 2px);
   color: var(--ink);
 }
 
+/* Panel with corner ornaments (4 <i> children added by PixelPanel) */
+.px-panel--deco {
+  position: relative;
+  padding: calc(var(--s) * 3px);
+}
+.px-corner {
+  position: absolute;
+  z-index: 0;
+  width: calc(var(--s) * 7px);
+  height: calc(var(--s) * 7px);
+  background: var(--spr-corner-7) no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+.px-corner--tl { top: 0; left: 0; }
+.px-corner--tr { top: 0; right: 0; transform: scaleX(-1); }
+.px-corner--bl { bottom: 0; left: 0; transform: scaleY(-1); }
+.px-corner--br { bottom: 0; right: 0; transform: scale(-1, -1); }
+
 /* ---------- Button (9-slice 8x8, corner 3) ---------- */
 .px-btn {
   box-sizing: border-box;
   border: calc(var(--s) * 3px) solid transparent;
-  border-image: url("/assets/sprites/button-normal.png") 3 fill / calc(var(--s) * 3px) stretch;
+  border-image: var(--spr-button-normal) 3 fill / calc(var(--s) * 3px) stretch;
   image-rendering: pixelated;
   background: none;
   padding: calc(var(--s) * 1px) calc(var(--s) * 4px);
@@ -31,14 +74,14 @@
   cursor: pointer;
 }
 .px-btn:hover:not(:disabled) {
-  border-image-source: url("/assets/sprites/button-hover.png");
+  border-image-source: var(--spr-button-hover);
 }
 .px-btn:active:not(:disabled),
 .px-btn.is-active {
-  border-image-source: url("/assets/sprites/button-pressed.png");
+  border-image-source: var(--spr-button-pressed);
 }
 .px-btn:disabled {
-  border-image-source: url("/assets/sprites/button-disabled.png");
+  border-image-source: var(--spr-button-disabled);
   color: var(--ink-soft);
   cursor: not-allowed;
 }
@@ -57,11 +100,45 @@
   text-align: left;
 }
 
+/* ---------- Round buttons (9-slice 12x12, corner 5). FIXED sizes. ----------
+   ctl = player controls (20 / 24 px), mini = small round button (14 px). */
+.px-btn--ctl,
+.px-btn--mini {
+  padding: 0;
+  border-width: calc(var(--s) * 5px);
+  border-image: var(--spr-ctl-normal) 5 fill / calc(var(--s) * 5px) stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+.px-btn--ctl {
+  width: calc(var(--s) * 20px);
+  height: calc(var(--s) * 20px);
+}
+.px-btn--ctl.px-btn--lg {
+  width: calc(var(--s) * 24px);
+  height: calc(var(--s) * 24px);
+}
+.px-btn--mini {
+  width: calc(var(--s) * 14px);
+  height: calc(var(--s) * 14px);
+  flex: none;
+}
+.px-btn--ctl:hover:not(:disabled),
+.px-btn--mini:hover:not(:disabled) {
+  border-image-source: var(--spr-ctl-hover);
+}
+.px-btn--ctl:active:not(:disabled),
+.px-btn--mini:active:not(:disabled) {
+  border-image-source: var(--spr-ctl-pressed);
+}
+
 /* ---------- Input (9-slice 8x8, corner 3) ---------- */
 .px-input {
   box-sizing: border-box;
   border: calc(var(--s) * 3px) solid transparent;
-  border-image: url("/assets/sprites/input-normal.png") 3 fill / calc(var(--s) * 3px) stretch;
+  border-image: var(--spr-input-normal) 3 fill / calc(var(--s) * 3px) stretch;
   image-rendering: pixelated;
   background: none;
   padding: calc(var(--s) * 1px) calc(var(--s) * 2px);
@@ -72,16 +149,19 @@
   outline: none;
 }
 .px-input:focus {
-  border-image-source: url("/assets/sprites/input-focus.png");
+  border-image-source: var(--spr-input-focus);
 }
 .px-input::placeholder {
   color: var(--ink-soft);
 }
 
-/* ---------- Progress + draggable star ---------- */
+/* ---------- Rounded progress bar + knob ----------
+   Track and fill are 9x7 sprites: 3 px rounded cap | 3 px body | 3 px cap.
+   --p (0..1) and --pad (half the knob, logical px) are set inline by the component. */
 .px-progress {
+  --pad: 6;
   position: relative;
-  height: calc(var(--s) * 9px);
+  height: calc(var(--s) * 11px);
   cursor: pointer;
   touch-action: none;
   user-select: none;
@@ -99,21 +179,49 @@
   position: absolute;
   left: 0;
   top: calc(var(--s) * 2px);
-  height: calc(var(--s) * 6px);
-  background-repeat: repeat-x;
-  background-size: calc(var(--s) * 2px) calc(var(--s) * 6px);
+  height: calc(var(--s) * 7px);
+  border-style: solid;
+  border-color: transparent;
+  border-width: 0 calc(var(--s) * 3px);
   image-rendering: pixelated;
 }
 .px-progress__track {
   right: 0;
-  background-image: url("/assets/sprites/track.png");
+  border-image: var(--spr-bar-track) 0 3 fill / 0 calc(var(--s) * 3px) stretch;
 }
 .px-progress__fill {
-  background-image: url("/assets/sprites/fill.png");
+  min-width: calc(var(--s) * 6px); /* never narrower than the two caps */
+  width: calc(var(--s) * var(--pad) * 1px + (100% - var(--s) * var(--pad) * 2px) * var(--p, 0));
+  border-image: var(--spr-bar-fill) 0 3 fill / 0 calc(var(--s) * 3px) stretch;
 }
 .px-progress__star {
   position: absolute;
   top: 0;
-  margin-left: calc(var(--s) * -4px);
+  left: calc(var(--s) * var(--pad) * 1px + (100% - var(--s) * var(--pad) * 2px) * var(--p, 0));
+  margin-left: calc(var(--s) * -5px);
   pointer-events: none;
+}
+
+/* ---------- Window buttons (13x13 sprite + 7x7 icon) ---------- */
+.win-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--s) * 13px);
+  height: calc(var(--s) * 13px);
+  padding: 0;
+  border: 0;
+  background: var(--spr-win-btn-normal) no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+  cursor: pointer;
+}
+.win-btn:hover {
+  background-image: var(--spr-win-btn-hover);
+}
+.win-btn:active {
+  transform: translateY(calc(var(--s) * 1px));
+}
+.win-btn:focus-visible {
+  outline: calc(var(--s) * 1px) solid var(--ink);
+  outline-offset: calc(var(--s) * 1px);
 }
