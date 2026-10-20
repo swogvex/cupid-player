@@ -134,6 +134,15 @@
   border-image-source: var(--spr-ctl-pressed);
 }
 
+/* Toggled-on round buttons: same pressed look as the active nav/language buttons.
+   The :hover variant keeps it pressed while the pointer is over it. */
+.px-btn--ctl.is-active,
+.px-btn--mini.is-active,
+.px-btn--ctl.is-active:hover:not(:disabled),
+.px-btn--mini.is-active:hover:not(:disabled) {
+  border-image-source: var(--spr-ctl-pressed);
+}
+
 /* ---------- Input (9-slice 8x8, corner 3) ---------- */
 .px-input {
   box-sizing: border-box;

@@ -1,0 +1,77 @@
+/* H6: player extras + queue panel. All sizes in logical px via --s. */
+.player__extras {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: calc(var(--s) * 2px);
+}
+
+/* Sliding queue panel: between the title bar (24) and the player (60). */
+.queue {
+  position: fixed;
+  top: calc(var(--s) * 24px);
+  bottom: calc(var(--s) * 60px);
+  right: 0;
+  width: calc(var(--s) * 120px);
+  z-index: 20;
+  display: flex;
+}
+.queue__panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.queue__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: calc(var(--s) * 3px);
+}
+.queue__empty {
+  margin: 0;
+}
+.queue__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+.queue__item {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--s) * 1px);
+  padding: calc(var(--s) * 1px) 0;
+}
+.queue__item.is-current .queue__main {
+  color: var(--accent);
+}
+.queue__main {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  color: var(--ink);
+}
+.queue__main:focus-visible {
+  outline: calc(var(--s) * 1px) solid var(--accent);
+}
+
+/* Library rows: playable ones react to the pointer, the current one is highlighted. */
+.row--playable {
+  cursor: pointer;
+}
+.row--playable:focus-visible {
+  outline: calc(var(--s) * 1px) solid var(--accent);
+  outline-offset: calc(var(--s) * -1px);
+}
+.row.is-current {
+  color: var(--accent);
+}
+.row.is-current .muted {
+  color: inherit;
+}

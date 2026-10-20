@@ -41,10 +41,2544 @@ export const THEMES = [
     "name": "Classic",
     "swatches": [
       "#EAD2C2",
-      "#E3B9A0",
+      "#9A5A46",
       "#5A3328"
     ]
   }
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];
+
+/** Size of ONE cell (w x h, logical px), number of cells (f) and fps (r) of every sprite, per theme. */
+export const SPRITES: Record<string, Record<string, { w: number; h: number; f: number; r: number }>> = {
+  "pink": {
+    "bar-fill": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bar-track": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-20x7": {
+      "w": 20,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-40x16": {
+      "w": 40,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "button-disabled": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-hover": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-pressed": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "corner-7": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "cover-ph-30": {
+      "w": 30,
+      "h": 30,
+      "f": 1,
+      "r": 8
+    },
+    "cover-shine": {
+      "w": 30,
+      "h": 30,
+      "f": 12,
+      "r": 12
+    },
+    "ctl-disabled": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-hover": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-normal": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-pressed": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "dash-4x1": {
+      "w": 4,
+      "h": 1,
+      "f": 1,
+      "r": 8
+    },
+    "deco-heart": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "deco-star": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "fill": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "glint-7": {
+      "w": 7,
+      "h": 7,
+      "f": 21,
+      "r": 8
+    },
+    "heart-16": {
+      "w": 16,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "heart-8": {
+      "w": 8,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "heart-beat": {
+      "w": 16,
+      "h": 14,
+      "f": 8,
+      "r": 8
+    },
+    "heart-wings-24x7": {
+      "w": 24,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-back": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-down": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-download": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-link": {
+      "w": 7,
+      "h": 4,
+      "f": 1,
+      "r": 8
+    },
+    "icon-list": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-next": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-note": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-pause": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-play": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-prev": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-queue": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-remove": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat-one": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-shuffle": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-sliders": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-star": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-up": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-high": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-low": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-mute": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "input-focus": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "input-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-download": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music-beat": {
+      "w": 11,
+      "h": 11,
+      "f": 12,
+      "r": 12
+    },
+    "knob-music-drag": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-volume": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "lace-6x3": {
+      "w": 6,
+      "h": 3,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-back": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-body": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-ears": {
+      "w": 70,
+      "h": 28,
+      "f": 52,
+      "r": 12
+    },
+    "mascot-compact-front": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-hearts": {
+      "w": 70,
+      "h": 28,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-compact-sparks": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-tail": {
+      "w": 70,
+      "h": 28,
+      "f": 47,
+      "r": 12
+    },
+    "mascot-full-back": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-body": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-ears": {
+      "w": 70,
+      "h": 50,
+      "f": 52,
+      "r": 12
+    },
+    "mascot-full-front": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-hearts": {
+      "w": 70,
+      "h": 50,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-full-sparks": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-tail": {
+      "w": 70,
+      "h": 50,
+      "f": 47,
+      "r": 12
+    },
+    "nav-heart": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "nav-heart-on": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "panel": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "star-9": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "star-9-drag": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "title-clouds": {
+      "w": 128,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "title-heart": {
+      "w": 64,
+      "h": 22,
+      "f": 24,
+      "r": 12
+    },
+    "title-heart-s": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "track": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "twinkle-5": {
+      "w": 5,
+      "h": 5,
+      "f": 5,
+      "r": 8
+    },
+    "twinkle-7": {
+      "w": 7,
+      "h": 7,
+      "f": 8,
+      "r": 8
+    },
+    "win-btn-hover": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-btn-normal": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-close": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-max": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-min": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "wing": {
+      "w": 14,
+      "h": 14,
+      "f": 4,
+      "r": 8
+    }
+  },
+  "midnight": {
+    "bar-fill": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bar-track": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-20x7": {
+      "w": 20,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-40x16": {
+      "w": 40,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "button-disabled": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-hover": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-pressed": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "corner-7": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "cover-ph-30": {
+      "w": 30,
+      "h": 30,
+      "f": 1,
+      "r": 8
+    },
+    "cover-shine": {
+      "w": 30,
+      "h": 30,
+      "f": 12,
+      "r": 12
+    },
+    "ctl-disabled": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-hover": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-normal": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-pressed": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "dash-4x1": {
+      "w": 4,
+      "h": 1,
+      "f": 1,
+      "r": 8
+    },
+    "deco-heart": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "deco-star": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "fill": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "glint-7": {
+      "w": 7,
+      "h": 7,
+      "f": 21,
+      "r": 8
+    },
+    "heart-16": {
+      "w": 16,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "heart-8": {
+      "w": 8,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "heart-beat": {
+      "w": 16,
+      "h": 14,
+      "f": 8,
+      "r": 8
+    },
+    "heart-wings-24x7": {
+      "w": 24,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-back": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-down": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-download": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-link": {
+      "w": 7,
+      "h": 4,
+      "f": 1,
+      "r": 8
+    },
+    "icon-list": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-next": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-note": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-pause": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-play": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-prev": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-queue": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-remove": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat-one": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-shuffle": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-sliders": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-star": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-up": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-high": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-low": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-mute": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "input-focus": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "input-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-download": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music-beat": {
+      "w": 11,
+      "h": 11,
+      "f": 12,
+      "r": 12
+    },
+    "knob-music-drag": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-volume": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "lace-6x3": {
+      "w": 6,
+      "h": 3,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-back": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-body": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-ears": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-compact-front": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-hearts": {
+      "w": 70,
+      "h": 28,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-compact-sparks": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-tail": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-back": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-body": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-ears": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-front": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-hearts": {
+      "w": 70,
+      "h": 50,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-full-sparks": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-tail": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "nav-heart": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "nav-heart-on": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "panel": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "star-9": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "star-9-drag": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "title-clouds": {
+      "w": 128,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "title-heart": {
+      "w": 64,
+      "h": 22,
+      "f": 48,
+      "r": 12
+    },
+    "title-heart-s": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "track": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "twinkle-5": {
+      "w": 5,
+      "h": 5,
+      "f": 5,
+      "r": 8
+    },
+    "twinkle-7": {
+      "w": 7,
+      "h": 7,
+      "f": 8,
+      "r": 8
+    },
+    "win-btn-hover": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-btn-normal": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-close": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-max": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-min": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "wing": {
+      "w": 14,
+      "h": 14,
+      "f": 4,
+      "r": 8
+    }
+  },
+  "lavender": {
+    "bar-fill": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bar-track": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-20x7": {
+      "w": 20,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-40x16": {
+      "w": 40,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "button-disabled": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-hover": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-pressed": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "corner-7": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "cover-ph-30": {
+      "w": 30,
+      "h": 30,
+      "f": 1,
+      "r": 8
+    },
+    "cover-shine": {
+      "w": 30,
+      "h": 30,
+      "f": 48,
+      "r": 12
+    },
+    "ctl-disabled": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-hover": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-normal": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-pressed": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "dash-4x1": {
+      "w": 4,
+      "h": 1,
+      "f": 1,
+      "r": 8
+    },
+    "deco-heart": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "deco-star": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "fill": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "glint-7": {
+      "w": 7,
+      "h": 7,
+      "f": 21,
+      "r": 8
+    },
+    "heart-16": {
+      "w": 16,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "heart-8": {
+      "w": 8,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "heart-beat": {
+      "w": 16,
+      "h": 14,
+      "f": 8,
+      "r": 8
+    },
+    "heart-wings-24x7": {
+      "w": 24,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-back": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-down": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-download": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-link": {
+      "w": 7,
+      "h": 4,
+      "f": 1,
+      "r": 8
+    },
+    "icon-list": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-next": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-note": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-pause": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-play": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-prev": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-queue": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-remove": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat-one": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-shuffle": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-sliders": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-star": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-up": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-high": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-low": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-mute": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "input-focus": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "input-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-download": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music-beat": {
+      "w": 11,
+      "h": 11,
+      "f": 12,
+      "r": 12
+    },
+    "knob-music-drag": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-volume": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "lace-6x3": {
+      "w": 6,
+      "h": 3,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-back": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-body": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-ears": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-compact-front": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-hearts": {
+      "w": 70,
+      "h": 28,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-compact-sparks": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-tail": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-back": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-body": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-ears": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-front": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-hearts": {
+      "w": 70,
+      "h": 50,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-full-sparks": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-tail": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "nav-heart": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "nav-heart-on": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "panel": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "star-9": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "star-9-drag": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "title-clouds": {
+      "w": 128,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "title-heart": {
+      "w": 96,
+      "h": 22,
+      "f": 48,
+      "r": 12
+    },
+    "title-heart-s": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "track": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "twinkle-5": {
+      "w": 5,
+      "h": 5,
+      "f": 5,
+      "r": 8
+    },
+    "twinkle-7": {
+      "w": 7,
+      "h": 7,
+      "f": 8,
+      "r": 8
+    },
+    "win-btn-hover": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-btn-normal": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-close": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-max": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-min": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "wing": {
+      "w": 14,
+      "h": 14,
+      "f": 4,
+      "r": 8
+    }
+  },
+  "mint": {
+    "bar-fill": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bar-track": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-20x7": {
+      "w": 20,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-40x16": {
+      "w": 40,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "button-disabled": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-hover": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-pressed": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "corner-7": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "cover-ph-30": {
+      "w": 30,
+      "h": 30,
+      "f": 1,
+      "r": 8
+    },
+    "cover-shine": {
+      "w": 30,
+      "h": 30,
+      "f": 48,
+      "r": 12
+    },
+    "ctl-disabled": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-hover": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-normal": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-pressed": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "dash-4x1": {
+      "w": 4,
+      "h": 1,
+      "f": 1,
+      "r": 8
+    },
+    "deco-heart": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "deco-star": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "fill": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "glint-7": {
+      "w": 7,
+      "h": 7,
+      "f": 21,
+      "r": 8
+    },
+    "heart-16": {
+      "w": 16,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "heart-8": {
+      "w": 8,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "heart-beat": {
+      "w": 16,
+      "h": 14,
+      "f": 8,
+      "r": 8
+    },
+    "heart-wings-24x7": {
+      "w": 24,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-back": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-down": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-download": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-link": {
+      "w": 7,
+      "h": 4,
+      "f": 1,
+      "r": 8
+    },
+    "icon-list": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-next": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-note": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-pause": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-play": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-prev": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-queue": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-remove": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat-one": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-shuffle": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-sliders": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-star": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-up": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-high": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-low": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-mute": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "input-focus": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "input-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-download": {
+      "w": 9,
+      "h": 8,
+      "f": 29,
+      "r": 12
+    },
+    "knob-music": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music-beat": {
+      "w": 11,
+      "h": 11,
+      "f": 12,
+      "r": 12
+    },
+    "knob-music-drag": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-volume": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "lace-6x3": {
+      "w": 6,
+      "h": 3,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-back": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-body": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-ears": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-compact-front": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-hearts": {
+      "w": 70,
+      "h": 28,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-compact-sparks": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-tail": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-back": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-body": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-ears": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-front": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-hearts": {
+      "w": 70,
+      "h": 50,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-full-sparks": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-tail": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "nav-heart": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "nav-heart-on": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "panel": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "star-9": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "star-9-drag": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "title-clouds": {
+      "w": 128,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "title-heart": {
+      "w": 96,
+      "h": 22,
+      "f": 48,
+      "r": 12
+    },
+    "title-heart-s": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "track": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "twinkle-5": {
+      "w": 5,
+      "h": 5,
+      "f": 5,
+      "r": 8
+    },
+    "twinkle-7": {
+      "w": 7,
+      "h": 7,
+      "f": 8,
+      "r": 8
+    },
+    "win-btn-hover": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-btn-normal": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-close": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-max": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-min": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "wing": {
+      "w": 14,
+      "h": 14,
+      "f": 4,
+      "r": 8
+    }
+  },
+  "classic": {
+    "bar-fill": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bar-track": {
+      "w": 9,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-20x7": {
+      "w": 20,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "bow-40x16": {
+      "w": 40,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "button-disabled": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-hover": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "button-pressed": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "corner-7": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "cover-ph-30": {
+      "w": 30,
+      "h": 30,
+      "f": 1,
+      "r": 8
+    },
+    "cover-shine": {
+      "w": 30,
+      "h": 30,
+      "f": 48,
+      "r": 12
+    },
+    "ctl-disabled": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-hover": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-normal": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "ctl-pressed": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "dash-4x1": {
+      "w": 4,
+      "h": 1,
+      "f": 1,
+      "r": 8
+    },
+    "deco-heart": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "deco-star": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "fill": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "glint-7": {
+      "w": 7,
+      "h": 7,
+      "f": 21,
+      "r": 8
+    },
+    "heart-16": {
+      "w": 16,
+      "h": 16,
+      "f": 1,
+      "r": 8
+    },
+    "heart-8": {
+      "w": 8,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "heart-beat": {
+      "w": 16,
+      "h": 14,
+      "f": 8,
+      "r": 8
+    },
+    "heart-wings-24x7": {
+      "w": 24,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-back": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-down": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-download": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-link": {
+      "w": 7,
+      "h": 4,
+      "f": 1,
+      "r": 8
+    },
+    "icon-list": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-next": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-note": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-pause": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-play": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-prev": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-queue": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-remove": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-repeat-one": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-shuffle": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-sliders": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-star": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-up": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-high": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-low": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-vol-mute": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "input-focus": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "input-normal": {
+      "w": 8,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "knob-download": {
+      "w": 9,
+      "h": 8,
+      "f": 26,
+      "r": 12
+    },
+    "knob-music": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-music-beat": {
+      "w": 11,
+      "h": 11,
+      "f": 12,
+      "r": 12
+    },
+    "knob-music-drag": {
+      "w": 11,
+      "h": 11,
+      "f": 1,
+      "r": 8
+    },
+    "knob-volume": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "lace-6x3": {
+      "w": 6,
+      "h": 3,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-back": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-body": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-ears": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-compact-front": {
+      "w": 70,
+      "h": 28,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-compact-hearts": {
+      "w": 70,
+      "h": 28,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-compact-sparks": {
+      "w": 70,
+      "h": 28,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-compact-tail": {
+      "w": 70,
+      "h": 28,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-back": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-body": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-ears": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "mascot-full-front": {
+      "w": 70,
+      "h": 50,
+      "f": 1,
+      "r": 8
+    },
+    "mascot-full-hearts": {
+      "w": 70,
+      "h": 50,
+      "f": 36,
+      "r": 12
+    },
+    "mascot-full-sparks": {
+      "w": 70,
+      "h": 50,
+      "f": 24,
+      "r": 12
+    },
+    "mascot-full-tail": {
+      "w": 70,
+      "h": 50,
+      "f": 48,
+      "r": 12
+    },
+    "nav-heart": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "nav-heart-on": {
+      "w": 5,
+      "h": 5,
+      "f": 1,
+      "r": 8
+    },
+    "panel": {
+      "w": 12,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "star-9": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "star-9-drag": {
+      "w": 9,
+      "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "title-clouds": {
+      "w": 128,
+      "h": 12,
+      "f": 1,
+      "r": 8
+    },
+    "title-heart": {
+      "w": 96,
+      "h": 22,
+      "f": 48,
+      "r": 12
+    },
+    "title-heart-s": {
+      "w": 9,
+      "h": 8,
+      "f": 1,
+      "r": 8
+    },
+    "track": {
+      "w": 2,
+      "h": 6,
+      "f": 1,
+      "r": 8
+    },
+    "twinkle-5": {
+      "w": 5,
+      "h": 5,
+      "f": 5,
+      "r": 8
+    },
+    "twinkle-7": {
+      "w": 7,
+      "h": 7,
+      "f": 8,
+      "r": 8
+    },
+    "win-btn-hover": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-btn-normal": {
+      "w": 13,
+      "h": 13,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-close": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-max": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-min": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "wing": {
+      "w": 14,
+      "h": 14,
+      "f": 4,
+      "r": 8
+    }
+  }
+};

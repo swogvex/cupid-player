@@ -1,0 +1,28 @@
+# fps: 12
+# order: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 2 1 0 0 0
+sssssssss
+sRwwwwwRs
+swQwEwQws
+swwegewws
+sRRRERRRs
+sQQQQQQQs
+sssssssss
+.........
+---
+sssssssss
+sRwwwwwRs
+swQwEwQws
+swwewewws
+sRRRERRRs
+sQQQQQQQs
+sssssssss
+.........
+---
+sssssssss
+sRwwwwwRs
+swQwwwQws
+swwewewws
+sRRRwRRRs
+sQQQQQQQs
+sssssssss
+.........

@@ -25,7 +25,22 @@
     "volume": "Volumen",
     "mute": "Silenciar",
     "unmute": "Activar sonido",
-    "nothing": "Nada en reproducción"
+    "nothing": "Nada en reproducción",
+    "shuffle": "Aleatorio",
+    "repeat": "Repetir: desactivado",
+    "repeatAll": "Repetir: todas",
+    "repeatOne": "Repetir: una",
+    "queue": "Cola de reproducción",
+    "nothingPlaying": "Nada sonando",
+    "cantPlay": "No se puede reproducir"
+  },
+  "queue": {
+    "title": "Cola",
+    "empty": "La cola está vacía",
+    "clear": "Vaciar cola",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "remove": "Quitar de la cola"
   },
   "library": {
     "title": "Biblioteca",
@@ -58,9 +73,13 @@
     "alwaysOnTop": "Siempre encima"
   },
   "status": {
-    "done": "ok",
-    "queued": "pendiente",
-    "needs_review": "necesita revisión"
+    "done": "Listo",
+    "queued": "En cola",
+    "searching": "Buscando",
+    "downloading": "Descargando",
+    "tagging": "Etiquetando",
+    "needs_review": "Necesita revisión",
+    "failed": "Falló"
   },
   "ambient": { "toggle": "Vista corazón" },
   "window": {

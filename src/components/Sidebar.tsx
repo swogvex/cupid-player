@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import { useNavStore, type View } from "../state/navStore";
 import { AnimSprite } from "./AnimSprite";
 import { ImportBox } from "./ImportBox";
+import { Mascot } from "./Mascot";
 import { PixelButton } from "./PixelButton";
 import { PixelPanel } from "./PixelPanel";
 import { Sprite } from "./Sprite";
-import { WingedHeart } from "./WingedHeart";
 
 const ITEMS: ReadonlyArray<readonly [View, string]> = [
   ["library", "icon-note"],
@@ -47,7 +47,7 @@ export function Sidebar() {
       <ImportBox />
 
       <div className="sidebar__wings">
-        <WingedHeart />
+        <Mascot />
       </div>
     </PixelPanel>
   );

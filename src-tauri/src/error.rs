@@ -1,32 +1,27 @@
 use serde::{Serialize, Serializer};
-use std::fmt;
 
-#[derive(Debug)]
+/// Single error type for the whole backend.
+#[derive(Debug, thiserror::Error)]
 pub enum AppError {
+    #[error("invalid window scale: {0}")]
     InvalidScale(u32),
-    Window(tauri::Error),
+    #[error("io error: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("database error: {0}")]
+    Db(#[from] rusqlite::Error),
+    #[error("tauri error: {0}")]
+    Tauri(#[from] tauri::Error),
+    #[error("json error: {0}")]
+    Json(#[from] serde_json::Error),
+    #[error("{0}")]
+    Msg(String),
 }
 
-impl fmt::Display for AppError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            AppError::InvalidScale(n) => write!(f, "invalid window scale: {n}"),
-            AppError::Window(e) => write!(f, "window error: {e}"),
-        }
-    }
-}
+pub type AppResult<T> = Result<T, AppError>;
 
-impl std::error::Error for AppError {}
-
-impl From<tauri::Error> for AppError {
-    fn from(e: tauri::Error) -> Self {
-        AppError::Window(e)
-    }
-}
-
-// Tauri commands need a serializable error; the frontend receives a plain string.
+// Commands must return a serializable error; the frontend receives a plain string.
 impl Serialize for AppError {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.to_string())
+    fn serialize<S: Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(&self.to_string())
     }
 }

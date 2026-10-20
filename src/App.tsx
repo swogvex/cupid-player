@@ -5,13 +5,18 @@ import { PlayerBar } from "./components/PlayerBar";
 import { Sidebar } from "./components/Sidebar";
 import { Sprite } from "./components/Sprite";
 import { TitleBar } from "./components/TitleBar";
+import { initAudio } from "./audio/init";
 import { startScaleTracking } from "./lib/scale";
+import { startVisibilityTracking } from "./lib/visibility";
+import { useLibraryStore } from "./state/libraryStore";
 import { useNavStore, type View } from "./state/navStore";
 import { useSettingsStore } from "./state/settingsStore";
 import { LibraryView } from "./views/LibraryView";
 import { PlaylistsView } from "./views/PlaylistsView";
+import { QueueView } from "./views/QueueView";
 import { SettingsView } from "./views/SettingsView";
 import { StatsView } from "./views/StatsView";
+import "./styles/themeart.css";
 
 const VIEWS: Record<View, ComponentType> = {
   library: LibraryView,
@@ -27,10 +32,21 @@ export default function App() {
   const view = useNavStore((s) => s.view);
   const ActiveView = VIEWS[view];
 
+  useEffect(() => initAudio(), []);
+
   useEffect(() => {
     void init();
-    return startScaleTracking();
+    const stopScale = startScaleTracking();
+    const stopVisibility = startVisibilityTracking();
+    return () => {
+      stopScale();
+      stopVisibility();
+    };
   }, [init]);
+
+  useEffect(() => {
+    void useLibraryStore.getState().load();
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -43,9 +59,13 @@ export default function App() {
         <div className="shell">
           <Sidebar />
           <div className="main-col">
-            <PixelPanel className="content-panel" deco>
+            <PixelPanel className="content-panel" deco data-view={view}>
               {/* No action yet: the ambient view arrives in H10. */}
-              <button type="button" className="heart-toggle" aria-label={t("ambient.toggle")}>
+              <button
+                type="button"
+                className="heart-toggle"
+                aria-label={t("ambient.toggle")}
+              >
                 <Sprite name="deco-heart" w={9} h={8} />
               </button>
               <ActiveView />
@@ -54,6 +74,7 @@ export default function App() {
           </div>
         </div>
       </div>
+      <QueueView />
     </div>
   );
 }

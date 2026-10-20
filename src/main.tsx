@@ -8,6 +8,7 @@ import "./styles/themes.css";
 import "./styles/base.css";
 import "./styles/pixel.css";
 import "./styles/layout.css";
+import "./styles/player.css";
 
 // Apply the last theme before the first paint so there is no flash of the default one.
 applyTheme(initialTheme());

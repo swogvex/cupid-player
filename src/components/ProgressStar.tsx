@@ -1,9 +1,18 @@
 import { useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
+import { hasSprite, spriteInfo } from "../lib/sprites";
+import { useSettingsStore } from "../state/settingsStore";
 import { Sprite } from "./Sprite";
 
-export type Knob = { name: string; dragName?: string; w: number; h: number };
+/** w and h are only a fallback: the real size is read from the theme's PNG. */
+export type Knob = { name: string; dragName?: string; beatName?: string; w: number; h: number };
 
-export const KNOB_MUSIC: Knob = { name: "knob-music", dragName: "knob-music-drag", w: 11, h: 11 };
+export const KNOB_MUSIC: Knob = {
+  name: "knob-music",
+  dragName: "knob-music-drag",
+  beatName: "knob-music-beat",
+  w: 11,
+  h: 11,
+};
 export const KNOB_VOLUME: Knob = { name: "knob-volume", w: 9, h: 8 };
 
 type ProgressStarProps = {
@@ -16,6 +25,8 @@ type ProgressStarProps = {
   label: string;
   disabled?: boolean;
   knob?: Knob;
+  /** The knob plays its beat animation (if the theme has one) while true. */
+  beating?: boolean;
 };
 
 /** Height of the bar container in logical px (see .px-progress). */
@@ -31,15 +42,28 @@ export function ProgressStar({
   label,
   disabled = false,
   knob = KNOB_MUSIC,
+  beating = false,
 }: ProgressStarProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
+  const theme = useSettingsStore((s) => s.theme);
   const p = clamp(value);
 
+  const info = spriteInfo(theme, knob.name);
+  const knobW = info?.w ?? knob.w;
+  const knobH = info?.h ?? knob.h;
+
   // Free space at each end = half the knob, so the knob stops before the edge.
-  const pad = Math.ceil(knob.w / 2);
-  const knobTop = Math.floor((BAR_H - knob.h) / 2);
-  const knobHalf = Math.floor(knob.w / 2);
+  const pad = Math.ceil(knobW / 2);
+  const knobTop = Math.floor((BAR_H - knobH) / 2);
+  const knobHalf = Math.floor(knobW / 2);
+
+  const shown =
+    dragging && knob.dragName
+      ? knob.dragName
+      : beating && knob.beatName && hasSprite(theme, knob.beatName)
+        ? knob.beatName
+        : knob.name;
 
   const ratioFrom = (e: PointerEvent<HTMLDivElement>) => {
     const el = ref.current;
@@ -92,7 +116,11 @@ export function ProgressStar({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
-      onPointerCancel={() => setDragging(false)}
+      onPointerCancel={() => {
+        if (!dragging) return;
+        setDragging(false);
+        onCommit?.(value);
+      }}
       onKeyDown={onKeyDown}
     >
       <div className="px-progress__track" />
@@ -101,7 +129,7 @@ export function ProgressStar({
         className="px-progress__star"
         style={{ top: `calc(var(--s) * ${knobTop}px)`, marginLeft: `calc(var(--s) * ${-knobHalf}px)` }}
       >
-        <Sprite name={dragging && knob.dragName ? knob.dragName : knob.name} w={knob.w} h={knob.h} />
+        <Sprite name={shown} w={knobW} h={knobH} />
       </div>
     </div>
   );

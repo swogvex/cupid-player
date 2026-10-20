@@ -41,16 +41,20 @@ export function ImportBox() {
 
   return (
     <div className="import">
-      <PixelInput
-        placeholder={t("import.placeholder")}
-        aria-label={t("import.placeholder")}
-        value={link}
-        onChange={(e) => setLink(e.target.value)}
-        autoComplete="off"
-        spellCheck={false}
-      />
-      <PixelButton onClick={start} disabled={phase === "running" || link.trim() === ""}>
-        {t("import.button")}
+      <div className="import__field">
+        <Sprite name="icon-link" className="import__field-icon" />
+        <PixelInput
+          placeholder={t("import.placeholder")}
+          aria-label={t("import.placeholder")}
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+        />
+      </div>
+      <PixelButton className="import__btn" onClick={start} disabled={phase === "running" || link.trim() === ""}>
+        <Sprite name="icon-download" />
+        <span>{t("import.button")}</span>
       </PixelButton>
       <div
         className="px-progress import__bar"
@@ -65,7 +69,7 @@ export function ImportBox() {
         {done > 0 && <div className="px-progress__fill" />}
         {phase !== "idle" && (
           <div className="px-progress__star">
-            <Sprite name="knob-download" w={9} h={8} />
+            <Sprite name="knob-download" />
           </div>
         )}
       </div>

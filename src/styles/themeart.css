@@ -1,0 +1,229 @@
+/* Theme art support (H4b). Logical px multiplied by --s.
+   Generic rules first; each theme adds its own section at the bottom. */
+
+.px-flip {
+  transform: scaleX(-1);
+}
+
+/* Animations stop while the window is hidden or minimised (see lib/visibility.ts). */
+:root[data-paused="true"] .px-anim {
+  animation-play-state: paused;
+}
+
+/* ---------- Icon before each view title (set through data-view on the content panel) ---------- */
+.content-panel[data-view] .view__title::before {
+  content: "";
+  display: inline-block;
+  width: calc(var(--s) * 9px);
+  height: calc(var(--s) * 9px);
+  margin-right: calc(var(--s) * 3px);
+  vertical-align: calc(var(--s) * -1px);
+  background: no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+}
+
+.content-panel[data-view="library"] .view__title::before {
+  background-image: var(--spr-icon-note);
+}
+
+.content-panel[data-view="playlists"] .view__title::before {
+  background-image: var(--spr-icon-star);
+}
+
+.content-panel[data-view="stats"] .view__title::before {
+  background-image: var(--spr-icon-list);
+}
+
+.content-panel[data-view="settings"] .view__title::before {
+  background-image: var(--spr-icon-sliders);
+}
+
+/* ---------- Import box: link icon inside the field, download icon in the button ---------- */
+.import__field {
+  position: relative;
+  display: block;
+}
+
+.import__field .px-input {
+  width: 100%;
+  padding-left: calc(var(--s) * 11px);
+}
+
+.import__field-icon {
+  position: absolute;
+  left: calc(var(--s) * 4px);
+  top: calc(var(--s) * 6px);
+  /* input is 16 px tall, icon 4 px */
+  pointer-events: none;
+}
+
+.import .px-btn.import__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--s) * 3px);
+}
+
+.import .px-btn.import__btn:disabled .px-sprite {
+  opacity: 0.5;
+}
+
+/* ---------- Sidebar mascot: layers stacked on one canvas ---------- */
+.mascot-host {
+  align-self: stretch;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascot {
+  position: relative;
+  flex: none;
+  line-height: 0;
+}
+
+.mascot__layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: 0;
+  pointer-events: none;
+}
+
+/* ---------- Empty cover: the glint turns over the vinyl ---------- */
+.cover-art {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.cover-art__fx {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* ================= Cupid Pink ================= */
+/* Faint clouds along the whole title bar, behind its content. */
+.titlebar--art {
+  position: relative;
+  isolation: isolate;
+}
+
+.titlebar__clouds {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--s) * 3px);
+  /* above the scalloped edge: adjust if it overlaps */
+  height: calc(var(--s) * 12px);
+  z-index: -1;
+  pointer-events: none;
+  background: var(--spr-title-clouds) repeat-x left bottom / calc(var(--s) * 128px) calc(var(--s) * 12px);
+  image-rendering: pixelated;
+}
+
+/* Little heart at the right of each navigation button; white when the button is active. */
+:root[data-theme="pink"] .nav-item::after {
+  content: "";
+  flex: none;
+  margin-left: auto;
+  width: calc(var(--s) * 5px);
+  height: calc(var(--s) * 5px);
+  background: var(--spr-nav-heart) no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+}
+
+:root[data-theme="pink"] .nav-item.is-active::after {
+  background-image: var(--spr-nav-heart-on);
+}
+
+/* Pressed and active buttons are strong pink: white text. */
+:root[data-theme="pink"] .px-btn.is-active,
+:root[data-theme="pink"] .px-btn:active:not(:disabled) {
+  color: #fff;
+}
+
+/* ================= Lavender ================= */
+/* Lavender sprigs along the whole title bar, behind its content (same strip mechanism as Cupid Pink). */
+:root[data-theme="lavender"] .titlebar--art .titlebar__clouds {
+  background-image: var(--spr-title-clouds);
+}
+
+/* Little flower at the right of each navigation button; white when the button is active. */
+:root[data-theme="lavender"] .nav-item::after {
+  content: "";
+  flex: none;
+  margin-left: auto;
+  width: calc(var(--s) * 5px);
+  height: calc(var(--s) * 5px);
+  background: var(--spr-nav-heart) no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+}
+
+:root[data-theme="lavender"] .nav-item.is-active::after {
+  background-image: var(--spr-nav-heart-on);
+}
+
+/* Pressed and active buttons are strong violet: white text. */
+:root[data-theme="lavender"] .px-btn.is-active,
+:root[data-theme="lavender"] .px-btn:active:not(:disabled) {
+  color: #fff;
+}
+
+/* ================= Mint ================= */
+/* Faint sprouts and glints along the whole title bar, behind its content (same strip mechanism as the other themes). */
+:root[data-theme="mint"] .titlebar--art .titlebar__clouds {
+  background-image: var(--spr-title-clouds);
+}
+
+/* Little four-leaf clover at the right of each navigation button; white when the button is active. */
+:root[data-theme="mint"] .nav-item::after {
+  content: "";
+  flex: none;
+  margin-left: auto;
+  width: calc(var(--s) * 5px);
+  height: calc(var(--s) * 5px);
+  background: var(--spr-nav-heart) no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+}
+
+:root[data-theme="mint"] .nav-item.is-active::after {
+  background-image: var(--spr-nav-heart-on);
+}
+
+/* Pressed and active buttons are strong green: white text. */
+:root[data-theme="mint"] .px-btn.is-active,
+:root[data-theme="mint"] .px-btn:active:not(:disabled) {
+  color: #fff;
+}
+
+/* ================= Classic ================= */
+/* Faint rosebuds, leaves and gold glints along the whole title bar, behind its content (same strip mechanism as the other themes). */
+:root[data-theme="classic"] .titlebar--art .titlebar__clouds {
+  background-image: var(--spr-title-clouds);
+}
+
+/* Little rose at the right of each navigation button; white when the button is active. */
+:root[data-theme="classic"] .nav-item::after {
+  content: "";
+  flex: none;
+  margin-left: auto;
+  width: calc(var(--s) * 5px);
+  height: calc(var(--s) * 5px);
+  background: var(--spr-nav-heart) no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+}
+
+:root[data-theme="classic"] .nav-item.is-active::after {
+  background-image: var(--spr-nav-heart-on);
+}
+
+/* Pressed and active buttons are strong rose-brown: white text. */
+:root[data-theme="classic"] .px-btn.is-active,
+:root[data-theme="classic"] .px-btn:active:not(:disabled) {
+  color: #fff;
+}

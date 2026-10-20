@@ -7,11 +7,14 @@
 // Output:
 //   public/assets/sprites/<id>/<name>.png   one PNG per sprite and theme
 //   src/styles/themes.css                   colour tokens + --spr-<name> url() variables per theme
-//   src/lib/themes.generated.ts             theme list for the picker
+//   src/lib/themes.generated.ts             theme list for the picker + SPRITES (size of every sprite)
 //
 // Sprite format: one char = one palette letter, "." = transparent.
+// The 12 base letters are required in every theme.json. A theme may add EXTRA letters
+// (any other single letter or digit) for its own sprites: they only exist in that theme.
 // Animated sprites: several frames in ONE file separated by a line with ---, plus an
-// optional "# order: 0 1 2 1" line (playback order, frames may repeat). The PNG is a
+// optional "# order: 0 1 2 1" line (playback order, frames may repeat) and an optional
+// "# fps: 12" line (default 8). The PNG is a
 // horizontal strip with one cell per entry of the order.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
@@ -25,7 +28,7 @@ const themesDir = join(root, "art", "themes");
 const outRoot = join(root, "public", "assets", "sprites");
 
 const DEFAULT_THEME = "pink";
-const LETTERS = ["a", "h", "d", "s", "l", "p", "q", "b", "y", "w", "t", "i"];
+const REQUIRED_LETTERS = ["a", "h", "d", "s", "l", "p", "q", "b", "y", "w", "t", "i"];
 
 // Strip BOM (Windows PowerShell 5.1 adds one with -Encoding utf8)
 const readText = (p) => readFileSync(p, "utf8").replace(/^\uFEFF/, "");
@@ -53,9 +56,12 @@ function loadThemes() {
     const cfg = JSON.parse(readText(file));
     const where = `art/themes/${entry.name}/theme.json`;
     const palette = {};
-    for (const letter of LETTERS) {
-      if (!(letter in (cfg.sprites ?? {}))) errors.push(`${where}: sprites."${letter}" is missing`);
-      else palette[letter] = parseHex(where, letter, cfg.sprites[letter]);
+    for (const [letter, hex] of Object.entries(cfg.sprites ?? {})) {
+      if (!/^[A-Za-z0-9]$/.test(letter)) errors.push(`${where}: sprites."${letter}" must be a single letter or digit`);
+      else palette[letter] = parseHex(where, letter, hex);
+    }
+    for (const letter of REQUIRED_LETTERS) {
+      if (!(letter in palette)) errors.push(`${where}: sprites."${letter}" is missing`);
     }
     list.push({
       id: entry.name,
@@ -68,12 +74,18 @@ function loadThemes() {
   return list.sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 }
 
-/** Splits a sprite file into frames and an optional playback order. */
+/** Splits a sprite file into frames, an optional playback order and an optional fps. */
 function parseSprite(text) {
   const frames = [[]];
   let order = null;
+  let fps = null;
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.trimEnd();
+    const mf = /^#\s*fps:\s*(\d+)$/i.exec(line);
+    if (mf) {
+      fps = Number(mf[1]);
+      continue;
+    }
     const m = /^#\s*order:\s*([\d\s]+)$/i.exec(line);
     if (m) {
       order = m[1].trim().split(/\s+/).map(Number);
@@ -86,7 +98,7 @@ function parseSprite(text) {
     if (line === "" || line.startsWith("#")) continue;
     frames[frames.length - 1].push(line);
   }
-  return { frames, order };
+  return { frames, order, fps };
 }
 
 /** name -> file path. Shared sprites first, then the theme's own (they win). */
@@ -101,14 +113,15 @@ function spriteFiles(themeId) {
   return map;
 }
 
+/** Writes the PNG and returns { w, h, f, r }: size of ONE cell, number of cells, fps. null on error. */
 function renderSprite(theme, name, path) {
   const where = path.replace(root, "").replace(/^[\\/]/, "");
-  const { frames, order: rawOrder } = parseSprite(readText(path));
+  const { frames, order: rawOrder, fps } = parseSprite(readText(path));
   const before = errors.length;
 
   if (frames.some((f) => f.length === 0)) {
     errors.push(`${where}: empty sprite or empty frame`);
-    return;
+    return null;
   }
   const width = frames[0][0].length;
   const height = frames[0].length;
@@ -134,7 +147,7 @@ function renderSprite(theme, name, path) {
   if (order.some((i) => !Number.isInteger(i) || i < 0 || i >= frames.length)) {
     errors.push(`${where}: "# order:" refers to a frame that does not exist`);
   }
-  if (errors.length > before) return;
+  if (errors.length > before) return null;
 
   const png = new PNG({ width: width * order.length, height });
   order.forEach((frameIndex, k) => {
@@ -150,16 +163,21 @@ function renderSprite(theme, name, path) {
     });
   });
   writeFileSync(join(outRoot, theme.id, `${name}.png`), PNG.sync.write(png));
+  return { w: width, h: height, f: order.length, r: fps ?? 8 };
 }
 
 const themes = loadThemes();
-const generated = []; // { theme, names }
+const generated = []; // { theme, names, sizes }
 
 for (const theme of themes) {
   mkdirSync(join(outRoot, theme.id), { recursive: true });
   const files = spriteFiles(theme.id);
-  for (const [name, path] of [...files].sort(([a], [b]) => a.localeCompare(b))) renderSprite(theme, name, path);
-  generated.push({ theme, names: [...files.keys()].sort() });
+  const sizes = {};
+  for (const [name, path] of [...files].sort(([a], [b]) => a.localeCompare(b))) {
+    const info = renderSprite(theme, name, path);
+    if (info) sizes[name] = info;
+  }
+  generated.push({ theme, names: [...files.keys()].sort(), sizes });
   console.log(`ok  ${theme.id}  ${files.size} sprites`);
 }
 
@@ -183,10 +201,14 @@ if (errors.length > 0) {
     name: t.name,
     swatches: [t.tokens.bg, t.tokens.accent, t.tokens.ink],
   }));
+  const spriteSizes = Object.fromEntries(generated.map((g) => [g.theme.id, g.sizes]));
   const ts =
     "// GENERATED by art/build-assets.mjs - do not edit.\n" +
     `export const THEMES = ${JSON.stringify(list, null, 2)} as const;\n\n` +
-    'export type ThemeId = (typeof THEMES)[number]["id"];\n';
+    'export type ThemeId = (typeof THEMES)[number]["id"];\n\n' +
+    "/** Size of ONE cell (w x h, logical px), number of cells (f) and fps (r) of every sprite, per theme. */\n" +
+    "export const SPRITES: Record<string, Record<string, { w: number; h: number; f: number; r: number }>> = " +
+    `${JSON.stringify(spriteSizes, null, 2)};\n`;
   mkdirSync(join(root, "src", "lib"), { recursive: true });
   writeFileSync(join(root, "src", "lib", "themes.generated.ts"), ts);
 }

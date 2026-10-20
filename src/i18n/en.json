@@ -25,7 +25,22 @@
     "volume": "Volume",
     "mute": "Mute",
     "unmute": "Unmute",
-    "nothing": "Nothing playing"
+    "nothing": "Nothing playing",
+    "shuffle": "Shuffle",
+    "repeat": "Repeat: off",
+    "repeatAll": "Repeat: all",
+    "repeatOne": "Repeat: one",
+    "queue": "Play queue",
+    "nothingPlaying": "Nothing playing",
+    "cantPlay": "Can't play this file"
+  },
+  "queue": {
+    "title": "Queue",
+    "empty": "The queue is empty",
+    "clear": "Clear queue",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "remove": "Remove from queue"
   },
   "library": {
     "title": "Library",
@@ -58,9 +73,13 @@
     "alwaysOnTop": "Always on top"
   },
   "status": {
-    "done": "ok",
-    "queued": "queued",
-    "needs_review": "needs review"
+    "done": "Done",
+    "queued": "Queued",
+    "searching": "Searching",
+    "downloading": "Downloading",
+    "tagging": "Tagging",
+    "needs_review": "Needs review",
+    "failed": "Failed"
   },
   "ambient": { "toggle": "Heart view" },
   "window": { "minimize": "Minimize", "maximize": "Maximize", "close": "Close" }

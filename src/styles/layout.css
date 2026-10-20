@@ -285,7 +285,9 @@
 
 .player__top {
   display: grid;
-  grid-template-columns: calc(var(--px) * 32) minmax(0, 1fr) auto minmax(calc(var(--px) * 47), 1fr);
+  /* cover | title (grows) | controls (centered) | extras (same share as the title) */
+  grid-template-columns:
+    calc(var(--px) * 32) minmax(0, 1fr) auto minmax(calc(var(--px) * 46), 1fr);
   align-items: center;
   column-gap: calc(var(--px) * 4);
   height: calc(var(--px) * 32);
@@ -315,13 +317,14 @@
 .player__controls {
   display: flex;
   align-items: center;
-  gap: calc(var(--px) * 6);
+  gap: calc(var(--px) * 4);
 }
 
-/* Fixed time columns: the bar never moves when the digits change */
+/* Fixed time columns: the bar never moves when the digits change.
+   The last column holds the volume control. */
 .player__bottom {
   display: grid;
-  grid-template-columns: calc(var(--px) * 22) 1fr calc(var(--px) * 22);
+  grid-template-columns: calc(var(--px) * 22) minmax(0, 1fr) calc(var(--px) * 22) auto;
   align-items: center;
   gap: calc(var(--px) * 3);
   height: calc(var(--px) * 11);
@@ -339,12 +342,13 @@
   text-align: right;
 }
 
-/* ---------- Volume ---------- */
+/* ---------- Volume (lives in the bottom row of the player) ---------- */
 .volume {
   display: flex;
   align-items: center;
   justify-self: end;
-  gap: calc(var(--px) * 3);
+  gap: calc(var(--px) * 2);
+  margin-left: calc(var(--px) * 2);
 }
 
 .volume__bar {
