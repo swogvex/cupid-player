@@ -92,7 +92,7 @@ fn is_intl_segment(s: &str) -> bool {
 }
 
 /// Spotify ids are 22 ASCII alphanumeric characters.
-fn is_valid_id(s: &str) -> bool {
+pub(super) fn is_valid_id(s: &str) -> bool {
     s.len() == 22 && s.bytes().all(|b| b.is_ascii_alphanumeric())
 }
 
