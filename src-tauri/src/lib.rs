@@ -4,6 +4,8 @@ mod error;
 mod paths;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod spotify;
+#[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
+mod ytdlp;
 mod window;
 
 use tauri::Manager;
