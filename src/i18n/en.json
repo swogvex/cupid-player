@@ -10,10 +10,56 @@
   "import": {
     "placeholder": "Paste a link",
     "button": "Import",
+    "cancel": "Cancel",
+    "cancelling": "Cancelling…",
     "idle": "Waiting",
+    "reading": "Reading link…",
     "progress": "Importing {{done}}/{{total}}",
     "done": "Completed!",
-    "needsReview": "{{count}} tracks need review"
+    "alreadyDone": "Already imported",
+    "cancelled": "Import cancelled",
+    "needsReview_one": "1 track needs review",
+    "needsReview_other": "{{count}} tracks need review",
+    "failed_one": "1 track failed",
+    "failed_other": "{{count}} tracks failed",
+    "problems_one": "1 track with problems",
+    "problems_other": "{{count}} tracks with problems",
+    "truncated": "Only the first 100",
+    "truncatedHint": "Spotify only shows the first 100 songs of a playlist. If it has more, split it into parts."
+  },
+  "row": { "retry": "Retry" },
+  "errors": {
+    "unknown": "Something went wrong",
+    "spotify_url": {
+      "empty": "Paste a link",
+      "too_long": "The link is too long",
+      "bad_chars": "The link has invalid characters",
+      "not_a_url": "That is not a link",
+      "not_https": "The link must start with https",
+      "bad_authority": "Invalid link",
+      "wrong_host": "Only open.spotify.com links",
+      "unsupported_kind": "Only songs and playlists",
+      "malformed_path": "Invalid Spotify link",
+      "bad_id": "Invalid Spotify link"
+    },
+    "embed": {
+      "format_changed": "Spotify changed its format and it cannot be read",
+      "unexpected_type": "That link is not the expected type",
+      "no_tracks": "The list is empty or not public",
+      "network": "Cannot reach Spotify",
+      "timeout": "Spotify took too long",
+      "not_found": "Not found (is it public?)",
+      "status": "Spotify returned an error",
+      "too_large": "Response too large"
+    },
+    "import": {
+      "busy": "An import is already running",
+      "db": "Database error",
+      "io": "Could not access the files",
+      "unsafe_name": "Invalid folder name",
+      "not_found": "Track not found",
+      "not_retryable": "That track cannot be retried"
+    }
   },
   "player": {
     "nowPlaying": "Now playing",

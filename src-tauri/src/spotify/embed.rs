@@ -10,7 +10,7 @@ use serde::Deserialize;
 use thiserror::Error;
 
 use super::model::{PlaylistMeta, TrackDetail, TrackMeta};
-use super::url::{is_valid_id, SpotifyKind, SpotifyRef};
+use super::url::{SpotifyKind, SpotifyRef, is_valid_id};
 
 const MAX_HTML_BYTES: usize = 2 * 1024 * 1024;
 const MAX_TEXT_LEN: usize = 300;
@@ -44,7 +44,9 @@ impl EmbedError {
     /// Stable code for the frontend to map to an i18n message.
     pub fn code(&self) -> &'static str {
         match self {
-            EmbedError::NoData | EmbedError::BadJson(_) | EmbedError::BadData => "embed.format_changed",
+            EmbedError::NoData | EmbedError::BadJson(_) | EmbedError::BadData => {
+                "embed.format_changed"
+            }
             EmbedError::UnexpectedType => "embed.unexpected_type",
             EmbedError::NoTracks => "embed.no_tracks",
             EmbedError::Network(_) => "embed.network",
@@ -176,7 +178,7 @@ fn track_id_from_uri(uri: &str) -> Option<&str> {
 }
 
 /// Only https images from Spotify's CDNs are ever downloaded later.
-fn safe_cover_url(raw: &str) -> Option<String> {
+pub fn safe_cover_url(raw: &str) -> Option<String> {
     let u = Url::parse(raw).ok()?;
     let host = u.host_str()?;
     let host_ok = host == "spotifycdn.com"
@@ -244,7 +246,9 @@ pub fn parse_playlist_embed(html: &str) -> Result<PlaylistMeta, EmbedError> {
     if e.kind != "playlist" {
         return Err(EmbedError::UnexpectedType);
     }
-    let spotify_id = e.id.filter(|id| is_valid_id(id)).ok_or(EmbedError::BadData)?;
+    let spotify_id =
+        e.id.filter(|id| is_valid_id(id))
+            .ok_or(EmbedError::BadData)?;
     let name = clean_text(&e.name.or(e.title).unwrap_or_default());
     if name.is_empty() {
         return Err(EmbedError::BadData);
@@ -277,7 +281,14 @@ pub fn parse_playlist_embed(html: &str) -> Result<PlaylistMeta, EmbedError> {
         return Err(EmbedError::NoTracks);
     }
 
-    Ok(PlaylistMeta { spotify_id, name, owner, cover_url, tracks, skipped })
+    Ok(PlaylistMeta {
+        spotify_id,
+        name,
+        owner,
+        cover_url,
+        tracks,
+        skipped,
+    })
 }
 
 /// Pure parser for a single track's embed page.
@@ -286,7 +297,9 @@ pub fn parse_track_embed(html: &str) -> Result<TrackDetail, EmbedError> {
     if e.kind != "track" {
         return Err(EmbedError::UnexpectedType);
     }
-    let spotify_id = e.id.filter(|id| is_valid_id(id)).ok_or(EmbedError::BadData)?;
+    let spotify_id =
+        e.id.filter(|id| is_valid_id(id))
+            .ok_or(EmbedError::BadData)?;
     let title = clean_text(&e.title.or(e.name).unwrap_or_default());
     // Same joining as Spotify uses in playlists; the result is never split again.
     let artist = e
@@ -304,7 +317,12 @@ pub fn parse_track_embed(html: &str) -> Result<TrackDetail, EmbedError> {
     let cover_url = entity_cover(e.cover_art, e.visual_identity);
 
     Ok(TrackDetail {
-        track: TrackMeta { spotify_id, title, artist, duration_ms },
+        track: TrackMeta {
+            spotify_id,
+            title,
+            artist,
+            duration_ms,
+        },
         cover_url,
     })
 }
@@ -323,7 +341,8 @@ async fn fetch_html(url: &str) -> Result<String, EmbedError> {
         .timeout(Duration::from_secs(15))
         // Follow at most 3 redirects, and only within open.spotify.com.
         .redirect(reqwest::redirect::Policy::custom(|attempt| {
-            if attempt.previous().len() < 3 && attempt.url().host_str() == Some("open.spotify.com") {
+            if attempt.previous().len() < 3 && attempt.url().host_str() == Some("open.spotify.com")
+            {
                 attempt.follow()
             } else {
                 attempt.stop()
@@ -336,7 +355,10 @@ async fn fetch_html(url: &str) -> Result<String, EmbedError> {
     if !resp.status().is_success() {
         return Err(EmbedError::Status(resp.status().as_u16()));
     }
-    if resp.content_length().is_some_and(|l| l > MAX_HTML_BYTES as u64) {
+    if resp
+        .content_length()
+        .is_some_and(|l| l > MAX_HTML_BYTES as u64)
+    {
         return Err(EmbedError::TooLarge);
     }
     let mut buf: Vec<u8> = Vec::new();
@@ -368,7 +390,7 @@ pub async fn fetch_track(r: &SpotifyRef) -> Result<TrackDetail, EmbedError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::{json, Value};
+    use serde_json::{Value, json};
 
     const FIXTURE: &str = include_str!("../../tests/fixtures/playlist_embed.html");
     const TRACK_FIXTURE: &str = include_str!("../../tests/fixtures/track_embed.html");
@@ -409,7 +431,9 @@ mod tests {
         assert!(!p.may_be_truncated());
         assert_eq!(
             p.cover_url.as_deref(),
-            Some("https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84b72d0c7e02888e481be00939")
+            Some(
+                "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84b72d0c7e02888e481be00939"
+            )
         );
 
         let first = &p.tracks[0];
@@ -433,7 +457,9 @@ mod tests {
         assert_eq!(d.track.duration_ms, 213_946);
         assert_eq!(
             d.cover_url.as_deref(),
-            Some("https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02a5b3932c6497daf873029eb3")
+            Some(
+                "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02a5b3932c6497daf873029eb3"
+            )
         );
     }
 
@@ -478,13 +504,28 @@ mod tests {
     #[test]
     fn rejects_wrong_type_empty_and_broken_pages() {
         let album = json!({"type": "album", "id": PL_ID, "name": "x", "trackList": []});
-        assert_eq!(parse_playlist_embed(&page(album)), Err(EmbedError::UnexpectedType));
-        assert_eq!(parse_playlist_embed(&page(playlist(vec![]))), Err(EmbedError::NoTracks));
-        assert_eq!(parse_playlist_embed("<html></html>"), Err(EmbedError::NoData));
+        assert_eq!(
+            parse_playlist_embed(&page(album)),
+            Err(EmbedError::UnexpectedType)
+        );
+        assert_eq!(
+            parse_playlist_embed(&page(playlist(vec![]))),
+            Err(EmbedError::NoTracks)
+        );
+        assert_eq!(
+            parse_playlist_embed("<html></html>"),
+            Err(EmbedError::NoData)
+        );
         let bad = r#"<script id="__NEXT_DATA__" type="application/json">{not json</script>"#;
-        assert!(matches!(parse_playlist_embed(bad), Err(EmbedError::BadJson(_))));
+        assert!(matches!(
+            parse_playlist_embed(bad),
+            Err(EmbedError::BadJson(_))
+        ));
         let empty_obj = r#"<script id="__NEXT_DATA__" type="application/json">{}</script>"#;
-        assert!(matches!(parse_playlist_embed(empty_obj), Err(EmbedError::BadJson(_))));
+        assert!(matches!(
+            parse_playlist_embed(empty_obj),
+            Err(EmbedError::BadJson(_))
+        ));
     }
 
     #[test]
@@ -506,10 +547,22 @@ mod tests {
     #[test]
     fn pick_cover_prefers_closest_to_300px() {
         let pick = |v| pick_cover(v);
-        assert_eq!(pick(vec![c("a", Some(64)), c("b", Some(640)), c("c", Some(300))]).as_deref(), Some("c"));
-        assert_eq!(pick(vec![c("a", Some(400)), c("b", Some(500))]).as_deref(), Some("a"));
-        assert_eq!(pick(vec![c("a", Some(64)), c("b", Some(100))]).as_deref(), Some("b"));
-        assert_eq!(pick(vec![c("a", None), c("b", Some(64))]).as_deref(), Some("b"));
+        assert_eq!(
+            pick(vec![c("a", Some(64)), c("b", Some(640)), c("c", Some(300))]).as_deref(),
+            Some("c")
+        );
+        assert_eq!(
+            pick(vec![c("a", Some(400)), c("b", Some(500))]).as_deref(),
+            Some("a")
+        );
+        assert_eq!(
+            pick(vec![c("a", Some(64)), c("b", Some(100))]).as_deref(),
+            Some("b")
+        );
+        assert_eq!(
+            pick(vec![c("a", None), c("b", Some(64))]).as_deref(),
+            Some("b")
+        );
         assert_eq!(pick(vec![c("a", None), c("b", None)]).as_deref(), Some("a"));
         assert_eq!(pick(vec![]), None);
     }
@@ -527,12 +580,21 @@ mod tests {
 
     #[test]
     fn track_rejects_wrong_type_and_missing_fields() {
-        assert_eq!(parse_track_embed(&page(playlist(vec![]))), Err(EmbedError::UnexpectedType));
-        assert_eq!(parse_playlist_embed(&page(track_entity())), Err(EmbedError::UnexpectedType));
+        assert_eq!(
+            parse_track_embed(&page(playlist(vec![]))),
+            Err(EmbedError::UnexpectedType)
+        );
+        assert_eq!(
+            parse_playlist_embed(&page(track_entity())),
+            Err(EmbedError::UnexpectedType)
+        );
 
         let mut no_artist = track_entity();
         no_artist["artists"] = json!([]);
-        assert_eq!(parse_track_embed(&page(no_artist)), Err(EmbedError::BadData));
+        assert_eq!(
+            parse_track_embed(&page(no_artist)),
+            Err(EmbedError::BadData)
+        );
 
         let mut bad_id = track_entity();
         bad_id["id"] = json!("nope");

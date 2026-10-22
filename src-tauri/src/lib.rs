@@ -1,12 +1,16 @@
 mod commands;
 mod db;
 mod error;
+#[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
+mod import;
+#[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
+mod library;
 mod paths;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod spotify;
+mod window;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod ytdlp;
-mod window;
 
 use tauri::Manager;
 use tauri_plugin_window_state::StateFlags;
@@ -36,6 +40,11 @@ pub fn run() {
             let paths = paths::AppPaths::resolve(app.handle())?;
             paths.ensure_dirs()?;
             let database = db::Database::open(&paths.db_file)?;
+            // A closed app can leave tracks "in progress": make them retryable.
+            {
+                let conn = database.conn()?;
+                db::tracks::fail_all_unfinished(&conn)?;
+            }
 
             #[cfg(debug_assertions)]
             if std::env::var("CUPID_SEED").is_ok() {
@@ -43,6 +52,7 @@ pub fn run() {
                 database.seed_dev_audio(&paths.singles_dir)?;
             }
 
+            app.manage(import::runner::ImportManager::default());
             app.manage(paths);
             app.manage(database);
             Ok(())
@@ -52,6 +62,10 @@ pub fn run() {
             commands::list_tracks,
             commands::list_playlists,
             commands::get_music_dir,
+            commands::parse_spotify_url,
+            commands::start_import,
+            commands::cancel_import,
+            commands::retry_track,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

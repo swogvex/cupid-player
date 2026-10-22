@@ -1,13 +1,17 @@
 //! yt-dlp sidecar integration. Only Rust launches it: the webview has no shell
 //! permissions (see capabilities/default.json).
 
+pub mod download;
 pub mod matcher;
 pub mod search;
 
 use std::time::Duration;
 
-use tauri::AppHandle;
-use tauri_plugin_shell::{process::CommandEvent, ShellExt};
+use tauri::{AppHandle, async_runtime::Receiver};
+use tauri_plugin_shell::{
+    ShellExt,
+    process::{CommandChild, CommandEvent},
+};
 use thiserror::Error;
 
 const MAX_STDOUT_BYTES: usize = 2 * 1024 * 1024;
@@ -38,7 +42,10 @@ impl RunError {
             RunError::Spawn(_) => "ytdlp.spawn",
             RunError::Timeout => "ytdlp.timeout",
             RunError::TooLarge => "ytdlp.too_large",
-            RunError::Failed { js_runtime_warning: true, .. } => "ytdlp.failed_js_runtime",
+            RunError::Failed {
+                js_runtime_warning: true,
+                ..
+            } => "ytdlp.failed_js_runtime",
             RunError::Failed { .. } => "ytdlp.failed",
         }
     }
@@ -79,20 +86,47 @@ fn classify_failure(code: Option<i32>, stderr: &str) -> RunError {
     }
 }
 
-/// Runs the yt-dlp sidecar with `args` (always a vector: never a shell string)
-/// and waits for it, killing the process on timeout.
+/// Starts the yt-dlp sidecar. `args` is always a vector, never a shell string.
+fn spawn_ytdlp(
+    app: &AppHandle,
+    args: &[String],
+) -> Result<(Receiver<CommandEvent>, CommandChild), RunError> {
+    app.shell()
+        .sidecar("yt-dlp")
+        .map_err(|e| RunError::Spawn(e.to_string()))?
+        .args(args)
+        .env("PYTHONIOENCODING", "utf-8")
+        .spawn()
+        .map_err(|e| RunError::Spawn(e.to_string()))
+}
+
+/// Kills yt-dlp and its children. On Windows the one-file yt-dlp.exe may do its
+/// real work in a child process, so killing only the parent could leave it
+/// running (to be checked with the Task Manager in the 7.3.7 cancel test).
+fn kill_process_tree(child: CommandChild) {
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        let root = std::env::var_os("SystemRoot").unwrap_or_else(|| "C:\\Windows".into());
+        let taskkill = std::path::Path::new(&root)
+            .join("System32")
+            .join("taskkill.exe");
+        let _ = std::process::Command::new(taskkill)
+            .args(["/PID", &child.pid().to_string(), "/T", "/F"])
+            .creation_flags(CREATE_NO_WINDOW)
+            .status();
+    }
+    let _ = child.kill();
+}
+
+/// Runs the yt-dlp sidecar with `args` and waits for it, killing it on timeout.
 pub async fn run_ytdlp(
     app: &AppHandle,
     args: &[String],
     timeout: Duration,
 ) -> Result<RunOutput, RunError> {
-    let cmd = app
-        .shell()
-        .sidecar("yt-dlp")
-        .map_err(|e| RunError::Spawn(e.to_string()))?
-        .args(args)
-        .env("PYTHONIOENCODING", "utf-8");
-    let (mut rx, child) = cmd.spawn().map_err(|e| RunError::Spawn(e.to_string()))?;
+    let (mut rx, child) = spawn_ytdlp(app, args)?;
 
     let collect = async {
         let mut stdout: Vec<u8> = Vec::new();
@@ -126,11 +160,11 @@ pub async fn run_ytdlp(
 
     match tokio::time::timeout(timeout, collect).await {
         Err(_) => {
-            let _ = child.kill();
+            kill_process_tree(child);
             Err(RunError::Timeout)
         }
         Ok(Err(e)) => {
-            let _ = child.kill();
+            kill_process_tree(child);
             Err(e)
         }
         Ok(Ok((stdout, stderr, code))) => {

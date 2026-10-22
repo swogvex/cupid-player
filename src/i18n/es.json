@@ -10,10 +10,56 @@
   "import": {
     "placeholder": "Pega un enlace",
     "button": "Importar",
+    "cancel": "Cancelar",
+    "cancelling": "Cancelando…",
     "idle": "En espera",
+    "reading": "Leyendo enlace…",
     "progress": "Importando {{done}}/{{total}}",
     "done": "¡Completado!",
-    "needsReview": "{{count}} pistas necesitan revisión"
+    "alreadyDone": "Ya estaba importada",
+    "cancelled": "Importación cancelada",
+    "needsReview_one": "1 pista necesita revisión",
+    "needsReview_other": "{{count}} pistas necesitan revisión",
+    "failed_one": "1 pista falló",
+    "failed_other": "{{count}} pistas fallaron",
+    "problems_one": "1 pista con problemas",
+    "problems_other": "{{count}} pistas con problemas",
+    "truncated": "Solo las primeras 100",
+    "truncatedHint": "Spotify solo muestra las primeras 100 canciones de una playlist. Si tiene más, divídela en partes."
+  },
+  "row": { "retry": "Reintentar" },
+  "errors": {
+    "unknown": "Algo salió mal",
+    "spotify_url": {
+      "empty": "Pega un enlace",
+      "too_long": "El enlace es demasiado largo",
+      "bad_chars": "El enlace tiene caracteres no válidos",
+      "not_a_url": "Eso no es un enlace",
+      "not_https": "El enlace debe empezar por https",
+      "bad_authority": "Enlace no válido",
+      "wrong_host": "Solo enlaces de open.spotify.com",
+      "unsupported_kind": "Solo canciones y playlists",
+      "malformed_path": "Enlace de Spotify no válido",
+      "bad_id": "Enlace de Spotify no válido"
+    },
+    "embed": {
+      "format_changed": "Spotify cambió su formato y no se puede leer",
+      "unexpected_type": "Ese enlace no es del tipo esperado",
+      "no_tracks": "La lista está vacía o no es pública",
+      "network": "Sin conexión con Spotify",
+      "timeout": "Spotify tardó demasiado",
+      "not_found": "No se encontró (¿es pública?)",
+      "status": "Spotify respondió con un error",
+      "too_large": "Respuesta demasiado grande"
+    },
+    "import": {
+      "busy": "Ya hay una importación en curso",
+      "db": "Error de la base de datos",
+      "io": "Error al acceder a los archivos",
+      "unsafe_name": "Nombre de carpeta no válido",
+      "not_found": "Pista no encontrada",
+      "not_retryable": "Esa pista no se puede reintentar"
+    }
   },
   "player": {
     "nowPlaying": "Ahora suena",

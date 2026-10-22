@@ -38,7 +38,11 @@ impl SpotifyRef {
 
     /// Public embed page used to read metadata (no API key).
     pub fn embed_url(&self) -> String {
-        format!("https://{SPOTIFY_HOST}/embed/{}/{}", self.kind.as_str(), self.id)
+        format!(
+            "https://{SPOTIFY_HOST}/embed/{}/{}",
+            self.kind.as_str(),
+            self.id
+        )
     }
 }
 
@@ -86,9 +90,7 @@ impl UrlError {
 
 /// `intl-xx` locale prefix that Spotify adds to shared links.
 fn is_intl_segment(s: &str) -> bool {
-    s.len() == 7
-        && s.starts_with("intl-")
-        && s[5..].bytes().all(|b| b.is_ascii_lowercase())
+    s.len() == 7 && s.starts_with("intl-") && s[5..].bytes().all(|b| b.is_ascii_lowercase())
 }
 
 /// Spotify ids are 22 ASCII alphanumeric characters.
@@ -120,10 +122,7 @@ pub fn parse_spotify_url(input: &str) -> Result<SpotifyRef, UrlError> {
     }
 
     // Query (?si=...) and fragment are ignored on purpose.
-    let mut segs: Vec<&str> = url
-        .path_segments()
-        .map(|s| s.collect())
-        .unwrap_or_default();
+    let mut segs: Vec<&str> = url.path_segments().map(|s| s.collect()).unwrap_or_default();
     if segs.last() == Some(&"") {
         segs.pop(); // one trailing slash is fine
     }
@@ -143,7 +142,10 @@ pub fn parse_spotify_url(input: &str) -> Result<SpotifyRef, UrlError> {
         return Err(UrlError::BadId);
     }
 
-    Ok(SpotifyRef { kind, id: (*id).to_string() })
+    Ok(SpotifyRef {
+        kind,
+        id: (*id).to_string(),
+    })
 }
 
 #[cfg(test)]
@@ -160,7 +162,13 @@ mod tests {
     #[test]
     fn accepts_plain_track_and_playlist() {
         let t = ok(&format!("https://open.spotify.com/track/{TRACK}"));
-        assert_eq!(t, SpotifyRef { kind: SpotifyKind::Track, id: TRACK.into() });
+        assert_eq!(
+            t,
+            SpotifyRef {
+                kind: SpotifyKind::Track,
+                id: TRACK.into()
+            }
+        );
         let p = ok(&format!("https://open.spotify.com/playlist/{PLAYLIST}"));
         assert_eq!(p.kind, SpotifyKind::Playlist);
         assert_eq!(p.id, PLAYLIST);
@@ -168,7 +176,9 @@ mod tests {
 
     #[test]
     fn accepts_intl_prefix_query_fragment_trailing_slash_and_spaces() {
-        let t = ok(&format!("  https://open.spotify.com/intl-es/track/{TRACK}?si=abc123#x  "));
+        let t = ok(&format!(
+            "  https://open.spotify.com/intl-es/track/{TRACK}?si=abc123#x  "
+        ));
         assert_eq!(t.id, TRACK);
         ok(&format!("https://open.spotify.com/playlist/{PLAYLIST}/"));
         ok(&format!("https://OPEN.SPOTIFY.COM/track/{TRACK}"));
@@ -176,9 +186,17 @@ mod tests {
 
     #[test]
     fn canonical_and_embed_urls_are_rebuilt() {
-        let t = ok(&format!("https://open.spotify.com/intl-es/track/{TRACK}?si=zzz"));
-        assert_eq!(t.canonical_url(), format!("https://open.spotify.com/track/{TRACK}"));
-        assert_eq!(t.embed_url(), format!("https://open.spotify.com/embed/track/{TRACK}"));
+        let t = ok(&format!(
+            "https://open.spotify.com/intl-es/track/{TRACK}?si=zzz"
+        ));
+        assert_eq!(
+            t.canonical_url(),
+            format!("https://open.spotify.com/track/{TRACK}")
+        );
+        assert_eq!(
+            t.embed_url(),
+            format!("https://open.spotify.com/embed/track/{TRACK}")
+        );
     }
 
     #[test]
@@ -199,8 +217,14 @@ mod tests {
     #[test]
     fn rejects_non_url_and_other_schemes() {
         assert_eq!(parse_spotify_url("hola"), Err(UrlError::NotAUrl));
-        assert_eq!(parse_spotify_url(&format!("spotify:track:{TRACK}")), Err(UrlError::NotHttps));
-        assert_eq!(parse_spotify_url("javascript:alert(1)"), Err(UrlError::NotHttps));
+        assert_eq!(
+            parse_spotify_url(&format!("spotify:track:{TRACK}")),
+            Err(UrlError::NotHttps)
+        );
+        assert_eq!(
+            parse_spotify_url("javascript:alert(1)"),
+            Err(UrlError::NotHttps)
+        );
         assert_eq!(
             parse_spotify_url(&format!("http://open.spotify.com/track/{TRACK}")),
             Err(UrlError::NotHttps)
@@ -230,7 +254,11 @@ mod tests {
     fn rejects_unsupported_kinds_and_bad_paths() {
         for kind in ["album", "artist", "episode", "show", "user"] {
             let url = format!("https://open.spotify.com/{kind}/{TRACK}");
-            assert_eq!(parse_spotify_url(&url), Err(UrlError::UnsupportedKind), "{kind}");
+            assert_eq!(
+                parse_spotify_url(&url),
+                Err(UrlError::UnsupportedKind),
+                "{kind}"
+            );
         }
         assert_eq!(
             parse_spotify_url("https://open.spotify.com/track"),
@@ -250,11 +278,11 @@ mod tests {
     fn rejects_bad_ids() {
         for id in [
             "short",
-            "4uLU6hMCjMI75M1A2tKUQ",       // 21 chars
-            "4uLU6hMCjMI75M1A2tKUQCC",     // 23 chars
-            "4uLU6hMCjMI75M1A2tKU-C",      // symbol
-            "4uLU6hMCjMI75M1A2tK%55",      // percent-encoding
-            "4uLU6hMCjMI75M1A2t&&calc",    // shell-looking suffix
+            "4uLU6hMCjMI75M1A2tKUQ",    // 21 chars
+            "4uLU6hMCjMI75M1A2tKUQCC",  // 23 chars
+            "4uLU6hMCjMI75M1A2tKU-C",   // symbol
+            "4uLU6hMCjMI75M1A2tK%55",   // percent-encoding
+            "4uLU6hMCjMI75M1A2t&&calc", // shell-looking suffix
         ] {
             let url = format!("https://open.spotify.com/track/{id}");
             assert_eq!(parse_spotify_url(&url), Err(UrlError::BadId), "{id}");

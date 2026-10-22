@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { listPlaylists, listTracks } from '../ipc/commands';
-import type { Playlist, Track, TrackFilter } from '../ipc/types';
+import type { Playlist, Track, TrackFilter, TrackStatus } from '../ipc/types';
 
 interface LibraryState {
   tracks: Track[];
@@ -8,6 +8,8 @@ interface LibraryState {
   loading: boolean;
   error: string | null;
   load: (filter?: TrackFilter) => Promise<void>;
+  /** Updates one row in place (live import progress) without reloading. */
+  setTrackStatus: (id: number, status: TrackStatus) => void;
 }
 
 export const useLibraryStore = create<LibraryState>((set) => ({
@@ -24,4 +26,6 @@ export const useLibraryStore = create<LibraryState>((set) => ({
       set({ loading: false, error: String(e) });
     }
   },
+  setTrackStatus: (id, status) =>
+    set((s) => ({ tracks: s.tracks.map((t) => (t.id === id ? { ...t, status } : t)) })),
 }));

@@ -38,3 +38,50 @@ export interface TrackFilter {
   query?: string;
   playlistId?: number;
 }
+
+export type SpotifyKind = 'track' | 'playlist';
+
+export interface ParsedLink {
+  kind: SpotifyKind;
+  id: string;
+}
+
+/** Returned by start_import and retry_track. */
+export interface ImportStarted {
+  importId: string;
+  playlistId: number | null;
+  name: string;
+  /** Tracks in the source list. */
+  total: number;
+  /** Tracks that will actually be downloaded now. */
+  toDownload: number;
+  alreadyDone: number;
+  skipped: number;
+  /** The playlist may have more tracks than Spotify's embed shows (about 100). */
+  truncated: boolean;
+}
+
+/** Event import://progress */
+export interface ImportProgressPayload {
+  importId: string;
+  fraction: number;
+  finished: number;
+  total: number;
+}
+
+/** Event import://track-state */
+export interface TrackStatePayload {
+  importId: string;
+  trackId: number;
+  status: TrackStatus;
+}
+
+/** Event import://done */
+export interface ImportDonePayload {
+  importId: string;
+  total: number;
+  done: number;
+  needsReview: number;
+  failed: number;
+  cancelled: boolean;
+}

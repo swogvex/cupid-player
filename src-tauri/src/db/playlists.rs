@@ -73,3 +73,17 @@ pub fn insert(conn: &Connection, p: &NewPlaylist) -> AppResult<i64> {
     )?;
     Ok(conn.last_insert_rowid())
 }
+
+pub fn find_by_spotify_id(conn: &Connection, spotify_id: &str) -> AppResult<Option<Playlist>> {
+    Ok(list(conn)?
+        .into_iter()
+        .find(|p| p.spotify_id.as_deref() == Some(spotify_id)))
+}
+
+pub fn set_cover_path(conn: &Connection, id: i64, path: &str) -> AppResult<()> {
+    conn.execute(
+        "UPDATE playlists SET cover_path = ?1 WHERE id = ?2",
+        params![path, id],
+    )?;
+    Ok(())
+}
