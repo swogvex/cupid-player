@@ -216,7 +216,7 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     },
     "icon-link": {
       "w": 7,
-      "h": 4,
+      "h": 7,
       "f": 1,
       "r": 8
     },
@@ -722,7 +722,7 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     },
     "icon-link": {
       "w": 7,
-      "h": 4,
+      "h": 7,
       "f": 1,
       "r": 8
     },
@@ -1228,7 +1228,7 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     },
     "icon-link": {
       "w": 7,
-      "h": 4,
+      "h": 7,
       "f": 1,
       "r": 8
     },
@@ -1734,7 +1734,7 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     },
     "icon-link": {
       "w": 7,
-      "h": 4,
+      "h": 7,
       "f": 1,
       "r": 8
     },
@@ -2240,7 +2240,7 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     },
     "icon-link": {
       "w": 7,
-      "h": 4,
+      "h": 7,
       "f": 1,
       "r": 8
     },

@@ -14,6 +14,8 @@ use crate::error::AppError;
 use crate::library::{covers, names, tags};
 
 pub const MAX_TAG_CHARS: usize = 200;
+/// Staged covers live in `.covers\pending-<id>.<ext>` until the edit dialog is saved.
+pub(crate) const PENDING_PREFIX: &str = "pending-";
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -31,6 +33,8 @@ pub enum EditError {
     InvalidText,
     #[error("the track has no file")]
     NoFile,
+    #[error("no staged cover")]
+    NoStagedCover,
     #[error("file is outside the music folder")]
     OutsideMusicDir,
     #[error("tags: {0}")]
@@ -50,6 +54,7 @@ impl EditError {
             EditError::NotFound => "library.not_found",
             EditError::InvalidText => "library.invalid_text",
             EditError::NoFile => "library.no_file",
+            EditError::NoStagedCover => "library.no_staged_cover",
             EditError::OutsideMusicDir => "library.outside_music",
             EditError::Tags(_) => "library.tags_failed",
             EditError::Cover(covers::CoverError::NotAnImage) => "library.cover_invalid",
@@ -78,7 +83,7 @@ fn is_invisible(c: char) -> bool {
 }
 
 /// Collapses whitespace, drops control and invisible characters, trims.
-fn clean_tag(input: &str) -> String {
+pub(crate) fn clean_tag(input: &str) -> String {
     let mut out = String::with_capacity(input.len());
     let mut pending_space = false;
     for c in input.chars() {
@@ -236,6 +241,76 @@ pub fn delete_track(
         }
     }
     tracks::delete(conn, id).map_err(db_err)
+}
+
+/// Absolute path of the track's audio file, if it exists inside the music folder.
+pub fn locate(conn: &Connection, music_dir: &Path, id: i64) -> Result<PathBuf, EditError> {
+    let track = load(conn, id)?;
+    music_file(music_dir, &track)?.ok_or(EditError::NoFile)
+}
+
+fn staged_paths(dest_dir: &Path, id: i64) -> [PathBuf; 2] {
+    let dir = dest_dir.join(covers::COVERS_DIR);
+    [covers::ImageKind::Jpeg, covers::ImageKind::Png]
+        .map(|k| dir.join(format!("{PENDING_PREFIX}{id}.{}", k.extension())))
+}
+
+fn discard_staged_in(dest_dir: &Path, id: i64) {
+    for p in staged_paths(dest_dir, id) {
+        let _ = std::fs::remove_file(p);
+    }
+}
+
+/// The folder where the track's covers live: the folder of its audio file.
+fn cover_home(music_dir: &Path, track: &Track) -> Result<PathBuf, EditError> {
+    let file = music_file(music_dir, track)?.ok_or(EditError::NoFile)?;
+    Ok(file.parent().ok_or(EditError::NoFile)?.to_path_buf())
+}
+
+/// Validates the image and saves it as a *staged* cover without touching the
+/// track. Nothing changes until `commit_staged_cover`. A previous staged cover
+/// of the same track is replaced.
+pub fn stage_cover_from_path(
+    conn: &Connection,
+    music_dir: &Path,
+    id: i64,
+    image_path: &Path,
+) -> Result<PathBuf, EditError> {
+    let track = load(conn, id)?;
+    let dest_dir = cover_home(music_dir, &track)?;
+    let image = read_image_file(image_path)?;
+    discard_staged_in(&dest_dir, id);
+    Ok(covers::store_track_cover(
+        &dest_dir,
+        &format!("{PENDING_PREFIX}{id}"),
+        &image,
+    )?)
+}
+
+/// Turns the staged cover into the track's real cover (and removes the staged copy).
+pub fn commit_staged_cover(
+    conn: &Connection,
+    music_dir: &Path,
+    id: i64,
+) -> Result<Track, EditError> {
+    let track = load(conn, id)?;
+    let dest_dir = cover_home(music_dir, &track)?;
+    let staged = staged_paths(&dest_dir, id)
+        .into_iter()
+        .find(|p| p.is_file())
+        .ok_or(EditError::NoStagedCover)?;
+    let result = set_cover_from_path(conn, music_dir, id, &staged);
+    discard_staged_in(&dest_dir, id);
+    result
+}
+
+/// Forgets the staged cover; the track keeps whatever cover it had.
+pub fn discard_staged_cover(conn: &Connection, music_dir: &Path, id: i64) -> Result<(), EditError> {
+    let track = load(conn, id)?;
+    if let Ok(dir) = cover_home(music_dir, &track) {
+        discard_staged_in(&dir, id);
+    }
+    Ok(())
 }
 
 /// Fills `duration_ms` for tracks stored with 0 using the real length of the
@@ -581,6 +656,100 @@ mod tests {
         assert_eq!(row(&conn, missing).duration_ms, 0);
         assert_eq!(row(&conn, no_file).duration_ms, 0);
         assert_eq!(backfill_durations(&conn, &fx.music).expect("again"), 0);
+    }
+
+    #[test]
+    fn locate_returns_only_existing_files_inside_the_music_folder() {
+        let fx = Fx::new();
+        let conn = fx.db.conn().expect("conn");
+        let file = fx.audio("A - B.opus");
+        let ok = add_track(&conn, Some(&file), 1000);
+        assert_eq!(locate(&conn, &fx.music, ok).expect("locate"), file);
+
+        let outside = fx.audio_in(&fx.root.join("elsewhere"), "x.opus");
+        let bad = add_track(&conn, Some(&outside), 1000);
+        assert!(matches!(
+            locate(&conn, &fx.music, bad),
+            Err(EditError::OutsideMusicDir)
+        ));
+
+        let missing = add_track(&conn, Some(&fx.singles.join("gone.opus")), 1000);
+        assert!(matches!(
+            locate(&conn, &fx.music, missing),
+            Err(EditError::NoFile)
+        ));
+        let none = add_track(&conn, None, 1000);
+        assert!(matches!(
+            locate(&conn, &fx.music, none),
+            Err(EditError::NoFile)
+        ));
+    }
+
+    #[test]
+    fn a_staged_cover_changes_nothing_until_it_is_committed() {
+        let fx = Fx::new();
+        let conn = fx.db.conn().expect("conn");
+        let file = fx.audio("A - B.opus");
+        let id = add_track(&conn, Some(&file), 1000);
+        let jpg = fx.root.join("pic.jpg");
+        std::fs::write(&jpg, JPEG).expect("write");
+
+        let staged = stage_cover_from_path(&conn, &fx.music, id, &jpg).expect("stage");
+        assert!(staged.is_file());
+        assert!(staged.to_string_lossy().contains(PENDING_PREFIX));
+        assert_eq!(row(&conn, id).cover_path, None);
+        let final_path = fx.singles.join(covers::COVERS_DIR).join("A - B.jpg");
+        assert!(!final_path.exists());
+
+        let t = commit_staged_cover(&conn, &fx.music, id).expect("commit");
+        assert_eq!(
+            t.cover_path.as_deref(),
+            Some(final_path.to_string_lossy().as_ref())
+        );
+        assert!(final_path.is_file());
+        assert!(!staged.exists(), "the staged copy is gone");
+    }
+
+    #[test]
+    fn discarding_a_staged_cover_keeps_the_previous_one() {
+        let fx = Fx::new();
+        let conn = fx.db.conn().expect("conn");
+        let file = fx.audio("A - B.opus");
+        let id = add_track(&conn, Some(&file), 1000);
+        let jpg = fx.root.join("pic.jpg");
+        std::fs::write(&jpg, JPEG).expect("write");
+        let first = set_cover_from_path(&conn, &fx.music, id, &jpg).expect("first cover");
+
+        let png = fx.root.join("pic.png");
+        std::fs::write(&png, PNG).expect("write");
+        let staged = stage_cover_from_path(&conn, &fx.music, id, &png).expect("stage");
+        discard_staged_cover(&conn, &fx.music, id).expect("discard");
+
+        assert!(!staged.exists());
+        assert_eq!(row(&conn, id).cover_path, first.cover_path);
+        let old = PathBuf::from(first.cover_path.expect("cover path"));
+        assert_eq!(std::fs::read(old).expect("read"), JPEG);
+        assert!(matches!(
+            commit_staged_cover(&conn, &fx.music, id),
+            Err(EditError::NoStagedCover)
+        ));
+    }
+
+    #[test]
+    fn staging_twice_keeps_only_the_latest_image() {
+        let fx = Fx::new();
+        let conn = fx.db.conn().expect("conn");
+        let file = fx.audio("A - B.opus");
+        let id = add_track(&conn, Some(&file), 1000);
+        let jpg = fx.root.join("pic.jpg");
+        std::fs::write(&jpg, JPEG).expect("write");
+        let png = fx.root.join("pic.png");
+        std::fs::write(&png, PNG).expect("write");
+
+        let first = stage_cover_from_path(&conn, &fx.music, id, &jpg).expect("first");
+        let second = stage_cover_from_path(&conn, &fx.music, id, &png).expect("second");
+        assert!(!first.exists());
+        assert!(second.is_file());
     }
 
     #[test]

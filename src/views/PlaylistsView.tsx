@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { PixelButton } from "../components/PixelButton";
 import { Sprite } from "../components/Sprite";
+import { TrackMenus } from "../components/TrackMenus";
 import { TrackRow } from "../components/TrackRow";
 import { useLibraryStore } from "../state/libraryStore";
 import { useNavStore } from "../state/navStore";
@@ -46,6 +47,7 @@ export function PlaylistsView() {
             ))}
           </ul>
         )}
+        <TrackMenus />
       </section>
     );
   }

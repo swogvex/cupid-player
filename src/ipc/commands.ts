@@ -1,6 +1,15 @@
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import type { ImportStarted, ParsedLink, Playlist, Track, TrackFilter } from "./types";
+import type {
+  CacheCleared,
+  CacheInfo,
+  ImportStarted,
+  ParsedLink,
+  Playlist,
+  ScanReport,
+  Track,
+  TrackFilter,
+} from "./types";
 
 // Single entry point to Rust: components never call invoke() directly.
 export const listTracks = (filter?: TrackFilter) =>
@@ -19,6 +28,45 @@ export const startImport = (url: string) => invoke<ImportStarted>("start_import"
 export const cancelImport = (importId: string) => invoke<boolean>("cancel_import", { importId });
 
 export const retryTrack = (trackId: number) => invoke<ImportStarted>("retry_track", { trackId });
+
+export interface TagsInput {
+  title: string;
+  artist: string;
+  album: string | null;
+}
+
+/** Writes title/artist/album to the database and the file. Rejects with "library.*" codes. */
+export const updateTags = (trackId: number, tags: TagsInput) =>
+  invoke<Track>("update_tags", { trackId, tags });
+
+/** Removes the track; with deleteFile also the audio file. Rejects with "library.*" codes. */
+export const deleteTrack = (trackId: number, deleteFile: boolean) =>
+  invoke<void>("delete_track", { trackId, deleteFile });
+
+/**
+ * Opens the native image picker (in Rust) and stages the image: the track keeps its
+ * cover until commitCover. Resolves with the staged file path, or null if cancelled.
+ */
+export const pickCover = (trackId: number) => invoke<string | null>("pick_cover", { trackId });
+
+/** Applies the staged cover as the track's real cover. */
+export const commitCover = (trackId: number) => invoke<Track>("commit_cover", { trackId });
+
+/** Drops the staged cover. */
+export const discardCover = (trackId: number) => invoke<void>("discard_cover", { trackId });
+
+/** Shows the track's file in the file manager. */
+export const revealTrack = (trackId: number) => invoke<void>("reveal_track", { trackId });
+
+/** Opens the native folder picker (in Rust) and imports its audio files. Resolves with null if cancelled. */
+export const scanFolder = () => invoke<ScanReport | null>("scan_folder");
+
+export const getCacheInfo = () => invoke<CacheInfo>("get_cache_info");
+
+/** Deletes unused covers and stale partial files. Never touches music. */
+export const clearCache = () => invoke<CacheCleared>("clear_cache");
+
+export const openMusicFolder = () => invoke<void>("open_music_folder");
 
 /** Resizes the window to 352*n x 208*n. Resolves with the scale actually applied. */
 export function setWindowScale(n: number): Promise<number> {

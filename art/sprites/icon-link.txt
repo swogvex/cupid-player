@@ -1,4 +1,7 @@
-.ii.ii.
-i..i..i
-i..i..i
-.ii.ii.
+....ii.
+...i..i
+...i..i
+.iiiii.
+i..i...
+i..i...
+.ii....

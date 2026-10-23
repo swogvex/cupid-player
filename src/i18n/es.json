@@ -1,6 +1,12 @@
 {
-  "app": { "title": "cupid player" },
-  "common": { "back": "Volver", "on": "Sí", "off": "No" },
+  "app": {
+    "title": "cupid player"
+  },
+  "common": {
+    "back": "Volver",
+    "on": "Sí",
+    "off": "No"
+  },
   "nav": {
     "library": "Biblioteca",
     "playlists": "Playlists",
@@ -27,7 +33,9 @@
     "truncated": "Solo las primeras 100",
     "truncatedHint": "Spotify solo muestra las primeras 100 canciones de una playlist. Si tiene más, divídela en partes."
   },
-  "row": { "retry": "Reintentar" },
+  "row": {
+    "retry": "Reintentar"
+  },
   "errors": {
     "unknown": "Algo salió mal",
     "spotify_url": {
@@ -59,6 +67,27 @@
       "unsafe_name": "Nombre de carpeta no válido",
       "not_found": "Pista no encontrada",
       "not_retryable": "Esa pista no se puede reintentar"
+    },
+    "library": {
+      "not_found": "No se encontró la canción",
+      "invalid_text": "Escribe un título y un artista (máximo 200 caracteres)",
+      "no_file": "La canción aún no tiene archivo",
+      "outside_music": "El archivo está fuera de la carpeta de música",
+      "tags_failed": "No se pudieron guardar las etiquetas del archivo",
+      "cover_invalid": "Elige una imagen JPG o PNG",
+      "cover_too_large": "La imagen pesa más de 2 MB",
+      "cover_failed": "No se pudo guardar la portada",
+      "io": "Error al acceder a los archivos",
+      "db": "Error de la base de datos",
+      "no_staged_cover": "No hay una portada pendiente"
+    },
+    "scan": {
+      "not_a_directory": "Eso no es una carpeta",
+      "db": "Error de la base de datos",
+      "io": "Error al acceder a los archivos"
+    },
+    "cache": {
+      "db": "Error de la base de datos"
     }
   },
   "player": {
@@ -116,7 +145,15 @@
     "title": "Ajustes",
     "language": "Idioma",
     "theme": "Tema",
-    "alwaysOnTop": "Siempre encima"
+    "alwaysOnTop": "Siempre encima",
+    "importFolder": "Importar carpeta",
+    "chooseFolder": "Elegir carpeta…",
+    "importFolderHint": "Copia el audio de una carpeta a tu biblioteca, sin duplicar",
+    "musicFolder": "Carpeta de música",
+    "openFolder": "Abrir carpeta",
+    "cache": "Caché",
+    "clearCache": "Limpiar caché",
+    "cacheHint": "Borra portadas sin usar y archivos temporales. Tu música no se toca."
   },
   "status": {
     "done": "Listo",
@@ -127,10 +164,59 @@
     "needs_review": "Necesita revisión",
     "failed": "Falló"
   },
-  "ambient": { "toggle": "Vista corazón" },
+  "ambient": {
+    "toggle": "Vista corazón"
+  },
   "window": {
     "minimize": "Minimizar",
     "maximize": "Maximizar",
     "close": "Cerrar"
+  },
+  "menu": {
+    "label": "Acciones de la canción",
+    "play": "Reproducir",
+    "playNext": "Reproducir a continuación",
+    "enqueue": "Añadir a la cola",
+    "edit": "Editar…",
+    "reveal": "Mostrar en la carpeta",
+    "delete": "Eliminar…"
+  },
+  "edit": {
+    "title": "Editar canción",
+    "fieldTitle": "Título",
+    "fieldArtist": "Artista",
+    "fieldAlbum": "Álbum",
+    "changeCover": "Cambiar portada…",
+    "noFileForCover": "Se puede cambiar cuando la canción esté descargada",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "cancel": "Cancelar",
+    "coverPending": "Nueva portada: se aplicará al guardar"
+  },
+  "delete": {
+    "title": "Eliminar canción",
+    "message": "«{{title}}» se quitará de la biblioteca.",
+    "fileHint": "Si borras también el archivo, no se podrá recuperar.",
+    "cancel": "Cancelar",
+    "remove": "Quitar",
+    "removeOnly": "Solo de la biblioteca",
+    "removeFile": "Borrar también el archivo"
+  },
+  "scan": {
+    "running": "Leyendo carpeta…",
+    "none": "No se encontró audio en esa carpeta",
+    "added_one": "1 canción añadida",
+    "added_other": "{{count}} canciones añadidas",
+    "duplicates_one": "1 ya estaba",
+    "duplicates_other": "{{count}} ya estaban",
+    "failed_one": "1 no se pudo leer",
+    "failed_other": "{{count}} no se pudieron leer",
+    "truncated": "Solo se leyeron los primeros 10 000 archivos"
+  },
+  "cache": {
+    "summary": "Portadas: {{covers}} · Liberable: {{free}}",
+    "nothing": "No había nada que limpiar",
+    "cleared_one": "1 archivo eliminado ({{size}})",
+    "cleared_other": "{{count}} archivos eliminados ({{size}})"
   }
 }

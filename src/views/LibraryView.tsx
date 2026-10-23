@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PixelInput } from "../components/PixelInput";
+import { TrackMenus } from "../components/TrackMenus";
 import { VirtualTrackList } from "../components/VirtualTrackList";
 import { filterTracks } from "../lib/search";
 import { useLibraryStore } from "../state/libraryStore";
@@ -42,6 +43,7 @@ export function LibraryView() {
           onPlay={(picked) => usePlayerStore.getState().playTracks(visibleTracks, picked.id)}
         />
       )}
+      <TrackMenus />
     </section>
   );
 }

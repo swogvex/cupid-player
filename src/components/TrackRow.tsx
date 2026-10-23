@@ -1,9 +1,10 @@
-import type { CSSProperties, KeyboardEvent, Ref } from "react";
+import type { CSSProperties, KeyboardEvent, MouseEvent, Ref } from "react";
 import { useTranslation } from "react-i18next";
 import type { Track } from "../ipc/types";
 import { formatTime } from "../lib/format";
 import { useImportStore } from "../state/importStore";
 import { selectCurrent, usePlayerStore } from "../state/playerStore";
+import { useTrackMenuStore } from "../state/trackMenuStore";
 
 type TrackRowProps = {
   track: Track;
@@ -35,6 +36,11 @@ export function TrackRow({ track, onPlay, style, rowRef, index, total }: TrackRo
       play();
     }
   };
+  // Right click, or the keyboard's menu key / Shift+F10 on a focused row.
+  const onContextMenu = (e: MouseEvent<HTMLLIElement>) => {
+    e.preventDefault();
+    useTrackMenuStore.getState().openMenu(track.id, e.clientX, e.clientY);
+  };
 
   const className = [
     "row",
@@ -57,6 +63,7 @@ export function TrackRow({ track, onPlay, style, rowRef, index, total }: TrackRo
       aria-current={isCurrent ? "true" : undefined}
       onDoubleClick={play}
       onKeyDown={onKeyDown}
+      onContextMenu={onContextMenu}
     >
       <span className="ellipsis">{track.title}</span>
       <span className="ellipsis muted">{track.artist}</span>

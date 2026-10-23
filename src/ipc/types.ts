@@ -85,3 +85,32 @@ export interface ImportDonePayload {
   failed: number;
   cancelled: boolean;
 }
+
+/** Returned by scan_folder. */
+export interface ScanReport {
+  /** Audio files seen. */
+  found: number;
+  added: number;
+  /** Already in the library or repeated inside the folder. */
+  duplicates: number;
+  /** Unreadable, empty, too large or impossible to copy. */
+  failed: number;
+  /** Only the first files were read (limit reached). */
+  truncated: boolean;
+}
+
+/** Returned by get_cache_info. */
+export interface CacheInfo {
+  /** Everything inside the ".covers" folders. */
+  coversBytes: number;
+  coversCount: number;
+  /** What "clear cache" would delete. */
+  reclaimableBytes: number;
+  reclaimableCount: number;
+}
+
+/** Returned by clear_cache. */
+export interface CacheCleared {
+  removed: number;
+  freedBytes: number;
+}

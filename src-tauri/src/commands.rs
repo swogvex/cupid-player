@@ -1,5 +1,5 @@
 use serde::Serialize;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 
 use crate::{
     db::{
@@ -9,7 +9,11 @@ use crate::{
     },
     error::{AppError, AppResult},
     import::runner::{self, ImportError, ImportManager, ImportStarted},
-    library::edit::{self, EditError, TagsInput},
+    library::{
+        cache::{self, CacheCleared, CacheError, CacheInfo},
+        edit::{self, EditError, TagsInput},
+        scan::{self, ScanError, ScanReport},
+    },
     paths::AppPaths,
     spotify::url::parse_spotify_url as parse_url,
 };
@@ -48,6 +52,16 @@ fn import_err(e: ImportError) -> AppError {
 
 fn edit_err(e: EditError) -> AppError {
     eprintln!("[library] {e}");
+    coded(e.code())
+}
+
+fn scan_err(e: ScanError) -> AppError {
+    eprintln!("[scan] {e}");
+    coded(e.code())
+}
+
+fn cache_err(e: CacheError) -> AppError {
+    eprintln!("[cache] {e}");
     coded(e.code())
 }
 
@@ -108,4 +122,135 @@ pub async fn delete_track(
 ) -> AppResult<()> {
     let conn = db.conn()?;
     edit::delete_track(&conn, &paths.music_dir, track_id, delete_file).map_err(edit_err)
+}
+
+/// Opens the native picker from Rust (the webview has no dialog permission and
+/// never sees the chosen path) and *stages* the image: the track keeps its
+/// current cover until `commit_cover`. Returns the staged file (inside the
+/// music folder, so it can be previewed) or `None` if the user cancels.
+#[tauri::command]
+pub async fn pick_cover(
+    app: AppHandle,
+    window: tauri::WebviewWindow,
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+    track_id: i64,
+) -> AppResult<Option<String>> {
+    use tauri_plugin_dialog::DialogExt;
+    let picked = app
+        .dialog()
+        .file()
+        .set_parent(&window)
+        .add_filter("Images", &["jpg", "jpeg", "png"])
+        .blocking_pick_file();
+    let Some(picked) = picked else {
+        return Ok(None);
+    };
+    let path = picked
+        .into_path()
+        .map_err(|_| coded("library.cover_failed"))?;
+    let conn = db.conn()?;
+    let staged =
+        edit::stage_cover_from_path(&conn, &paths.music_dir, track_id, &path).map_err(edit_err)?;
+    Ok(Some(staged.to_string_lossy().into_owned()))
+}
+
+/// Applies the staged cover as the track's real cover.
+#[tauri::command]
+pub async fn commit_cover(
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+    track_id: i64,
+) -> AppResult<Track> {
+    let conn = db.conn()?;
+    edit::commit_staged_cover(&conn, &paths.music_dir, track_id).map_err(edit_err)
+}
+
+/// Drops the staged cover (the edit dialog was cancelled).
+#[tauri::command]
+pub async fn discard_cover(
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+    track_id: i64,
+) -> AppResult<()> {
+    let conn = db.conn()?;
+    edit::discard_staged_cover(&conn, &paths.music_dir, track_id).map_err(edit_err)
+}
+
+/// Shows the track's file in Explorer. Only files inside the music folder.
+#[tauri::command]
+pub async fn reveal_track(
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+    track_id: i64,
+) -> AppResult<()> {
+    let file = {
+        let conn = db.conn()?;
+        edit::locate(&conn, &paths.music_dir, track_id).map_err(edit_err)?
+    };
+    tauri_plugin_opener::reveal_item_in_dir(&file).map_err(|e| {
+        eprintln!("[library] reveal failed: {e}");
+        coded("library.io")
+    })
+}
+
+/// Opens the native folder picker (from Rust) and imports the audio files inside
+/// it into the library. Returns `None` if the user cancels.
+#[tauri::command]
+pub async fn scan_folder(
+    app: AppHandle,
+    window: tauri::WebviewWindow,
+) -> AppResult<Option<ScanReport>> {
+    use tauri_plugin_dialog::DialogExt;
+    let picked = app
+        .dialog()
+        .file()
+        .set_parent(&window)
+        .blocking_pick_folder();
+    let Some(picked) = picked else {
+        return Ok(None);
+    };
+    let root = picked.into_path().map_err(|_| coded("scan.io"))?;
+
+    // Reading tags and copying files can take a while: keep it off the async threads.
+    let handle = app.clone();
+    let report = tauri::async_runtime::spawn_blocking(move || {
+        let db = handle.state::<Database>();
+        let paths = handle.state::<AppPaths>();
+        let conn = db.conn().map_err(|e| ScanError::Db(e.to_string()))?;
+        scan::scan_folder(&conn, &paths, &root)
+    })
+    .await
+    .map_err(|_| coded("scan.io"))?
+    .map_err(scan_err)?;
+    Ok(Some(report))
+}
+
+/// Size of the covers and how much "clear cache" would free.
+#[tauri::command]
+pub async fn get_cache_info(
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+) -> AppResult<CacheInfo> {
+    let conn = db.conn()?;
+    cache::cache_info(&conn, &paths.music_dir).map_err(cache_err)
+}
+
+/// Deletes unused covers and stale partial files. Never touches music.
+#[tauri::command]
+pub async fn clear_cache(
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+) -> AppResult<CacheCleared> {
+    let conn = db.conn()?;
+    cache::clear_cache(&conn, &paths.music_dir).map_err(cache_err)
+}
+
+/// Opens the music folder in Explorer.
+#[tauri::command]
+pub async fn open_music_folder(paths: State<'_, AppPaths>) -> AppResult<()> {
+    tauri_plugin_opener::open_path(&paths.music_dir, None::<&str>).map_err(|e| {
+        eprintln!("[library] open folder failed: {e}");
+        coded("library.io")
+    })
 }

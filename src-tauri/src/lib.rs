@@ -36,6 +36,7 @@ pub fn run() {
         )
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let paths = paths::AppPaths::resolve(app.handle())?;
             paths.ensure_dirs()?;
@@ -74,6 +75,14 @@ pub fn run() {
             commands::retry_track,
             commands::update_tags,
             commands::delete_track,
+            commands::pick_cover,
+            commands::commit_cover,
+            commands::discard_cover,
+            commands::reveal_track,
+            commands::scan_folder,
+            commands::get_cache_info,
+            commands::clear_cache,
+            commands::open_music_folder,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

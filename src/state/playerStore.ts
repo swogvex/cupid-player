@@ -51,6 +51,7 @@ type PlayerState = {
   repeat: RepeatMode;
   error: boolean;
   queueOpen: boolean;
+  coverRev: number;
 
   playTracks: (tracks: Track[], startId?: number) => void;
   playAt: (index: number) => void;
@@ -70,6 +71,10 @@ type PlayerState = {
   clearQueue: () => void;
   toggleQueue: () => void;
   setQueueOpen: (open: boolean) => void;
+  /** Refreshes the queue entries of a track after its tags or cover changed. */
+  updateTrack: (track: Track) => void;
+  /** Removes every queue entry of a track (e.g. before deleting it). */
+  removeTrackById: (id: number) => void;
 
   // Called by the engine events (see audio/init.ts).
   _tick: (position: number, duration: number) => void;
@@ -110,6 +115,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     repeat: "off",
     error: false,
     queueOpen: false,
+    coverRev: 0,
 
     playTracks: (tracks, startId) => {
       const list = tracks.map(toPlayerTrack).filter((t): t is PlayerTrack => t !== null);
@@ -247,6 +253,31 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
 
     toggleQueue: () => set({ queueOpen: !get().queueOpen }),
     setQueueOpen: (open) => set({ queueOpen: open }),
+
+    updateTrack: (track) => {
+      const info = toPlayerTrack(track);
+      if (!info) return;
+      // One new object per old object: `queue` and `baseQueue` keep sharing references,
+      // and duplicates of the same track stay distinct entries.
+      const swapped = new Map<PlayerTrack, PlayerTrack>();
+      const swap = (item: PlayerTrack): PlayerTrack => {
+        if (item.id !== track.id) return item;
+        let next = swapped.get(item);
+        if (!next) {
+          next = { ...info };
+          swapped.set(item, next);
+        }
+        return next;
+      };
+      const { queue, baseQueue, coverRev } = get();
+      set({ queue: queue.map(swap), baseQueue: baseQueue.map(swap), coverRev: coverRev + 1 });
+    },
+
+    removeTrackById: (id) => {
+      for (let i = get().queue.length - 1; i >= 0; i--) {
+        if (get().queue[i].id === id) get().removeAt(i);
+      }
+    },
 
     _tick: (position, duration) => set((s) => ({ position, duration: duration > 0 ? duration : s.duration })),
     _setPlaying: (playing) => set({ playing }),
