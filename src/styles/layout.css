@@ -424,3 +424,15 @@
 .row__retry:focus-visible {
   outline: calc(var(--s) * 1px) solid var(--accent);
 }
+
+/* ---------- Virtualized lists (H8.1) ---------- */
+.list--virtual {
+  position: relative;
+}
+
+.row--virtual {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
