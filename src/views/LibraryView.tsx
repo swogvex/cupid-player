@@ -10,8 +10,8 @@ export function LibraryView() {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
-  const rawtracks = useLibraryStore((s) => s.tracks);
-  const tracks = rawtracks.length ? Array.from({ length: 5000 }, (_, i) => ({ ...rawtracks[0], id: 100000 + i, title: `Test ${i}` })) : rawtracks;
+  const tracks = useLibraryStore((s) => s.tracks);
+  // const tracks = rawtracks.length ? Array.from({ length: 5000 }, (_, i) => ({ ...rawtracks[0], id: 100000 + i, title: `Test ${i}` })) : rawtracks;
   const error = useLibraryStore((s) => s.error);
 
   const visibleTracks = useMemo(() => filterTracks(tracks, deferredQuery), [tracks, deferredQuery]);

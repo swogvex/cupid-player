@@ -40,10 +40,16 @@ pub fn run() {
             let paths = paths::AppPaths::resolve(app.handle())?;
             paths.ensure_dirs()?;
             let database = db::Database::open(&paths.db_file)?;
-            // A closed app can leave tracks "in progress": make them retryable.
             {
                 let conn = database.conn()?;
+                // A closed app can leave tracks "in progress": make them retryable.
                 db::tracks::fail_all_unfinished(&conn)?;
+                // Tracks stored with duration 0 get the real length of their file (H8).
+                match library::edit::backfill_durations(&conn, &paths.music_dir) {
+                    Ok(0) => {}
+                    Ok(n) => eprintln!("[library] fixed {n} missing durations"),
+                    Err(e) => eprintln!("[library] duration backfill failed: {e}"),
+                }
             }
 
             #[cfg(debug_assertions)]
@@ -66,6 +72,8 @@ pub fn run() {
             commands::start_import,
             commands::cancel_import,
             commands::retry_track,
+            commands::update_tags,
+            commands::delete_track,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

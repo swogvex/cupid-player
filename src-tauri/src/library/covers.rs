@@ -10,7 +10,7 @@ use crate::library::names::{MAX_FILE_STEM_CHARS, is_inside, is_safe_component};
 use crate::spotify::embed::safe_cover_url;
 
 pub const COVERS_DIR: &str = ".covers";
-const MAX_IMAGE_BYTES: usize = 2 * 1024 * 1024;
+pub const MAX_IMAGE_BYTES: usize = 2 * 1024 * 1024;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageKind {

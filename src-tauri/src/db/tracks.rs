@@ -221,6 +221,53 @@ pub fn fail_all_unfinished(conn: &Connection) -> AppResult<usize> {
     )?)
 }
 
+/// Edits the user-visible text of a track (H8). `album = None` clears it.
+pub fn update_meta(
+    conn: &Connection,
+    id: i64,
+    title: &str,
+    artist: &str,
+    album: Option<&str>,
+) -> AppResult<()> {
+    conn.execute(
+        "UPDATE tracks SET title = ?1, artist = ?2, album = ?3 WHERE id = ?4",
+        params![title, artist, album, id],
+    )?;
+    Ok(())
+}
+
+pub fn set_duration(conn: &Connection, id: i64, duration_ms: i64) -> AppResult<()> {
+    conn.execute(
+        "UPDATE tracks SET duration_ms = ?1 WHERE id = ?2",
+        params![duration_ms, id],
+    )?;
+    Ok(())
+}
+
+/// Removes the row. `plays` rows go with it (ON DELETE CASCADE).
+pub fn delete(conn: &Connection, id: i64) -> AppResult<()> {
+    conn.execute("DELETE FROM tracks WHERE id = ?1", [id])?;
+    Ok(())
+}
+
+/// (id, file_path) of tracks that have a file but no known duration.
+pub fn list_missing_durations(conn: &Connection) -> AppResult<Vec<(i64, String)>> {
+    let mut stmt = conn.prepare(
+        "SELECT id, file_path FROM tracks WHERE duration_ms <= 0 AND file_path IS NOT NULL",
+    )?;
+    let rows = stmt.query_map([], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?)))?;
+    Ok(rows.collect::<rusqlite::Result<Vec<_>>>()?)
+}
+
+/// How many other tracks point at the same cover file.
+pub fn count_cover_uses(conn: &Connection, cover_path: &str, except_id: i64) -> AppResult<i64> {
+    Ok(conn.query_row(
+        "SELECT COUNT(*) FROM tracks WHERE cover_path = ?1 AND id <> ?2",
+        params![cover_path, except_id],
+        |r| r.get(0),
+    )?)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
