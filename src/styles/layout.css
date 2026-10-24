@@ -570,3 +570,88 @@
   color: var(--panel-2);
   line-height: calc(var(--px) * 10);
 }
+
+/* ---------- Overlays never overflow; long text uses ellipsis or Marquee (D-105) ---------- */
+.modal__box,
+.modal__form {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.modal__box {
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.modal__box > *,
+.modal__form > *,
+.field {
+  min-width: 0;
+}
+
+.field .px-input,
+.field .px-input input {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+
+.edit__top {
+  flex-wrap: wrap;
+}
+
+.edit__top .muted {
+  flex: 1 1 100%;
+  overflow-wrap: anywhere;
+}
+
+.toast {
+  overflow-wrap: anywhere;
+}
+
+.marquee {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee__inner {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes marquee-bounce {
+  0%,
+  14% {
+    transform: translateX(0);
+  }
+  50%,
+  64% {
+    transform: translateX(var(--shift));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.marquee--always[data-overflow="true"] .marquee__inner,
+[data-marquee-host]:hover .marquee[data-overflow="true"] .marquee__inner,
+[data-marquee-host]:focus-within .marquee[data-overflow="true"] .marquee__inner {
+  display: inline-block;
+  overflow: visible;
+  text-overflow: clip;
+  will-change: transform;
+  animation: marquee-bounce var(--dur) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee__inner {
+    display: block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    animation: none !important;
+  }
+}

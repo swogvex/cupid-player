@@ -114,3 +114,9 @@ export interface CacheCleared {
   removed: number;
   freedBytes: number;
 }
+
+/** One (playlist, track) pair from list_playlist_members. */
+export interface PlaylistMember {
+  playlistId: number;
+  trackId: number;
+}

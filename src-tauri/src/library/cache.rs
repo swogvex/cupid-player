@@ -4,7 +4,6 @@
 //! - stale partial files (".part", ".ytdl") left by interrupted copies or downloads.
 //!   Covers still in use and audio files are never removed.
 
-
 use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};

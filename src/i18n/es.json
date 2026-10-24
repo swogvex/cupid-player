@@ -88,6 +88,14 @@
     },
     "cache": {
       "db": "Error de la base de datos"
+    },
+    "playlist": {
+      "not_found": "No se encontró la playlist",
+      "invalid_name": "Escribe un nombre (máximo 60 caracteres)",
+      "name_taken": "Ya existe una playlist con ese nombre",
+      "too_many": "Demasiadas canciones a la vez",
+      "no_folder": "Esta playlist no tiene carpeta en el disco",
+      "db": "Error de la base de datos"
     }
   },
   "player": {

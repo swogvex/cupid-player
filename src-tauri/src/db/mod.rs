@@ -16,7 +16,10 @@ use crate::error::{AppError, AppResult};
 
 /// Ordered migrations. Migration N sets `PRAGMA user_version = N`.
 /// To change the schema: append a new file here, never edit an old one.
-const MIGRATIONS: &[&str] = &[include_str!("schema.sql")];
+const MIGRATIONS: &[&str] = &[
+    include_str!("schema.sql"),
+    include_str!("002_playlist_tracks.sql"),
+];
 
 pub struct Database {
     conn: Mutex<Connection>,

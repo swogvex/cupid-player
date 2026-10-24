@@ -8,6 +8,7 @@ import { useLibraryStore } from "../state/libraryStore";
 import { usePlayerStore } from "../state/playerStore";
 import { useTrackMenuStore } from "../state/trackMenuStore";
 import { CoverArt } from "./CoverArt";
+import { Marquee } from "./Marquee";
 import { Modal } from "./Modal";
 import { Overlay } from "./Overlay";
 import { PixelButton } from "./PixelButton";
@@ -104,6 +105,7 @@ function EditForm({ track }: { track: Track }) {
         <h3 id="edit-title" className="modal__title">
           {t("edit.title")}
         </h3>
+        <Marquee className="muted" text={track.title} always />
 
         <div className="edit__top">
           <span className="player__cover">

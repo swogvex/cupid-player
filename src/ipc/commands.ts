@@ -6,6 +6,7 @@ import type {
   ImportStarted,
   ParsedLink,
   Playlist,
+  PlaylistMember,
   ScanReport,
   Track,
   TrackFilter,
@@ -57,6 +58,30 @@ export const discardCover = (trackId: number) => invoke<void>("discard_cover", {
 
 /** Shows the track's file in the file manager. */
 export const revealTrack = (trackId: number) => invoke<void>("reveal_track", { trackId });
+
+export const listPlaylistMembers = () => invoke<PlaylistMember[]>("list_playlist_members");
+
+/** A playlist of the user's own. Rejects with "playlist.*" codes (e.g. "playlist.name_taken"). */
+export const createPlaylist = (name: string) => invoke<Playlist>("create_playlist", { name });
+
+export const renamePlaylist = (playlistId: number, name: string) =>
+  invoke<Playlist>("rename_playlist", { playlistId, name });
+
+/** Deletes the playlist only: its tracks and files stay in the library. */
+export const deletePlaylist = (playlistId: number) =>
+  invoke<void>("delete_playlist", { playlistId });
+
+/** Resolves with how many tracks were added (duplicates are skipped). */
+export const addToPlaylist = (playlistId: number, trackIds: number[]) =>
+  invoke<number>("add_to_playlist", { playlistId, trackIds });
+
+/** Removes the track from this playlist only; it stays in the library. */
+export const removeFromPlaylist = (playlistId: number, trackId: number) =>
+  invoke<boolean>("remove_from_playlist", { playlistId, trackId });
+
+/** Opens the folder of an imported playlist. */
+export const revealPlaylist = (playlistId: number) =>
+  invoke<void>("reveal_playlist", { playlistId });
 
 /** Opens the native folder picker (in Rust) and imports its audio files. Resolves with null if cancelled. */
 export const scanFolder = () => invoke<ScanReport | null>("scan_folder");

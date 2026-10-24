@@ -4,13 +4,13 @@ use tauri::{AppHandle, Manager, State};
 use crate::{
     db::{
         Database,
-        playlists::{self, Playlist},
         tracks::{self, Track, TrackFilter},
     },
     error::{AppError, AppResult},
     import::runner::{self, ImportError, ImportManager, ImportStarted},
     library::{
         cache::{self, CacheCleared, CacheError, CacheInfo},
+        collections::{self, ListError, Member, PlaylistRow},
         edit::{self, EditError, TagsInput},
         scan::{self, ScanError, ScanReport},
     },
@@ -28,9 +28,9 @@ pub async fn list_tracks(
 }
 
 #[tauri::command]
-pub async fn list_playlists(db: State<'_, Database>) -> AppResult<Vec<Playlist>> {
+pub async fn list_playlists(db: State<'_, Database>) -> AppResult<Vec<PlaylistRow>> {
     let conn = db.conn()?;
-    playlists::list(&conn)
+    collections::list(&conn).map_err(list_err)
 }
 
 #[tauri::command]
@@ -62,6 +62,11 @@ fn scan_err(e: ScanError) -> AppError {
 
 fn cache_err(e: CacheError) -> AppError {
     eprintln!("[cache] {e}");
+    coded(e.code())
+}
+
+fn list_err(e: ListError) -> AppError {
+    eprintln!("[playlist] {e}");
     coded(e.code())
 }
 
@@ -251,6 +256,76 @@ pub async fn clear_cache(
 pub async fn open_music_folder(paths: State<'_, AppPaths>) -> AppResult<()> {
     tauri_plugin_opener::open_path(&paths.music_dir, None::<&str>).map_err(|e| {
         eprintln!("[library] open folder failed: {e}");
+        coded("library.io")
+    })
+}
+
+/// (playlist, track) pairs in playlist order; the frontend groups them.
+#[tauri::command]
+pub async fn list_playlist_members(db: State<'_, Database>) -> AppResult<Vec<Member>> {
+    let conn = db.conn()?;
+    collections::list_members(&conn).map_err(list_err)
+}
+
+/// A playlist of the user's own (no Spotify link, no folder on disk).
+#[tauri::command]
+pub async fn create_playlist(db: State<'_, Database>, name: String) -> AppResult<PlaylistRow> {
+    let conn = db.conn()?;
+    collections::create(&conn, &name).map_err(list_err)
+}
+
+#[tauri::command]
+pub async fn rename_playlist(
+    db: State<'_, Database>,
+    playlist_id: i64,
+    name: String,
+) -> AppResult<PlaylistRow> {
+    let conn = db.conn()?;
+    collections::rename(&conn, playlist_id, &name).map_err(list_err)
+}
+
+/// Deletes the playlist only: its tracks and files stay in the library.
+#[tauri::command]
+pub async fn delete_playlist(db: State<'_, Database>, playlist_id: i64) -> AppResult<()> {
+    let conn = db.conn()?;
+    collections::delete(&conn, playlist_id).map_err(list_err)
+}
+
+/// Returns how many tracks were actually added (duplicates are skipped).
+#[tauri::command]
+pub async fn add_to_playlist(
+    db: State<'_, Database>,
+    playlist_id: i64,
+    track_ids: Vec<i64>,
+) -> AppResult<usize> {
+    let conn = db.conn()?;
+    collections::add_tracks(&conn, playlist_id, &track_ids).map_err(list_err)
+}
+
+/// Removes the track from this playlist only; it stays in the library.
+#[tauri::command]
+pub async fn remove_from_playlist(
+    db: State<'_, Database>,
+    playlist_id: i64,
+    track_id: i64,
+) -> AppResult<bool> {
+    let conn = db.conn()?;
+    collections::remove_track(&conn, playlist_id, track_id).map_err(list_err)
+}
+
+/// Opens the folder of an imported playlist in Explorer.
+#[tauri::command]
+pub async fn reveal_playlist(
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+    playlist_id: i64,
+) -> AppResult<()> {
+    let dir = {
+        let conn = db.conn()?;
+        collections::playlist_dir(&conn, &paths.playlists_dir, playlist_id).map_err(list_err)?
+    };
+    tauri_plugin_opener::open_path(&dir, None::<&str>).map_err(|e| {
+        eprintln!("[library] open playlist folder failed: {e}");
         coded("library.io")
     })
 }
