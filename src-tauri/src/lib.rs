@@ -8,6 +8,8 @@ mod library;
 mod paths;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod spotify;
+#[allow(dead_code)] // temporal: se usa desde los comandos en 9.2
+mod stats;
 mod window;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod ytdlp;

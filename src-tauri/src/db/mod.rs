@@ -3,6 +3,7 @@
 pub mod playlists;
 #[cfg(debug_assertions)]
 mod seed;
+pub mod stats;
 pub mod tracks;
 
 use std::{
