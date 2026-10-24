@@ -639,7 +639,7 @@
 
 .marquee--always[data-overflow="true"] .marquee__inner,
 [data-marquee-host]:hover .marquee[data-overflow="true"] .marquee__inner,
-[data-marquee-host]:focus-within .marquee[data-overflow="true"] .marquee__inner {
+[data-marquee-host]:has(:focus-visible) .marquee[data-overflow="true"] .marquee__inner {
   display: inline-block;
   overflow: visible;
   text-overflow: clip;

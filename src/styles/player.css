@@ -75,3 +75,25 @@
 .row.is-current .muted {
   color: inherit;
 }
+/* ---------- The queue never grows with its content (D-105) ---------- */
+.queue__panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.queue__head > span {
+  min-width: 0;
+}
+
+.queue__list {
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.queue__item {
+  min-width: 0;
+}
+
+.queue__main {
+  overflow: hidden;
+}

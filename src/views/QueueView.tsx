@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { usePlayerStore } from "../state/playerStore";
+import { Marquee } from "../components/Marquee";
 import { PixelButton } from "../components/PixelButton";
 import { PixelPanel } from "../components/PixelPanel";
 import { Sprite } from "../components/Sprite";
@@ -35,10 +36,15 @@ export function QueueView() {
         ) : (
           <ol className="queue__list">
             {queue.map((track, i) => (
-              <li key={`${i}-${track.id}`} className={i === index ? "queue__item is-current" : "queue__item"}>
+              <li
+                key={`${i}-${track.id}`}
+                className={i === index ? "queue__item is-current" : "queue__item"}
+                data-marquee-host
+              >
                 <button type="button" className="queue__main" onClick={() => playAt(i)}>
-                  <span className="ellipsis">{track.title}</span>
-                  <span className="muted ellipsis">{track.artist}</span>
+                  {/* The playing track scrolls all the time; the others while hovered or focused. */}
+                  <Marquee text={track.title} always={i === index} />
+                  <Marquee className="muted" text={track.artist} />
                 </button>
                 <PixelButton variant="mini" aria-label={t("queue.moveUp")} disabled={i === 0} onClick={() => move(i, i - 1)}>
                   <Sprite name="icon-up" w={7} h={7} />

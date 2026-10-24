@@ -9,6 +9,7 @@ import { PixelPanel } from "./PixelPanel";
 import { ProgressStar } from "./ProgressStar";
 import { Sprite } from "./Sprite";
 import { VolumeControl } from "./VolumeControl";
+import { Marquee } from "./Marquee";
 
 /** Separate component: position changes ~4 times per second and must not re-render the whole bar. */
 function PlayerProgress({ children }: { children?: ReactNode }) {
@@ -62,10 +63,10 @@ export function PlayerBar() {
         <div className="player__cover">
           <CoverArt src={coverSrc} />
         </div>
-        <div className="player__info">
-          <span className="muted ellipsis">{t("player.nowPlaying")}</span>
-          <span className="ellipsis">{track ? track.title : t("player.nothingPlaying")}</span>
-          <span className="muted ellipsis">{error ? t("player.cantPlay") : (track?.artist ?? "")}</span>
+        <div className="player__info" data-marquee-host>
+          <Marquee className="muted" text={t("player.nowPlaying")} />
+          <Marquee text={track ? track.title : t("player.nothingPlaying")} always={playing} />
+          <Marquee className="muted" text={error ? t("player.cantPlay") : (track?.artist ?? "")} always={playing} />
         </div>
         <div className="player__controls">
           <PixelButton variant="ctl" aria-label={t("player.previous")} onClick={prev} disabled={!track}>
