@@ -767,3 +767,48 @@
   justify-content: space-between;
   gap: calc(var(--px) * 2);
 }
+
+/* ---------- Stats (H9.4) ---------- */
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 2);
+  min-width: 0;
+  margin-left: auto;
+}
+
+.month-nav__label {
+  min-width: 0;
+  text-align: center;
+  line-height: calc(var(--px) * 10);
+}
+
+.month-nav__btn {
+  appearance: none;
+  margin: 0;
+  padding: 0 calc(var(--px) * 2);
+  border: 0;
+  background: none;
+  font: inherit;
+  line-height: calc(var(--px) * 10);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.month-nav__btn:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.month-nav__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.month-nav__btn:focus-visible {
+  outline: calc(var(--px) * 1) solid var(--accent);
+}
+
+.stats__empty {
+  margin: 0;
+  line-height: calc(var(--px) * 10);
+}

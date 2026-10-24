@@ -380,6 +380,14 @@ pub async fn get_stats(
     stats::month_stats(&conn, &key, STATS_TOP).map_err(stats_err)
 }
 
+/// Months with listening time, newest first. The current month may be missing
+/// if nothing has been heard in it yet.
+#[tauri::command]
+pub async fn list_stat_months(db: State<'_, Database>) -> AppResult<Vec<String>> {
+    let conn = db.conn()?;
+    history::list_months(&conn).map_err(stats_err)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

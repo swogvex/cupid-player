@@ -90,8 +90,16 @@
       "db": "Error de la base de datos"
     },
     "stats": {
-      "bad_month": "Mes no válido",
-      "db": "Error de la base de datos"
+      "title": "Estadísticas",
+      "minutes": "Minutos",
+      "topArtist": "Top artista",
+      "topSong": "Top canción",
+      "topSongs": "Top canciones",
+      "emptyMonth": "Aún no has escuchado nada este mes",
+      "prevMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente",
+      "plays_one": "{{count}} reproducción",
+      "plays_other": "{{count}} reproducciones"
     },
     "playlist": {
       "not_found": "No se encontró la playlist",

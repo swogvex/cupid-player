@@ -90,8 +90,16 @@
       "db": "Database error"
     },
     "stats": {
-      "bad_month": "Invalid month",
-      "db": "Database error"
+      "title": "Stats",
+      "minutes": "Minutes",
+      "topArtist": "Top artist",
+      "topSong": "Top song",
+      "topSongs": "Top songs",
+      "emptyMonth": "You haven't listened to anything this month yet",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "plays_one": "{{count}} play",
+      "plays_other": "{{count}} plays"
     },
     "playlist": {
       "not_found": "Playlist not found",

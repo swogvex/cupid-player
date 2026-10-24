@@ -198,6 +198,18 @@ pub fn get_closed(conn: &Connection, month_key: &str) -> AppResult<Option<Closed
     .transpose()
 }
 
+/// Months that have listening time (still open or already closed), newest first.
+pub fn list_months(conn: &Connection) -> AppResult<Vec<String>> {
+    let mut stmt = conn.prepare(
+        "SELECT month_key FROM plays WHERE seconds_listened > 0 \
+         UNION \
+         SELECT month_key FROM monthly_stats \
+         ORDER BY month_key DESC",
+    )?;
+    let rows = stmt.query_map([], |r| r.get::<_, String>(0))?;
+    Ok(rows.collect::<rusqlite::Result<Vec<_>>>()?)
+}
+
 /// Helpers shared by the tests of `db::stats`, `stats::rollup` and `stats`.
 #[cfg(test)]
 pub mod test_support {
@@ -382,5 +394,25 @@ mod tests {
         assert_eq!(to_minutes(30), 1);
         assert_eq!(to_minutes(90), 2);
         assert_eq!(to_minutes(3600), 60);
+    }
+
+    #[test]
+    fn lists_months_with_listening_newest_first() {
+        let d = db();
+        let conn = d.conn().expect("conn");
+        assert!(list_months(&conn).expect("empty").is_empty());
+
+        let t = track(&conn, "T", "A");
+        listen(&conn, t, at(2026, 8, 5, 12, 0), 100);
+        listen(&conn, t, at(2026, 8, 6, 12, 0), 100); // same month twice
+        listen(&conn, t, at(2026, 9, 5, 12, 0), 50);
+        listen(&conn, t, at(2026, 7, 5, 12, 0), 0); // nothing heard: not listed
+        // A closed month whose plays no longer exist still counts.
+        insert_closed(&conn, "2026-05", 10, &[], &[], Utc::now()).expect("closed");
+
+        assert_eq!(
+            list_months(&conn).expect("months"),
+            ["2026-09", "2026-08", "2026-05"]
+        );
     }
 }
