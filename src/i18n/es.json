@@ -89,6 +89,10 @@
     "cache": {
       "db": "Error de la base de datos"
     },
+    "stats": {
+      "bad_month": "Mes no válido",
+      "db": "Error de la base de datos"
+    },
     "playlist": {
       "not_found": "No se encontró la playlist",
       "invalid_name": "Escribe un nombre (máximo 60 caracteres)",

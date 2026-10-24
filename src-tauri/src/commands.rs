@@ -3,7 +3,7 @@ use tauri::{AppHandle, Manager, State};
 
 use crate::{
     db::{
-        Database,
+        Database, stats as history,
         tracks::{self, Track, TrackFilter},
     },
     error::{AppError, AppResult},
@@ -16,6 +16,7 @@ use crate::{
     },
     paths::AppPaths,
     spotify::url::parse_spotify_url as parse_url,
+    stats::{self, MonthStats},
 };
 
 #[tauri::command]
@@ -334,4 +335,69 @@ pub async fn reveal_playlist(
         eprintln!("[library] open playlist folder failed: {e}");
         coded("library.io")
     })
+}
+
+/// How many artists and tracks the Stats screen shows.
+const STATS_TOP: usize = 10;
+
+/// Stable codes for the frontend: `stats.bad_month` passes through, anything else
+/// (database trouble, unknown track...) is logged and reported as `stats.db`.
+fn stats_err(e: AppError) -> AppError {
+    match e {
+        AppError::Msg(code) if code.starts_with("stats.") => AppError::Msg(code),
+        other => {
+            eprintln!("[stats] {other}");
+            coded("stats.db")
+        }
+    }
+}
+
+/// Opens a listening session for a track. Resolves with the session id, which
+/// `update_play` then uses. The frontend calls this once the track has been heard
+/// for a few seconds, so skipped songs leave no trace.
+#[tauri::command]
+pub async fn start_play(db: State<'_, Database>, track_id: i64) -> AppResult<i64> {
+    let conn = db.conn()?;
+    history::start_play(&conn, track_id, chrono::Local::now()).map_err(stats_err)
+}
+
+/// Raises the listened seconds of a session (it never lowers them). Resolves with
+/// `false` if the session no longer exists (e.g. its track was deleted).
+#[tauri::command]
+pub async fn update_play(db: State<'_, Database>, play_id: i64, seconds: i64) -> AppResult<bool> {
+    let conn = db.conn()?;
+    history::update_play(&conn, play_id, seconds).map_err(stats_err)
+}
+
+/// Stats of a month (`YYYY-MM`, local time). Without `month_key`, the current month.
+#[tauri::command]
+pub async fn get_stats(
+    db: State<'_, Database>,
+    month_key: Option<String>,
+) -> AppResult<MonthStats> {
+    let key = month_key.unwrap_or_else(|| history::month_key_of(chrono::Local::now()));
+    let conn = db.conn()?;
+    stats::month_stats(&conn, &key, STATS_TOP).map_err(stats_err)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn stats_errors_keep_stable_codes_and_hide_the_rest() {
+        let code = |e: AppError| stats_err(e).to_string();
+        assert_eq!(
+            code(AppError::Msg("stats.bad_month".into())),
+            "stats.bad_month"
+        );
+        assert_eq!(
+            code(AppError::Msg("database lock poisoned".into())),
+            "stats.db"
+        );
+        assert_eq!(
+            code(AppError::Db(rusqlite::Error::QueryReturnedNoRows)),
+            "stats.db"
+        );
+    }
 }

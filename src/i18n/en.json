@@ -89,6 +89,10 @@
     "cache": {
       "db": "Database error"
     },
+    "stats": {
+      "bad_month": "Invalid month",
+      "db": "Database error"
+    },
     "playlist": {
       "not_found": "Playlist not found",
       "invalid_name": "Enter a name (60 characters max)",

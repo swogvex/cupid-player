@@ -120,3 +120,28 @@ export interface PlaylistMember {
   playlistId: number;
   trackId: number;
 }
+
+/** One artist in a month's ranking. */
+export interface ArtistStat {
+  artist: string;
+  seconds: number;
+}
+
+/** One track in a month's ranking. `plays` counts listening sessions. */
+export interface TrackStat {
+  title: string;
+  artist: string;
+  seconds: number;
+  plays: number;
+}
+
+/** Returned by get_stats. */
+export interface MonthStats {
+  /** "YYYY-MM", local time. */
+  monthKey: string;
+  minutes: number;
+  topArtists: ArtistStat[];
+  topTracks: TrackStat[];
+  /** true when the numbers come from the frozen monthly summary. */
+  closed: boolean;
+}

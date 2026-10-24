@@ -8,7 +8,6 @@ mod library;
 mod paths;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod spotify;
-#[allow(dead_code)] // temporal: se usa desde los comandos en 9.2
 mod stats;
 mod window;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
@@ -53,6 +52,13 @@ pub fn run() {
                     Ok(n) => eprintln!("[library] fixed {n} missing durations"),
                     Err(e) => eprintln!("[library] duration backfill failed: {e}"),
                 }
+                // Freeze the summary of every finished month (also covers an app that stayed
+                // closed for months). A failure here must never stop the app from opening.
+                match stats::rollup::close_pending_months(&conn, chrono::Local::now()) {
+                    Ok(months) if months.is_empty() => {}
+                    Ok(months) => eprintln!("[stats] closed months: {}", months.join(", ")),
+                    Err(e) => eprintln!("[stats] monthly close failed: {e}"),
+                }
             }
 
             #[cfg(debug_assertions)]
@@ -92,6 +98,9 @@ pub fn run() {
             commands::get_cache_info,
             commands::clear_cache,
             commands::open_music_folder,
+            commands::start_play,
+            commands::update_play,
+            commands::get_stats,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

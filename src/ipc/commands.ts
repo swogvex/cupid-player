@@ -4,6 +4,7 @@ import type {
   CacheCleared,
   CacheInfo,
   ImportStarted,
+  MonthStats,
   ParsedLink,
   Playlist,
   PlaylistMember,
@@ -95,6 +96,22 @@ export const getCacheInfo = () => invoke<CacheInfo>("get_cache_info");
 export const clearCache = () => invoke<CacheCleared>("clear_cache");
 
 export const openMusicFolder = () => invoke<void>("open_music_folder");
+
+/**
+ * Opens a listening session for a track (call it once the track has been heard for a few
+ * seconds). Resolves with the session id. Rejects with a "stats.*" code.
+ */
+export const startPlay = (trackId: number) => invoke<number>("start_play", { trackId });
+
+/**
+ * Raises the listened seconds of a session; Rust never lowers them. `seconds` must be an
+ * integer (use Math.floor). Resolves with false if the session no longer exists.
+ */
+export const updatePlay = (playId: number, seconds: number) =>
+  invoke<boolean>("update_play", { playId, seconds });
+
+/** Stats of a month ("YYYY-MM", local time); the current month if omitted. */
+export const getStats = (monthKey?: string) => invoke<MonthStats>("get_stats", { monthKey });
 
 /** Resizes the window to 352*n x 208*n. Resolves with the scale actually applied. */
 export function setWindowScale(n: number): Promise<number> {

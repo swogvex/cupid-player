@@ -3,7 +3,6 @@
 //! The frontend counts real listening time (clock time while the audio is playing).
 //! It creates the row with `start_play` once a track has been heard for a few seconds
 //! and then raises `seconds_listened` with `update_play` (checkpoints and final flush).
-#![allow(dead_code)] // temporal: se usa desde los comandos en 9.2
 
 use chrono::{DateTime, Local, SecondsFormat, Utc};
 use rusqlite::{Connection, OptionalExtension, params};
