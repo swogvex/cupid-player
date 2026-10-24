@@ -5,6 +5,8 @@
 //! Imported (Spotify) playlists are members too: SQL triggers keep the table in
 //! sync with `tracks.playlist_id`, so the importer needs no changes.
 
+use std::collections::HashSet;
+use std::fs;
 use std::path::{Path, PathBuf};
 
 use chrono::{SecondsFormat, Utc};
@@ -13,8 +15,10 @@ use serde::Serialize;
 use thiserror::Error;
 
 use crate::db::playlists::{self, NewPlaylist};
-use crate::library::edit::clean_tag;
-use crate::library::names;
+use crate::db::tracks::{self, TrackFilter};
+use crate::library::edit::{self, clean_tag};
+use crate::library::{covers, names};
+use crate::paths::AppPaths;
 
 pub const MAX_NAME_CHARS: usize = 60;
 /// Tracks that can be added to a playlist in one call.
@@ -32,6 +36,8 @@ pub enum ListError {
     TooMany,
     #[error("the playlist has no usable folder")]
     NoFolder,
+    #[error("could not delete files: {0}")]
+    Files(String),
     #[error("database: {0}")]
     Db(String),
 }
@@ -51,6 +57,7 @@ impl ListError {
             ListError::NameTaken => "playlist.name_taken",
             ListError::TooMany => "playlist.too_many",
             ListError::NoFolder => "playlist.no_folder",
+            ListError::Files(_) => "playlist.files_failed",
             ListError::Db(_) => "playlist.db",
         }
     }
@@ -149,6 +156,99 @@ pub fn delete(conn: &Connection, id: i64) -> Result<(), ListError> {
     let n = conn.execute("DELETE FROM playlists WHERE id = ?1", [id])?;
     if n == 0 {
         return Err(ListError::NotFound);
+    }
+    Ok(())
+}
+
+/// Ids of the tracks that were imported together with this playlist.
+fn origin_track_ids(conn: &Connection, playlist_id: i64) -> Result<Vec<i64>, ListError> {
+    let mut stmt = conn.prepare("SELECT id FROM tracks WHERE playlist_id = ?1")?;
+    let rows = stmt.query_map([playlist_id], |r| r.get::<_, i64>(0))?;
+    Ok(rows.collect::<rusqlite::Result<Vec<_>>>()?)
+}
+
+fn is_partial_download(path: &Path) -> bool {
+    path.extension()
+        .and_then(|e| e.to_str())
+        .is_some_and(|e| matches!(e.to_ascii_lowercase().as_str(), "part" | "ytdl"))
+}
+
+/// Removes what a deleted playlist leaves in its folder, never audio: the playlist
+/// cover, track covers nobody uses, partial downloads and the folders if empty.
+/// `remove_dir` only works on empty folders, so songs that stay keep their folder.
+fn tidy_folder(conn: &Connection, music_dir: &Path, dir: &Path) {
+    if !names::is_inside(music_dir, dir) {
+        return;
+    }
+    let remaining = tracks::list(conn, &TrackFilter::default()).unwrap_or_default();
+
+    for kind in [covers::ImageKind::Jpeg, covers::ImageKind::Png] {
+        let cover = covers::playlist_cover_path(dir, kind);
+        if !cover.is_file() {
+            continue;
+        }
+        // Tracks that used it as their fallback lose it: their art falls back to the theme's.
+        for t in &remaining {
+            if t.cover_path
+                .as_deref()
+                .is_some_and(|p| Path::new(p) == cover.as_path())
+            {
+                let _ = conn.execute("UPDATE tracks SET cover_path = NULL WHERE id = ?1", [t.id]);
+            }
+        }
+        let _ = fs::remove_file(&cover);
+    }
+
+    for entry in fs::read_dir(dir).into_iter().flatten().flatten() {
+        let path = entry.path();
+        if path.is_file() && is_partial_download(&path) {
+            let _ = fs::remove_file(path);
+        }
+    }
+
+    // Matched by file name, like the cache cleanup: the worst case is keeping a cover.
+    let in_use: HashSet<String> = remaining
+        .iter()
+        .filter_map(|t| t.cover_path.as_deref())
+        .filter_map(|p| {
+            Path::new(p)
+                .file_name()
+                .map(|n| n.to_string_lossy().to_lowercase())
+        })
+        .collect();
+    let covers_dir = dir.join(covers::COVERS_DIR);
+    for entry in fs::read_dir(&covers_dir).into_iter().flatten().flatten() {
+        let path = entry.path();
+        let name = entry.file_name().to_string_lossy().to_lowercase();
+        if path.is_file() && !in_use.contains(&name) {
+            let _ = fs::remove_file(path);
+        }
+    }
+    let _ = fs::remove_dir(&covers_dir);
+    let _ = fs::remove_dir(dir);
+}
+
+/// Deletes a playlist and tidies its folder (imported playlists only).
+/// With `delete_files` it also deletes the tracks imported with it, their files and
+/// covers, and then the folder. Without it every song stays in the library.
+pub fn delete_playlist(
+    conn: &Connection,
+    paths: &AppPaths,
+    id: i64,
+    delete_files: bool,
+) -> Result<(), ListError> {
+    get(conn, id)?;
+    // Only imported playlists have a folder; user playlists are database-only.
+    let dir = playlist_dir(conn, &paths.playlists_dir, id).ok();
+    if delete_files && dir.is_some() {
+        for track_id in origin_track_ids(conn, id)? {
+            edit::delete_track(conn, &paths.music_dir, track_id, true)
+                .map_err(|e| ListError::Files(e.to_string()))?;
+        }
+    }
+    delete(conn, id)?;
+    if let Some(dir) = dir {
+        tidy_folder(conn, &paths.music_dir, &dir);
     }
     Ok(())
 }
@@ -440,6 +540,152 @@ mod tests {
         assert!(matches!(
             add_tracks(&conn, p, &ids),
             Err(ListError::TooMany)
+        ));
+    }
+
+    struct Disk {
+        root: PathBuf,
+        paths: AppPaths,
+    }
+
+    impl Disk {
+        fn new() -> Self {
+            let root =
+                std::env::temp_dir().join(format!("cupid-pldel-test-{}", uuid::Uuid::new_v4()));
+            let paths = AppPaths::new(&root.join("data"), &root.join("CupidPlayer"));
+            fs::create_dir_all(&paths.playlists_dir).expect("dirs");
+            Self { root, paths }
+        }
+
+        /// A small file under `Playlists\`.
+        fn file(&self, parts: &[&str]) -> PathBuf {
+            let mut p = self.paths.playlists_dir.clone();
+            for part in parts {
+                p.push(part);
+            }
+            fs::create_dir_all(p.parent().expect("parent")).expect("parent dir");
+            fs::write(&p, b"x").expect("file");
+            p
+        }
+    }
+
+    impl Drop for Disk {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.root);
+        }
+    }
+
+    /// Imported playlist "Mix" with songs A and B, a playlist cover, A's own cover,
+    /// an unused cover and a partial download. Song B uses the playlist cover as fallback.
+    fn imported_mix(conn: &Connection, disk: &Disk) -> (i64, i64, i64) {
+        let pid = playlists::insert(conn, &NewPlaylist::basic("Mix", "Mix")).expect("playlist");
+        let a_file = disk.file(&["Mix", "01 - X - A.opus"]);
+        let a_cover = disk.file(&["Mix", ".covers", "01 - X - A.jpg"]);
+        let b_file = disk.file(&["Mix", "02 - X - B.opus"]);
+        let cover = disk.file(&["Mix", "cover.jpg"]);
+        disk.file(&["Mix", ".covers", "old.jpg"]);
+        disk.file(&["Mix", "stuck.opus.part"]);
+
+        let mut a = NewTrack::basic("A", "X", 1000);
+        a.playlist_id = Some(pid);
+        a.position = Some(1);
+        a.status = "done".into();
+        a.file_path = Some(a_file.to_string_lossy().into_owned());
+        a.cover_path = Some(a_cover.to_string_lossy().into_owned());
+        let a_id = tracks::insert(conn, &a).expect("a");
+
+        let mut b = NewTrack::basic("B", "X", 1000);
+        b.playlist_id = Some(pid);
+        b.position = Some(2);
+        b.status = "done".into();
+        b.file_path = Some(b_file.to_string_lossy().into_owned());
+        b.cover_path = Some(cover.to_string_lossy().into_owned());
+        let b_id = tracks::insert(conn, &b).expect("b");
+        (pid, a_id, b_id)
+    }
+
+    #[test]
+    fn deleting_an_imported_playlist_keeps_the_songs_and_removes_the_residues() {
+        let d = db();
+        let conn = d.conn().expect("conn");
+        let disk = Disk::new();
+        let (pid, a, b) = imported_mix(&conn, &disk);
+        let dir = disk.paths.playlists_dir.join("Mix");
+
+        delete_playlist(&conn, &disk.paths, pid, false).expect("delete");
+        assert!(matches!(get(&conn, pid), Err(ListError::NotFound)));
+
+        let ta = tracks::get(&conn, a).expect("get").expect("A stays");
+        let tb = tracks::get(&conn, b).expect("get").expect("B stays");
+        assert!(Path::new(ta.file_path.as_deref().expect("file")).is_file());
+        assert!(Path::new(tb.file_path.as_deref().expect("file")).is_file());
+        assert!(
+            Path::new(ta.cover_path.as_deref().expect("cover")).is_file(),
+            "its own cover stays"
+        );
+        assert_eq!(
+            tb.cover_path, None,
+            "the fallback cover left with the playlist"
+        );
+        assert!(!dir.join("cover.jpg").exists());
+        assert!(!dir.join(".covers").join("old.jpg").exists());
+        assert!(!dir.join("stuck.opus.part").exists());
+        assert!(dir.is_dir(), "the songs keep their folder");
+    }
+
+    #[test]
+    fn deleting_with_files_removes_the_songs_and_the_whole_folder() {
+        let d = db();
+        let conn = d.conn().expect("conn");
+        let disk = Disk::new();
+        let (pid, a, b) = imported_mix(&conn, &disk);
+        let dir = disk.paths.playlists_dir.join("Mix");
+        let mine = create(&conn, "Mine").expect("user playlist").id;
+        add_tracks(&conn, mine, &[a]).expect("add");
+
+        delete_playlist(&conn, &disk.paths, pid, true).expect("delete");
+        assert!(tracks::get(&conn, a).expect("get").is_none());
+        assert!(tracks::get(&conn, b).expect("get").is_none());
+        assert!(!dir.exists(), "no residues are left");
+        assert_eq!(get(&conn, mine).expect("get").track_count, 0);
+    }
+
+    #[test]
+    fn files_the_playlist_does_not_own_are_never_deleted() {
+        let d = db();
+        let conn = d.conn().expect("conn");
+        let disk = Disk::new();
+        let (pid, _, _) = imported_mix(&conn, &disk);
+        let dir = disk.paths.playlists_dir.join("Mix");
+        let extra = disk.file(&["Mix", "extra.opus"]);
+        let mut t = NewTrack::basic("Extra", "Y", 1000);
+        t.file_path = Some(extra.to_string_lossy().into_owned());
+        t.status = "done".into();
+        let extra_id = tracks::insert(&conn, &t).expect("registered in place");
+
+        delete_playlist(&conn, &disk.paths, pid, true).expect("delete");
+        assert!(extra.is_file());
+        assert!(tracks::get(&conn, extra_id).expect("get").is_some());
+        assert!(
+            dir.is_dir(),
+            "the folder stays because it still holds a song"
+        );
+    }
+
+    #[test]
+    fn deleting_a_user_playlist_touches_no_files() {
+        let d = db();
+        let conn = d.conn().expect("conn");
+        let disk = Disk::new();
+        let keep = disk.file(&["Mix", "keep.opus"]);
+        let p = create(&conn, "Mine").expect("playlist").id;
+
+        delete_playlist(&conn, &disk.paths, p, true).expect("delete");
+        assert!(keep.is_file());
+        assert!(matches!(get(&conn, p), Err(ListError::NotFound)));
+        assert!(matches!(
+            delete_playlist(&conn, &disk.paths, p, false),
+            Err(ListError::NotFound)
         ));
     }
 }

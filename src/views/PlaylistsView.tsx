@@ -75,9 +75,6 @@ export function PlaylistsView() {
         <h2 id="view-playlists" className="view__title">
           {t("playlists.title")}
         </h2>
-        <PixelButton onClick={() => usePlaylistMenuStore.getState().openName({ mode: "create" })}>
-          {t("playlists.new")}
-        </PixelButton>
       </header>
       {error ? (
         <p className="muted">{error}</p>

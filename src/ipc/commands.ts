@@ -67,9 +67,12 @@ export const createPlaylist = (name: string) => invoke<Playlist>("create_playlis
 export const renamePlaylist = (playlistId: number, name: string) =>
   invoke<Playlist>("rename_playlist", { playlistId, name });
 
-/** Deletes the playlist only: its tracks and files stay in the library. */
-export const deletePlaylist = (playlistId: number) =>
-  invoke<void>("delete_playlist", { playlistId });
+/**
+ * Deletes the playlist and tidies its folder (imported playlists). With deleteFiles it also
+ * deletes the songs imported with it and their files; otherwise every song stays.
+ */
+export const deletePlaylist = (playlistId: number, deleteFiles: boolean) =>
+  invoke<void>("delete_playlist", { playlistId, deleteFiles });
 
 /** Resolves with how many tracks were added (duplicates are skipped). */
 export const addToPlaylist = (playlistId: number, trackIds: number[]) =>

@@ -95,7 +95,8 @@
       "name_taken": "A playlist with that name already exists",
       "too_many": "Too many songs at once",
       "no_folder": "This playlist has no folder on disk",
-      "db": "Database error"
+      "db": "Database error",
+      "files_failed": "Some files could not be deleted (are they in use?)"
     }
   },
   "player": {
@@ -140,7 +141,7 @@
     "title": "Playlists",
     "tracks_one": "{{count}} song",
     "tracks_other": "{{count}} songs",
-    "empty": "No playlists yet",
+    "empty": "No playlists yet. Right-click to create one.",
     "new": "New",
     "emptyPlaylist": "This playlist is empty",
     "addSongs": "Add songs…"
@@ -256,7 +257,13 @@
     "title": "Delete playlist",
     "message": "The playlist “{{name}}” will be deleted. Its songs stay in your library.",
     "cancel": "Cancel",
-    "confirm": "Delete"
+    "confirm": "Delete",
+    "messageImported": "The playlist “{{name}}”, imported from Spotify, will be deleted.",
+    "hintKeep": "“Playlist only” keeps the songs and their files; the playlist cover and leftovers are removed.",
+    "hintFiles_one": "“Delete the files too” removes 1 song from the library (and from other playlists), its file and the folder.",
+    "hintFiles_other": "“Delete the files too” removes {{count}} songs from the library (and from other playlists), their files and the folder.",
+    "keep": "Playlist only",
+    "withFiles": "Delete the files too"
   },
   "picker": {
     "title": "Add songs",

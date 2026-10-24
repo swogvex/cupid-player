@@ -95,7 +95,8 @@
       "name_taken": "Ya existe una playlist con ese nombre",
       "too_many": "Demasiadas canciones a la vez",
       "no_folder": "Esta playlist no tiene carpeta en el disco",
-      "db": "Error de la base de datos"
+      "db": "Error de la base de datos",
+      "files_failed": "No se pudieron borrar algunos archivos (¿están en uso?)"
     }
   },
   "player": {
@@ -140,7 +141,7 @@
     "title": "Playlists",
     "tracks_one": "{{count}} canción",
     "tracks_other": "{{count}} canciones",
-    "empty": "Aún no hay playlists",
+    "empty": "Aún no hay playlists. Haz clic derecho para crear una.",
     "new": "Nueva",
     "emptyPlaylist": "Esta playlist está vacía",
     "addSongs": "Añadir canciones…"
@@ -256,7 +257,13 @@
     "title": "Eliminar playlist",
     "message": "Se eliminará la playlist «{{name}}». Sus canciones se quedan en tu biblioteca.",
     "cancel": "Cancelar",
-    "confirm": "Eliminar"
+    "confirm": "Eliminar",
+    "messageImported": "Se eliminará la playlist «{{name}}», importada de Spotify.",
+    "hintKeep": "«Solo la playlist» conserva las canciones y sus archivos; se borran la portada de la playlist y los restos.",
+    "hintFiles_one": "«Borrar también los archivos» elimina 1 canción de la biblioteca (y de otras playlists), su archivo y la carpeta.",
+    "hintFiles_other": "«Borrar también los archivos» elimina {{count}} canciones de la biblioteca (y de otras playlists), sus archivos y la carpeta.",
+    "keep": "Solo la playlist",
+    "withFiles": "Borrar también los archivos"
   },
   "picker": {
     "title": "Añadir canciones",

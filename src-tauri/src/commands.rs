@@ -284,11 +284,17 @@ pub async fn rename_playlist(
     collections::rename(&conn, playlist_id, &name).map_err(list_err)
 }
 
-/// Deletes the playlist only: its tracks and files stay in the library.
+/// Deletes the playlist and tidies its folder. With `delete_files` it also deletes the
+/// tracks imported with it and their files; without it every song stays in the library.
 #[tauri::command]
-pub async fn delete_playlist(db: State<'_, Database>, playlist_id: i64) -> AppResult<()> {
+pub async fn delete_playlist(
+    db: State<'_, Database>,
+    paths: State<'_, AppPaths>,
+    playlist_id: i64,
+    delete_files: bool,
+) -> AppResult<()> {
     let conn = db.conn()?;
-    collections::delete(&conn, playlist_id).map_err(list_err)
+    collections::delete_playlist(&conn, &paths, playlist_id, delete_files).map_err(list_err)
 }
 
 /// Returns how many tracks were actually added (duplicates are skipped).
