@@ -1,6 +1,7 @@
 import { useSettingsStore } from "../state/settingsStore";
 import { usePlayerStore } from "../state/playerStore";
 import * as engine from "./engine";
+import { initListenTracker } from "./listenTracker";
 import { initMediaSession } from "./mediaSession";
 import { initShortcuts } from "./shortcuts";
 
@@ -23,11 +24,13 @@ export function initAudio(): () => void {
 
   const offMedia = initMediaSession();
   const offKeys = initShortcuts();
+  const offListen = initListenTracker();
 
   return () => {
     offVolume();
     offEngine();
     offMedia();
     offKeys();
+    offListen();
   };
 }
