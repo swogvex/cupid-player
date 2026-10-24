@@ -10,6 +10,8 @@ interface LibraryState {
   loading: boolean;
   error: string | null;
   load: (filter?: TrackFilter) => Promise<void>;
+  /** Reloads only playlists and their members (after creating, renaming, adding...). */
+  refreshPlaylists: () => Promise<void>;
   /** Updates one row in place (live import progress) without reloading. */
   setTrackStatus: (id: number, status: TrackStatus) => void;
   /** Swaps a row for the version returned by the backend (after editing). */
@@ -41,6 +43,14 @@ export const useLibraryStore = create<LibraryState>((set) => ({
       set({ tracks, playlists, members: groupMembers(members), loading: false });
     } catch (e) {
       set({ loading: false, error: String(e) });
+    }
+  },
+  refreshPlaylists: async () => {
+    try {
+      const [playlists, members] = await Promise.all([listPlaylists(), listPlaylistMembers()]);
+      set({ playlists, members: groupMembers(members) });
+    } catch (e) {
+      set({ error: String(e) });
     }
   },
   setTrackStatus: (id, status) =>

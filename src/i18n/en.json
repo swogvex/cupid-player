@@ -140,7 +140,10 @@
     "title": "Playlists",
     "tracks_one": "{{count}} song",
     "tracks_other": "{{count}} songs",
-    "empty": "No playlists yet"
+    "empty": "No playlists yet",
+    "new": "New",
+    "emptyPlaylist": "This playlist is empty",
+    "addSongs": "Add songs…"
   },
   "stats": {
     "title": "Stats",
@@ -187,7 +190,10 @@
     "enqueue": "Add to queue",
     "edit": "Edit…",
     "reveal": "Show in folder",
-    "delete": "Delete…"
+    "delete": "Delete…",
+    "addToPlaylist": "Add to playlist…",
+    "removeFromPlaylist": "Remove from playlist",
+    "deleteFromLibrary": "Delete from library…"
   },
   "edit": {
     "title": "Edit song",
@@ -226,5 +232,48 @@
     "nothing": "Nothing to clean",
     "cleared_one": "1 file removed ({{size}})",
     "cleared_other": "{{count}} files removed ({{size}})"
+  },
+  "playlistMenu": {
+    "label": "Playlist actions",
+    "new": "New playlist…",
+    "play": "Play",
+    "enqueue": "Add to queue",
+    "addSongs": "Add songs…",
+    "rename": "Rename…",
+    "reveal": "Show in folder",
+    "delete": "Delete playlist…"
+  },
+  "playlistName": {
+    "createTitle": "New playlist",
+    "renameTitle": "Rename playlist",
+    "label": "Name",
+    "create": "Create",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel"
+  },
+  "playlistDelete": {
+    "title": "Delete playlist",
+    "message": "The playlist “{{name}}” will be deleted. Its songs stay in your library.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "picker": {
+    "title": "Add songs",
+    "search": "Search songs",
+    "empty": "No songs found",
+    "alreadyIn": "Already in the playlist",
+    "selectVisible": "Select visible",
+    "selected_one": "1 selected",
+    "selected_other": "{{count}} selected",
+    "add": "Add ({{count}})",
+    "cancel": "Cancel"
+  },
+  "addTo": {
+    "title": "Add to a playlist",
+    "new": "New playlist…",
+    "already": "already there",
+    "none": "You have no playlists yet",
+    "cancel": "Cancel"
   }
 }

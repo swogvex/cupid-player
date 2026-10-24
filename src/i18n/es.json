@@ -140,7 +140,10 @@
     "title": "Playlists",
     "tracks_one": "{{count}} canción",
     "tracks_other": "{{count}} canciones",
-    "empty": "Aún no hay playlists"
+    "empty": "Aún no hay playlists",
+    "new": "Nueva",
+    "emptyPlaylist": "Esta playlist está vacía",
+    "addSongs": "Añadir canciones…"
   },
   "stats": {
     "title": "Estadísticas",
@@ -187,7 +190,10 @@
     "enqueue": "Añadir a la cola",
     "edit": "Editar…",
     "reveal": "Mostrar en la carpeta",
-    "delete": "Eliminar…"
+    "delete": "Eliminar…",
+    "addToPlaylist": "Añadir a playlist…",
+    "removeFromPlaylist": "Quitar de la playlist",
+    "deleteFromLibrary": "Eliminar de la biblioteca…"
   },
   "edit": {
     "title": "Editar canción",
@@ -226,5 +232,48 @@
     "nothing": "No había nada que limpiar",
     "cleared_one": "1 archivo eliminado ({{size}})",
     "cleared_other": "{{count}} archivos eliminados ({{size}})"
+  },
+  "playlistMenu": {
+    "label": "Acciones de la playlist",
+    "new": "Nueva playlist…",
+    "play": "Reproducir",
+    "enqueue": "Añadir a la cola",
+    "addSongs": "Añadir canciones…",
+    "rename": "Renombrar…",
+    "reveal": "Mostrar en la carpeta",
+    "delete": "Eliminar playlist…"
+  },
+  "playlistName": {
+    "createTitle": "Nueva playlist",
+    "renameTitle": "Renombrar playlist",
+    "label": "Nombre",
+    "create": "Crear",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "cancel": "Cancelar"
+  },
+  "playlistDelete": {
+    "title": "Eliminar playlist",
+    "message": "Se eliminará la playlist «{{name}}». Sus canciones se quedan en tu biblioteca.",
+    "cancel": "Cancelar",
+    "confirm": "Eliminar"
+  },
+  "picker": {
+    "title": "Añadir canciones",
+    "search": "Buscar canciones",
+    "empty": "No hay canciones",
+    "alreadyIn": "Ya está en la playlist",
+    "selectVisible": "Seleccionar visibles",
+    "selected_one": "1 seleccionada",
+    "selected_other": "{{count}} seleccionadas",
+    "add": "Añadir ({{count}})",
+    "cancel": "Cancelar"
+  },
+  "addTo": {
+    "title": "Añadir a una playlist",
+    "new": "Nueva playlist…",
+    "already": "ya está",
+    "none": "Aún no tienes playlists",
+    "cancel": "Cancelar"
   }
 }

@@ -10,6 +10,8 @@ type TrackRowProps = {
   track: Track;
   /** Called on double click or Enter. Only fires for tracks that have a downloaded file. */
   onPlay?: (track: Track) => void;
+  /** Set when the row lives inside a playlist: its menu gains "Remove from playlist". */
+  playlistId?: number;
   /** Only used by virtualized lists. */
   style?: CSSProperties;
   rowRef?: Ref<HTMLLIElement>;
@@ -18,7 +20,7 @@ type TrackRowProps = {
   total?: number;
 };
 
-export function TrackRow({ track, onPlay, style, rowRef, index, total }: TrackRowProps) {
+export function TrackRow({ track, onPlay, playlistId, style, rowRef, index, total }: TrackRowProps) {
   const { t } = useTranslation();
   const label = t(`status.${track.status}`);
   const isCurrent = usePlayerStore((s) => selectCurrent(s)?.id === track.id);
@@ -36,10 +38,12 @@ export function TrackRow({ track, onPlay, style, rowRef, index, total }: TrackRo
       play();
     }
   };
-  // Right click, or the keyboard's menu key / Shift+F10 on a focused row.
+  // Right click, or the keyboard's menu key / Shift+F10 on a focused row. The event
+  // stops here so the view's own menu (empty area) does not open as well.
   const onContextMenu = (e: MouseEvent<HTMLLIElement>) => {
     e.preventDefault();
-    useTrackMenuStore.getState().openMenu(track.id, e.clientX, e.clientY);
+    e.stopPropagation();
+    useTrackMenuStore.getState().openMenu(track.id, e.clientX, e.clientY, playlistId ?? null);
   };
 
   const className = [

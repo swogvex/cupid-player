@@ -1,0 +1,757 @@
+=== QueueView.tsx ===
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { usePlayerStore } from "../state/playerStore";
+import { PixelButton } from "../components/PixelButton";
+import { PixelPanel } from "../components/PixelPanel";
+import { Sprite } from "../components/Sprite";
+
+export function QueueView() {
+  const { t } = useTranslation();
+  const open = usePlayerStore((s) => s.queueOpen);
+  const queue = usePlayerStore((s) => s.queue);
+  const index = usePlayerStore((s) => s.index);
+  const { playAt, move, removeAt, clearQueue, setQueueOpen } = usePlayerStore.getState();
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setQueueOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, setQueueOpen]);
+
+  if (!open) return null;
+
+  return (
+    <aside className="queue" aria-label={t("queue.title")}>
+      <PixelPanel className="queue__panel">
+        <div className="queue__head">
+          <span>{t("queue.title")}</span>
+          <PixelButton variant="mini" aria-label={t("queue.clear")} onClick={clearQueue} disabled={queue.length < 2}>
+            <Sprite name="icon-remove" w={7} h={7} />
+          </PixelButton>
+        </div>
+        {queue.length === 0 ? (
+          <p className="muted queue__empty">{t("queue.empty")}</p>
+        ) : (
+          <ol className="queue__list">
+            {queue.map((track, i) => (
+              <li key={`${i}-${track.id}`} className={i === index ? "queue__item is-current" : "queue__item"}>
+                <button type="button" className="queue__main" onClick={() => playAt(i)}>
+                  <span className="ellipsis">{track.title}</span>
+                  <span className="muted ellipsis">{track.artist}</span>
+                </button>
+                <PixelButton variant="mini" aria-label={t("queue.moveUp")} disabled={i === 0} onClick={() => move(i, i - 1)}>
+                  <Sprite name="icon-up" w={7} h={7} />
+                </PixelButton>
+                <PixelButton
+                  variant="mini"
+                  aria-label={t("queue.moveDown")}
+                  disabled={i === queue.length - 1}
+                  onClick={() => move(i, i + 1)}
+                >
+                  <Sprite name="icon-down" w={7} h={7} />
+                </PixelButton>
+                <PixelButton variant="mini" aria-label={t("queue.remove")} onClick={() => removeAt(i)}>
+                  <Sprite name="icon-remove" w={7} h={7} />
+                </PixelButton>
+              </li>
+            ))}
+          </ol>
+        )}
+      </PixelPanel>
+    </aside>
+  );
+}
+=== PlayerBar.tsx ===
+import { useMemo, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { formatTime } from "../lib/format";
+import { selectCurrent, usePlayerStore } from "../state/playerStore";
+import { CoverArt } from "./CoverArt";
+import { PixelButton } from "./PixelButton";
+import { PixelPanel } from "./PixelPanel";
+import { ProgressStar } from "./ProgressStar";
+import { Sprite } from "./Sprite";
+import { VolumeControl } from "./VolumeControl";
+
+/** Separate component: position changes ~4 times per second and must not re-render the whole bar. */
+function PlayerProgress({ children }: { children?: ReactNode }) {
+  const { t } = useTranslation();
+  const hasTrack = usePlayerStore((s) => s.index >= 0);
+  const position = usePlayerStore((s) => s.position);
+  const duration = usePlayerStore((s) => s.duration);
+  const playing = usePlayerStore((s) => s.playing);
+  const seekRatio = usePlayerStore((s) => s.seekRatio);
+  const [scrub, setScrub] = useState<number | null>(null);
+
+  const ratio = duration > 0 ? Math.min(1, position / duration) : 0;
+  const shown = scrub ?? ratio;
+
+  return (
+    <div className="player__bottom">
+      <span className="player__time">{formatTime(shown * duration * 1000)}</span>
+      <ProgressStar
+        value={shown}
+        onChange={setScrub}
+        onCommit={(v) => {
+          seekRatio(v);
+          setScrub(null);
+        }}
+        label={t("player.seek")}
+        beating={playing}
+        disabled={!hasTrack}
+      />
+      <span className="player__time player__time--end">{formatTime(duration * 1000)}</span>
+      {children}
+    </div>
+  );
+}
+
+export function PlayerBar() {
+  const { t } = useTranslation();
+  const track = usePlayerStore(selectCurrent);
+  const playing = usePlayerStore((s) => s.playing);
+  const error = usePlayerStore((s) => s.error);
+  const shuffle = usePlayerStore((s) => s.shuffle);
+  const repeat = usePlayerStore((s) => s.repeat);
+  const queueOpen = usePlayerStore((s) => s.queueOpen);
+  const { togglePlay, next, prev, toggleShuffle, cycleRepeat, toggleQueue } = usePlayerStore.getState();
+
+  const coverSrc = useMemo(() => (track?.coverPath ? convertFileSrc(track.coverPath) : null), [track?.coverPath]);
+  const repeatLabel = repeat === "one" ? t("player.repeatOne") : repeat === "all" ? t("player.repeatAll") : t("player.repeat");
+
+  return (
+    <PixelPanel className="player" deco>
+      <div className="player__top">
+        <div className="player__cover">
+          <CoverArt src={coverSrc} />
+        </div>
+        <div className="player__info">
+          <span className="muted ellipsis">{t("player.nowPlaying")}</span>
+          <span className="ellipsis">{track ? track.title : t("player.nothingPlaying")}</span>
+          <span className="muted ellipsis">{error ? t("player.cantPlay") : (track?.artist ?? "")}</span>
+        </div>
+        <div className="player__controls">
+          <PixelButton variant="ctl" aria-label={t("player.previous")} onClick={prev} disabled={!track}>
+            <Sprite name="icon-prev" w={9} h={9} />
+          </PixelButton>
+          <PixelButton
+            variant="ctl"
+            large
+            aria-label={playing ? t("player.pause") : t("player.play")}
+            onClick={togglePlay}
+            disabled={!track}
+          >
+            <Sprite name={playing ? "icon-pause" : "icon-play"} w={9} h={9} />
+          </PixelButton>
+          <PixelButton variant="ctl" aria-label={t("player.next")} onClick={next} disabled={!track}>
+            <Sprite name="icon-next" w={9} h={9} />
+          </PixelButton>
+        </div>
+        <div className="player__extras">
+          <PixelButton variant="mini" active={shuffle} aria-label={t("player.shuffle")} aria-pressed={shuffle} onClick={toggleShuffle}>
+            <Sprite name="icon-shuffle" w={7} h={7} />
+          </PixelButton>
+          <PixelButton variant="mini" active={repeat !== "off"} aria-label={repeatLabel} aria-pressed={repeat !== "off"} onClick={cycleRepeat}>
+            <Sprite name={repeat === "one" ? "icon-repeat-one" : "icon-repeat"} w={7} h={7} />
+          </PixelButton>
+          <PixelButton variant="mini" active={queueOpen} aria-label={t("player.queue")} aria-pressed={queueOpen} onClick={toggleQueue}>
+            <Sprite name="icon-queue" w={7} h={7} />
+          </PixelButton>
+        </div>
+      </div>
+      <PlayerProgress>
+        <VolumeControl />
+      </PlayerProgress>
+    </PixelPanel>
+  );
+}
+=== player.css ===
+/* H6: player extras + queue panel. All sizes in logical px via --s. */
+.player__extras {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: calc(var(--s) * 2px);
+}
+
+/* Sliding queue panel: between the title bar (24) and the player (60). */
+.queue {
+  position: fixed;
+  top: calc(var(--s) * 24px);
+  bottom: calc(var(--s) * 60px);
+  right: 0;
+  width: calc(var(--s) * 120px);
+  z-index: 20;
+  display: flex;
+}
+.queue__panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.queue__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: calc(var(--s) * 3px);
+}
+.queue__empty {
+  margin: 0;
+}
+.queue__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+.queue__item {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--s) * 1px);
+  padding: calc(var(--s) * 1px) 0;
+}
+.queue__item.is-current .queue__main {
+  color: var(--accent);
+}
+.queue__main {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  color: var(--ink);
+}
+.queue__main:focus-visible {
+  outline: calc(var(--s) * 1px) solid var(--accent);
+}
+
+/* Library rows: playable ones react to the pointer, the current one is highlighted. */
+.row--playable {
+  cursor: pointer;
+}
+.row--playable:focus-visible {
+  outline: calc(var(--s) * 1px) solid var(--accent);
+  outline-offset: calc(var(--s) * -1px);
+}
+.row.is-current {
+  color: var(--accent);
+}
+.row.is-current .muted {
+  color: inherit;
+}
+=== themes.css ===
+/* GENERATED by art/build-assets.mjs - do not edit. */
+
+:root,
+:root[data-theme="pink"] {
+  --bg: #F9CFD8;
+  --panel: #FBD8DF;
+  --panel-2: #FDE6EA;
+  --line: #E8A0B4;
+  --accent: #E8609A;
+  --accent-hi: #FF8CC0;
+  --ink: #6B1F4A;
+  --ink-soft: #B04A7C;
+  --star: #F6D365;
+  --ambient-bg: #2A2340;
+  --titlebar-bg: #E8A0B4;
+  --titlebar-ink: #6B1F4A;
+  --titlebar-shadow: #FDE6EA;
+  --titlebar-hi: #FDE6EA;
+  --spr-bar-fill: url("/assets/sprites/pink/bar-fill.png");
+  --spr-bar-track: url("/assets/sprites/pink/bar-track.png");
+  --spr-bow-20x7: url("/assets/sprites/pink/bow-20x7.png");
+  --spr-bow-40x16: url("/assets/sprites/pink/bow-40x16.png");
+  --spr-button-disabled: url("/assets/sprites/pink/button-disabled.png");
+  --spr-button-hover: url("/assets/sprites/pink/button-hover.png");
+  --spr-button-normal: url("/assets/sprites/pink/button-normal.png");
+  --spr-button-pressed: url("/assets/sprites/pink/button-pressed.png");
+  --spr-corner-7: url("/assets/sprites/pink/corner-7.png");
+  --spr-cover-ph-30: url("/assets/sprites/pink/cover-ph-30.png");
+  --spr-cover-shine: url("/assets/sprites/pink/cover-shine.png");
+  --spr-ctl-disabled: url("/assets/sprites/pink/ctl-disabled.png");
+  --spr-ctl-hover: url("/assets/sprites/pink/ctl-hover.png");
+  --spr-ctl-normal: url("/assets/sprites/pink/ctl-normal.png");
+  --spr-ctl-pressed: url("/assets/sprites/pink/ctl-pressed.png");
+  --spr-dash-4x1: url("/assets/sprites/pink/dash-4x1.png");
+  --spr-deco-heart: url("/assets/sprites/pink/deco-heart.png");
+  --spr-deco-star: url("/assets/sprites/pink/deco-star.png");
+  --spr-fill: url("/assets/sprites/pink/fill.png");
+  --spr-glint-7: url("/assets/sprites/pink/glint-7.png");
+  --spr-heart-16: url("/assets/sprites/pink/heart-16.png");
+  --spr-heart-8: url("/assets/sprites/pink/heart-8.png");
+  --spr-heart-beat: url("/assets/sprites/pink/heart-beat.png");
+  --spr-heart-wings-24x7: url("/assets/sprites/pink/heart-wings-24x7.png");
+  --spr-icon-back: url("/assets/sprites/pink/icon-back.png");
+  --spr-icon-down: url("/assets/sprites/pink/icon-down.png");
+  --spr-icon-download: url("/assets/sprites/pink/icon-download.png");
+  --spr-icon-link: url("/assets/sprites/pink/icon-link.png");
+  --spr-icon-list: url("/assets/sprites/pink/icon-list.png");
+  --spr-icon-next: url("/assets/sprites/pink/icon-next.png");
+  --spr-icon-note: url("/assets/sprites/pink/icon-note.png");
+  --spr-icon-pause: url("/assets/sprites/pink/icon-pause.png");
+  --spr-icon-play: url("/assets/sprites/pink/icon-play.png");
+  --spr-icon-prev: url("/assets/sprites/pink/icon-prev.png");
+  --spr-icon-queue: url("/assets/sprites/pink/icon-queue.png");
+  --spr-icon-remove: url("/assets/sprites/pink/icon-remove.png");
+  --spr-icon-repeat: url("/assets/sprites/pink/icon-repeat.png");
+  --spr-icon-repeat-one: url("/assets/sprites/pink/icon-repeat-one.png");
+  --spr-icon-shuffle: url("/assets/sprites/pink/icon-shuffle.png");
+  --spr-icon-sliders: url("/assets/sprites/pink/icon-sliders.png");
+  --spr-icon-star: url("/assets/sprites/pink/icon-star.png");
+  --spr-icon-up: url("/assets/sprites/pink/icon-up.png");
+  --spr-icon-vol-high: url("/assets/sprites/pink/icon-vol-high.png");
+  --spr-icon-vol-low: url("/assets/sprites/pink/icon-vol-low.png");
+  --spr-icon-vol-mute: url("/assets/sprites/pink/icon-vol-mute.png");
+  --spr-input-focus: url("/assets/sprites/pink/input-focus.png");
+  --spr-input-normal: url("/assets/sprites/pink/input-normal.png");
+  --spr-knob-download: url("/assets/sprites/pink/knob-download.png");
+  --spr-knob-music: url("/assets/sprites/pink/knob-music.png");
+  --spr-knob-music-beat: url("/assets/sprites/pink/knob-music-beat.png");
+  --spr-knob-music-drag: url("/assets/sprites/pink/knob-music-drag.png");
+  --spr-knob-volume: url("/assets/sprites/pink/knob-volume.png");
+  --spr-lace-6x3: url("/assets/sprites/pink/lace-6x3.png");
+  --spr-mascot-compact-back: url("/assets/sprites/pink/mascot-compact-back.png");
+  --spr-mascot-compact-body: url("/assets/sprites/pink/mascot-compact-body.png");
+  --spr-mascot-compact-ears: url("/assets/sprites/pink/mascot-compact-ears.png");
+  --spr-mascot-compact-front: url("/assets/sprites/pink/mascot-compact-front.png");
+  --spr-mascot-compact-hearts: url("/assets/sprites/pink/mascot-compact-hearts.png");
+  --spr-mascot-compact-sparks: url("/assets/sprites/pink/mascot-compact-sparks.png");
+  --spr-mascot-compact-tail: url("/assets/sprites/pink/mascot-compact-tail.png");
+  --spr-mascot-full-back: url("/assets/sprites/pink/mascot-full-back.png");
+  --spr-mascot-full-body: url("/assets/sprites/pink/mascot-full-body.png");
+  --spr-mascot-full-ears: url("/assets/sprites/pink/mascot-full-ears.png");
+  --spr-mascot-full-front: url("/assets/sprites/pink/mascot-full-front.png");
+  --spr-mascot-full-hearts: url("/assets/sprites/pink/mascot-full-hearts.png");
+  --spr-mascot-full-sparks: url("/assets/sprites/pink/mascot-full-sparks.png");
+  --spr-mascot-full-tail: url("/assets/sprites/pink/mascot-full-tail.png");
+  --spr-nav-heart: url("/assets/sprites/pink/nav-heart.png");
+  --spr-nav-heart-on: url("/assets/sprites/pink/nav-heart-on.png");
+  --spr-panel: url("/assets/sprites/pink/panel.png");
+  --spr-star-9: url("/assets/sprites/pink/star-9.png");
+  --spr-star-9-drag: url("/assets/sprites/pink/star-9-drag.png");
+  --spr-title-clouds: url("/assets/sprites/pink/title-clouds.png");
+  --spr-title-heart: url("/assets/sprites/pink/title-heart.png");
+  --spr-title-heart-s: url("/assets/sprites/pink/title-heart-s.png");
+  --spr-track: url("/assets/sprites/pink/track.png");
+  --spr-twinkle-5: url("/assets/sprites/pink/twinkle-5.png");
+  --spr-twinkle-7: url("/assets/sprites/pink/twinkle-7.png");
+  --spr-win-btn-hover: url("/assets/sprites/pink/win-btn-hover.png");
+  --spr-win-btn-normal: url("/assets/sprites/pink/win-btn-normal.png");
+  --spr-win-icon-close: url("/assets/sprites/pink/win-icon-close.png");
+  --spr-win-icon-max: url("/assets/sprites/pink/win-icon-max.png");
+  --spr-win-icon-min: url("/assets/sprites/pink/win-icon-min.png");
+  --spr-wing: url("/assets/sprites/pink/wing.png");
+}
+
+:root[data-theme="midnight"] {
+  --bg: #0F0D24;
+  --panel: #17143A;
+  --panel-2: #221E55;
+  --line: #4B43A8;
+  --accent: #6C5CE0;
+  --accent-hi: #9A8CFF;
+  --ink: #EDE6FF;
+  --ink-soft: #A99BEA;
+  --star: #FFD97A;
+  --ambient-bg: #05040F;
+  --titlebar-bg: #2A2468;
+  --titlebar-ink: #EDE6FF;
+  --titlebar-shadow: #0B0920;
+  --titlebar-hi: #4B43A8;
+  --spr-bar-fill: url("/assets/sprites/midnight/bar-fill.png");
+  --spr-bar-track: url("/assets/sprites/midnight/bar-track.png");
+  --spr-bow-20x7: url("/assets/sprites/midnight/bow-20x7.png");
+  --spr-bow-40x16: url("/assets/sprites/midnight/bow-40x16.png");
+  --spr-button-disabled: url("/assets/sprites/midnight/button-disabled.png");
+  --spr-button-hover: url("/assets/sprites/midnight/button-hover.png");
+  --spr-button-normal: url("/assets/sprites/midnight/button-normal.png");
+  --spr-button-pressed: url("/assets/sprites/midnight/button-pressed.png");
+  --spr-corner-7: url("/assets/sprites/midnight/corner-7.png");
+  --spr-cover-ph-30: url("/assets/sprites/midnight/cover-ph-30.png");
+  --spr-cover-shine: url("/assets/sprites/midnight/cover-shine.png");
+  --spr-ctl-disabled: url("/assets/sprites/midnight/ctl-disabled.png");
+  --spr-ctl-hover: url("/assets/sprites/midnight/ctl-hover.png");
+  --spr-ctl-normal: url("/assets/sprites/midnight/ctl-normal.png");
+  --spr-ctl-pressed: url("/assets/sprites/midnight/ctl-pressed.png");
+  --spr-dash-4x1: url("/assets/sprites/midnight/dash-4x1.png");
+  --spr-deco-heart: url("/assets/sprites/midnight/deco-heart.png");
+  --spr-deco-star: url("/assets/sprites/midnight/deco-star.png");
+  --spr-fill: url("/assets/sprites/midnight/fill.png");
+  --spr-glint-7: url("/assets/sprites/midnight/glint-7.png");
+  --spr-heart-16: url("/assets/sprites/midnight/heart-16.png");
+  --spr-heart-8: url("/assets/sprites/midnight/heart-8.png");
+  --spr-heart-beat: url("/assets/sprites/midnight/heart-beat.png");
+  --spr-heart-wings-24x7: url("/assets/sprites/midnight/heart-wings-24x7.png");
+  --spr-icon-back: url("/assets/sprites/midnight/icon-back.png");
+  --spr-icon-down: url("/assets/sprites/midnight/icon-down.png");
+  --spr-icon-download: url("/assets/sprites/midnight/icon-download.png");
+  --spr-icon-link: url("/assets/sprites/midnight/icon-link.png");
+  --spr-icon-list: url("/assets/sprites/midnight/icon-list.png");
+  --spr-icon-next: url("/assets/sprites/midnight/icon-next.png");
+  --spr-icon-note: url("/assets/sprites/midnight/icon-note.png");
+  --spr-icon-pause: url("/assets/sprites/midnight/icon-pause.png");
+  --spr-icon-play: url("/assets/sprites/midnight/icon-play.png");
+  --spr-icon-prev: url("/assets/sprites/midnight/icon-prev.png");
+  --spr-icon-queue: url("/assets/sprites/midnight/icon-queue.png");
+  --spr-icon-remove: url("/assets/sprites/midnight/icon-remove.png");
+  --spr-icon-repeat: url("/assets/sprites/midnight/icon-repeat.png");
+  --spr-icon-repeat-one: url("/assets/sprites/midnight/icon-repeat-one.png");
+  --spr-icon-shuffle: url("/assets/sprites/midnight/icon-shuffle.png");
+  --spr-icon-sliders: url("/assets/sprites/midnight/icon-sliders.png");
+  --spr-icon-star: url("/assets/sprites/midnight/icon-star.png");
+  --spr-icon-up: url("/assets/sprites/midnight/icon-up.png");
+  --spr-icon-vol-high: url("/assets/sprites/midnight/icon-vol-high.png");
+  --spr-icon-vol-low: url("/assets/sprites/midnight/icon-vol-low.png");
+  --spr-icon-vol-mute: url("/assets/sprites/midnight/icon-vol-mute.png");
+  --spr-input-focus: url("/assets/sprites/midnight/input-focus.png");
+  --spr-input-normal: url("/assets/sprites/midnight/input-normal.png");
+  --spr-knob-download: url("/assets/sprites/midnight/knob-download.png");
+  --spr-knob-music: url("/assets/sprites/midnight/knob-music.png");
+  --spr-knob-music-beat: url("/assets/sprites/midnight/knob-music-beat.png");
+  --spr-knob-music-drag: url("/assets/sprites/midnight/knob-music-drag.png");
+  --spr-knob-volume: url("/assets/sprites/midnight/knob-volume.png");
+  --spr-lace-6x3: url("/assets/sprites/midnight/lace-6x3.png");
+  --spr-mascot-compact-back: url("/assets/sprites/midnight/mascot-compact-back.png");
+  --spr-mascot-compact-body: url("/assets/sprites/midnight/mascot-compact-body.png");
+  --spr-mascot-compact-ears: url("/assets/sprites/midnight/mascot-compact-ears.png");
+  --spr-mascot-compact-front: url("/assets/sprites/midnight/mascot-compact-front.png");
+  --spr-mascot-compact-hearts: url("/assets/sprites/midnight/mascot-compact-hearts.png");
+  --spr-mascot-compact-sparks: url("/assets/sprites/midnight/mascot-compact-sparks.png");
+  --spr-mascot-compact-tail: url("/assets/sprites/midnight/mascot-compact-tail.png");
+  --spr-mascot-full-back: url("/assets/sprites/midnight/mascot-full-back.png");
+  --spr-mascot-full-body: url("/assets/sprites/midnight/mascot-full-body.png");
+  --spr-mascot-full-ears: url("/assets/sprites/midnight/mascot-full-ears.png");
+  --spr-mascot-full-front: url("/assets/sprites/midnight/mascot-full-front.png");
+  --spr-mascot-full-hearts: url("/assets/sprites/midnight/mascot-full-hearts.png");
+  --spr-mascot-full-sparks: url("/assets/sprites/midnight/mascot-full-sparks.png");
+  --spr-mascot-full-tail: url("/assets/sprites/midnight/mascot-full-tail.png");
+  --spr-nav-heart: url("/assets/sprites/midnight/nav-heart.png");
+  --spr-nav-heart-on: url("/assets/sprites/midnight/nav-heart-on.png");
+  --spr-panel: url("/assets/sprites/midnight/panel.png");
+  --spr-star-9: url("/assets/sprites/midnight/star-9.png");
+  --spr-star-9-drag: url("/assets/sprites/midnight/star-9-drag.png");
+  --spr-title-clouds: url("/assets/sprites/midnight/title-clouds.png");
+  --spr-title-heart: url("/assets/sprites/midnight/title-heart.png");
+  --spr-title-heart-s: url("/assets/sprites/midnight/title-heart-s.png");
+  --spr-track: url("/assets/sprites/midnight/track.png");
+  --spr-twinkle-5: url("/assets/sprites/midnight/twinkle-5.png");
+  --spr-twinkle-7: url("/assets/sprites/midnight/twinkle-7.png");
+  --spr-win-btn-hover: url("/assets/sprites/midnight/win-btn-hover.png");
+  --spr-win-btn-normal: url("/assets/sprites/midnight/win-btn-normal.png");
+  --spr-win-icon-close: url("/assets/sprites/midnight/win-icon-close.png");
+  --spr-win-icon-max: url("/assets/sprites/midnight/win-icon-max.png");
+  --spr-win-icon-min: url("/assets/sprites/midnight/win-icon-min.png");
+  --spr-wing: url("/assets/sprites/midnight/wing.png");
+}
+
+:root[data-theme="lavender"] {
+  --bg: #D6D1F7;
+  --panel: #E6E2FB;
+  --panel-2: #F3F0FF;
+  --line: #B9B0EE;
+  --accent: #8F7FE6;
+  --accent-hi: #B7ABF5;
+  --ink: #3E2F86;
+  --ink-soft: #6E5CC0;
+  --star: #F6D365;
+  --ambient-bg: #1F1A3D;
+  --titlebar-bg: #B9B0EE;
+  --titlebar-ink: #3E2F86;
+  --titlebar-shadow: #F3F0FF;
+  --titlebar-hi: #F3F0FF;
+  --spr-bar-fill: url("/assets/sprites/lavender/bar-fill.png");
+  --spr-bar-track: url("/assets/sprites/lavender/bar-track.png");
+  --spr-bow-20x7: url("/assets/sprites/lavender/bow-20x7.png");
+  --spr-bow-40x16: url("/assets/sprites/lavender/bow-40x16.png");
+  --spr-button-disabled: url("/assets/sprites/lavender/button-disabled.png");
+  --spr-button-hover: url("/assets/sprites/lavender/button-hover.png");
+  --spr-button-normal: url("/assets/sprites/lavender/button-normal.png");
+  --spr-button-pressed: url("/assets/sprites/lavender/button-pressed.png");
+  --spr-corner-7: url("/assets/sprites/lavender/corner-7.png");
+  --spr-cover-ph-30: url("/assets/sprites/lavender/cover-ph-30.png");
+  --spr-cover-shine: url("/assets/sprites/lavender/cover-shine.png");
+  --spr-ctl-disabled: url("/assets/sprites/lavender/ctl-disabled.png");
+  --spr-ctl-hover: url("/assets/sprites/lavender/ctl-hover.png");
+  --spr-ctl-normal: url("/assets/sprites/lavender/ctl-normal.png");
+  --spr-ctl-pressed: url("/assets/sprites/lavender/ctl-pressed.png");
+  --spr-dash-4x1: url("/assets/sprites/lavender/dash-4x1.png");
+  --spr-deco-heart: url("/assets/sprites/lavender/deco-heart.png");
+  --spr-deco-star: url("/assets/sprites/lavender/deco-star.png");
+  --spr-fill: url("/assets/sprites/lavender/fill.png");
+  --spr-glint-7: url("/assets/sprites/lavender/glint-7.png");
+  --spr-heart-16: url("/assets/sprites/lavender/heart-16.png");
+  --spr-heart-8: url("/assets/sprites/lavender/heart-8.png");
+  --spr-heart-beat: url("/assets/sprites/lavender/heart-beat.png");
+  --spr-heart-wings-24x7: url("/assets/sprites/lavender/heart-wings-24x7.png");
+  --spr-icon-back: url("/assets/sprites/lavender/icon-back.png");
+  --spr-icon-down: url("/assets/sprites/lavender/icon-down.png");
+  --spr-icon-download: url("/assets/sprites/lavender/icon-download.png");
+  --spr-icon-link: url("/assets/sprites/lavender/icon-link.png");
+  --spr-icon-list: url("/assets/sprites/lavender/icon-list.png");
+  --spr-icon-next: url("/assets/sprites/lavender/icon-next.png");
+  --spr-icon-note: url("/assets/sprites/lavender/icon-note.png");
+  --spr-icon-pause: url("/assets/sprites/lavender/icon-pause.png");
+  --spr-icon-play: url("/assets/sprites/lavender/icon-play.png");
+  --spr-icon-prev: url("/assets/sprites/lavender/icon-prev.png");
+  --spr-icon-queue: url("/assets/sprites/lavender/icon-queue.png");
+  --spr-icon-remove: url("/assets/sprites/lavender/icon-remove.png");
+  --spr-icon-repeat: url("/assets/sprites/lavender/icon-repeat.png");
+  --spr-icon-repeat-one: url("/assets/sprites/lavender/icon-repeat-one.png");
+  --spr-icon-shuffle: url("/assets/sprites/lavender/icon-shuffle.png");
+  --spr-icon-sliders: url("/assets/sprites/lavender/icon-sliders.png");
+  --spr-icon-star: url("/assets/sprites/lavender/icon-star.png");
+  --spr-icon-up: url("/assets/sprites/lavender/icon-up.png");
+  --spr-icon-vol-high: url("/assets/sprites/lavender/icon-vol-high.png");
+  --spr-icon-vol-low: url("/assets/sprites/lavender/icon-vol-low.png");
+  --spr-icon-vol-mute: url("/assets/sprites/lavender/icon-vol-mute.png");
+  --spr-input-focus: url("/assets/sprites/lavender/input-focus.png");
+  --spr-input-normal: url("/assets/sprites/lavender/input-normal.png");
+  --spr-knob-download: url("/assets/sprites/lavender/knob-download.png");
+  --spr-knob-music: url("/assets/sprites/lavender/knob-music.png");
+  --spr-knob-music-beat: url("/assets/sprites/lavender/knob-music-beat.png");
+  --spr-knob-music-drag: url("/assets/sprites/lavender/knob-music-drag.png");
+  --spr-knob-volume: url("/assets/sprites/lavender/knob-volume.png");
+  --spr-lace-6x3: url("/assets/sprites/lavender/lace-6x3.png");
+  --spr-mascot-compact-back: url("/assets/sprites/lavender/mascot-compact-back.png");
+  --spr-mascot-compact-body: url("/assets/sprites/lavender/mascot-compact-body.png");
+  --spr-mascot-compact-ears: url("/assets/sprites/lavender/mascot-compact-ears.png");
+  --spr-mascot-compact-front: url("/assets/sprites/lavender/mascot-compact-front.png");
+  --spr-mascot-compact-hearts: url("/assets/sprites/lavender/mascot-compact-hearts.png");
+  --spr-mascot-compact-sparks: url("/assets/sprites/lavender/mascot-compact-sparks.png");
+  --spr-mascot-compact-tail: url("/assets/sprites/lavender/mascot-compact-tail.png");
+  --spr-mascot-full-back: url("/assets/sprites/lavender/mascot-full-back.png");
+  --spr-mascot-full-body: url("/assets/sprites/lavender/mascot-full-body.png");
+  --spr-mascot-full-ears: url("/assets/sprites/lavender/mascot-full-ears.png");
+  --spr-mascot-full-front: url("/assets/sprites/lavender/mascot-full-front.png");
+  --spr-mascot-full-hearts: url("/assets/sprites/lavender/mascot-full-hearts.png");
+  --spr-mascot-full-sparks: url("/assets/sprites/lavender/mascot-full-sparks.png");
+  --spr-mascot-full-tail: url("/assets/sprites/lavender/mascot-full-tail.png");
+  --spr-nav-heart: url("/assets/sprites/lavender/nav-heart.png");
+  --spr-nav-heart-on: url("/assets/sprites/lavender/nav-heart-on.png");
+  --spr-panel: url("/assets/sprites/lavender/panel.png");
+  --spr-star-9: url("/assets/sprites/lavender/star-9.png");
+  --spr-star-9-drag: url("/assets/sprites/lavender/star-9-drag.png");
+  --spr-title-clouds: url("/assets/sprites/lavender/title-clouds.png");
+  --spr-title-heart: url("/assets/sprites/lavender/title-heart.png");
+  --spr-title-heart-s: url("/assets/sprites/lavender/title-heart-s.png");
+  --spr-track: url("/assets/sprites/lavender/track.png");
+  --spr-twinkle-5: url("/assets/sprites/lavender/twinkle-5.png");
+  --spr-twinkle-7: url("/assets/sprites/lavender/twinkle-7.png");
+  --spr-win-btn-hover: url("/assets/sprites/lavender/win-btn-hover.png");
+  --spr-win-btn-normal: url("/assets/sprites/lavender/win-btn-normal.png");
+  --spr-win-icon-close: url("/assets/sprites/lavender/win-icon-close.png");
+  --spr-win-icon-max: url("/assets/sprites/lavender/win-icon-max.png");
+  --spr-win-icon-min: url("/assets/sprites/lavender/win-icon-min.png");
+  --spr-wing: url("/assets/sprites/lavender/wing.png");
+}
+
+:root[data-theme="mint"] {
+  --bg: #A9E0C9;
+  --panel: #DDF3E4;
+  --panel-2: #EDF9EB;
+  --line: #8ED3B3;
+  --accent: #4DBE8C;
+  --accent-hi: #8BE3B8;
+  --ink: #1D5A45;
+  --ink-soft: #3A8A68;
+  --star: #F6D365;
+  --ambient-bg: #123D2E;
+  --titlebar-bg: #8ED3B3;
+  --titlebar-ink: #1D5A45;
+  --titlebar-shadow: #EDF9EB;
+  --titlebar-hi: #EDF9EB;
+  --spr-bar-fill: url("/assets/sprites/mint/bar-fill.png");
+  --spr-bar-track: url("/assets/sprites/mint/bar-track.png");
+  --spr-bow-20x7: url("/assets/sprites/mint/bow-20x7.png");
+  --spr-bow-40x16: url("/assets/sprites/mint/bow-40x16.png");
+  --spr-button-disabled: url("/assets/sprites/mint/button-disabled.png");
+  --spr-button-hover: url("/assets/sprites/mint/button-hover.png");
+  --spr-button-normal: url("/assets/sprites/mint/button-normal.png");
+  --spr-button-pressed: url("/assets/sprites/mint/button-pressed.png");
+  --spr-corner-7: url("/assets/sprites/mint/corner-7.png");
+  --spr-cover-ph-30: url("/assets/sprites/mint/cover-ph-30.png");
+  --spr-cover-shine: url("/assets/sprites/mint/cover-shine.png");
+  --spr-ctl-disabled: url("/assets/sprites/mint/ctl-disabled.png");
+  --spr-ctl-hover: url("/assets/sprites/mint/ctl-hover.png");
+  --spr-ctl-normal: url("/assets/sprites/mint/ctl-normal.png");
+  --spr-ctl-pressed: url("/assets/sprites/mint/ctl-pressed.png");
+  --spr-dash-4x1: url("/assets/sprites/mint/dash-4x1.png");
+  --spr-deco-heart: url("/assets/sprites/mint/deco-heart.png");
+  --spr-deco-star: url("/assets/sprites/mint/deco-star.png");
+  --spr-fill: url("/assets/sprites/mint/fill.png");
+  --spr-glint-7: url("/assets/sprites/mint/glint-7.png");
+  --spr-heart-16: url("/assets/sprites/mint/heart-16.png");
+  --spr-heart-8: url("/assets/sprites/mint/heart-8.png");
+  --spr-heart-beat: url("/assets/sprites/mint/heart-beat.png");
+  --spr-heart-wings-24x7: url("/assets/sprites/mint/heart-wings-24x7.png");
+  --spr-icon-back: url("/assets/sprites/mint/icon-back.png");
+  --spr-icon-down: url("/assets/sprites/mint/icon-down.png");
+  --spr-icon-download: url("/assets/sprites/mint/icon-download.png");
+  --spr-icon-link: url("/assets/sprites/mint/icon-link.png");
+  --spr-icon-list: url("/assets/sprites/mint/icon-list.png");
+  --spr-icon-next: url("/assets/sprites/mint/icon-next.png");
+  --spr-icon-note: url("/assets/sprites/mint/icon-note.png");
+  --spr-icon-pause: url("/assets/sprites/mint/icon-pause.png");
+  --spr-icon-play: url("/assets/sprites/mint/icon-play.png");
+  --spr-icon-prev: url("/assets/sprites/mint/icon-prev.png");
+  --spr-icon-queue: url("/assets/sprites/mint/icon-queue.png");
+  --spr-icon-remove: url("/assets/sprites/mint/icon-remove.png");
+  --spr-icon-repeat: url("/assets/sprites/mint/icon-repeat.png");
+  --spr-icon-repeat-one: url("/assets/sprites/mint/icon-repeat-one.png");
+  --spr-icon-shuffle: url("/assets/sprites/mint/icon-shuffle.png");
+  --spr-icon-sliders: url("/assets/sprites/mint/icon-sliders.png");
+  --spr-icon-star: url("/assets/sprites/mint/icon-star.png");
+  --spr-icon-up: url("/assets/sprites/mint/icon-up.png");
+  --spr-icon-vol-high: url("/assets/sprites/mint/icon-vol-high.png");
+  --spr-icon-vol-low: url("/assets/sprites/mint/icon-vol-low.png");
+  --spr-icon-vol-mute: url("/assets/sprites/mint/icon-vol-mute.png");
+  --spr-input-focus: url("/assets/sprites/mint/input-focus.png");
+  --spr-input-normal: url("/assets/sprites/mint/input-normal.png");
+  --spr-knob-download: url("/assets/sprites/mint/knob-download.png");
+  --spr-knob-music: url("/assets/sprites/mint/knob-music.png");
+  --spr-knob-music-beat: url("/assets/sprites/mint/knob-music-beat.png");
+  --spr-knob-music-drag: url("/assets/sprites/mint/knob-music-drag.png");
+  --spr-knob-volume: url("/assets/sprites/mint/knob-volume.png");
+  --spr-lace-6x3: url("/assets/sprites/mint/lace-6x3.png");
+  --spr-mascot-compact-back: url("/assets/sprites/mint/mascot-compact-back.png");
+  --spr-mascot-compact-body: url("/assets/sprites/mint/mascot-compact-body.png");
+  --spr-mascot-compact-ears: url("/assets/sprites/mint/mascot-compact-ears.png");
+  --spr-mascot-compact-front: url("/assets/sprites/mint/mascot-compact-front.png");
+  --spr-mascot-compact-hearts: url("/assets/sprites/mint/mascot-compact-hearts.png");
+  --spr-mascot-compact-sparks: url("/assets/sprites/mint/mascot-compact-sparks.png");
+  --spr-mascot-compact-tail: url("/assets/sprites/mint/mascot-compact-tail.png");
+  --spr-mascot-full-back: url("/assets/sprites/mint/mascot-full-back.png");
+  --spr-mascot-full-body: url("/assets/sprites/mint/mascot-full-body.png");
+  --spr-mascot-full-ears: url("/assets/sprites/mint/mascot-full-ears.png");
+  --spr-mascot-full-front: url("/assets/sprites/mint/mascot-full-front.png");
+  --spr-mascot-full-hearts: url("/assets/sprites/mint/mascot-full-hearts.png");
+  --spr-mascot-full-sparks: url("/assets/sprites/mint/mascot-full-sparks.png");
+  --spr-mascot-full-tail: url("/assets/sprites/mint/mascot-full-tail.png");
+  --spr-nav-heart: url("/assets/sprites/mint/nav-heart.png");
+  --spr-nav-heart-on: url("/assets/sprites/mint/nav-heart-on.png");
+  --spr-panel: url("/assets/sprites/mint/panel.png");
+  --spr-star-9: url("/assets/sprites/mint/star-9.png");
+  --spr-star-9-drag: url("/assets/sprites/mint/star-9-drag.png");
+  --spr-title-clouds: url("/assets/sprites/mint/title-clouds.png");
+  --spr-title-heart: url("/assets/sprites/mint/title-heart.png");
+  --spr-title-heart-s: url("/assets/sprites/mint/title-heart-s.png");
+  --spr-track: url("/assets/sprites/mint/track.png");
+  --spr-twinkle-5: url("/assets/sprites/mint/twinkle-5.png");
+  --spr-twinkle-7: url("/assets/sprites/mint/twinkle-7.png");
+  --spr-win-btn-hover: url("/assets/sprites/mint/win-btn-hover.png");
+  --spr-win-btn-normal: url("/assets/sprites/mint/win-btn-normal.png");
+  --spr-win-icon-close: url("/assets/sprites/mint/win-icon-close.png");
+  --spr-win-icon-max: url("/assets/sprites/mint/win-icon-max.png");
+  --spr-win-icon-min: url("/assets/sprites/mint/win-icon-min.png");
+  --spr-wing: url("/assets/sprites/mint/wing.png");
+}
+
+:root[data-theme="classic"] {
+  --bg: #EAD2C2;
+  --panel: #F4E3D3;
+  --panel-2: #FAF0E4;
+  --line: #C79A84;
+  --accent: #9A5A46;
+  --accent-hi: #D79A82;
+  --ink: #5A3328;
+  --ink-soft: #8B5A48;
+  --star: #E8B84A;
+  --ambient-bg: #2B1B16;
+  --titlebar-bg: #6B4034;
+  --titlebar-ink: #F6E7D8;
+  --titlebar-shadow: #3E241C;
+  --titlebar-hi: #8B5A48;
+  --spr-bar-fill: url("/assets/sprites/classic/bar-fill.png");
+  --spr-bar-track: url("/assets/sprites/classic/bar-track.png");
+  --spr-bow-20x7: url("/assets/sprites/classic/bow-20x7.png");
+  --spr-bow-40x16: url("/assets/sprites/classic/bow-40x16.png");
+  --spr-button-disabled: url("/assets/sprites/classic/button-disabled.png");
+  --spr-button-hover: url("/assets/sprites/classic/button-hover.png");
+  --spr-button-normal: url("/assets/sprites/classic/button-normal.png");
+  --spr-button-pressed: url("/assets/sprites/classic/button-pressed.png");
+  --spr-corner-7: url("/assets/sprites/classic/corner-7.png");
+  --spr-cover-ph-30: url("/assets/sprites/classic/cover-ph-30.png");
+  --spr-cover-shine: url("/assets/sprites/classic/cover-shine.png");
+  --spr-ctl-disabled: url("/assets/sprites/classic/ctl-disabled.png");
+  --spr-ctl-hover: url("/assets/sprites/classic/ctl-hover.png");
+  --spr-ctl-normal: url("/assets/sprites/classic/ctl-normal.png");
+  --spr-ctl-pressed: url("/assets/sprites/classic/ctl-pressed.png");
+  --spr-dash-4x1: url("/assets/sprites/classic/dash-4x1.png");
+  --spr-deco-heart: url("/assets/sprites/classic/deco-heart.png");
+  --spr-deco-star: url("/assets/sprites/classic/deco-star.png");
+  --spr-fill: url("/assets/sprites/classic/fill.png");
+  --spr-glint-7: url("/assets/sprites/classic/glint-7.png");
+  --spr-heart-16: url("/assets/sprites/classic/heart-16.png");
+  --spr-heart-8: url("/assets/sprites/classic/heart-8.png");
+  --spr-heart-beat: url("/assets/sprites/classic/heart-beat.png");
+  --spr-heart-wings-24x7: url("/assets/sprites/classic/heart-wings-24x7.png");
+  --spr-icon-back: url("/assets/sprites/classic/icon-back.png");
+  --spr-icon-down: url("/assets/sprites/classic/icon-down.png");
+  --spr-icon-download: url("/assets/sprites/classic/icon-download.png");
+  --spr-icon-link: url("/assets/sprites/classic/icon-link.png");
+  --spr-icon-list: url("/assets/sprites/classic/icon-list.png");
+  --spr-icon-next: url("/assets/sprites/classic/icon-next.png");
+  --spr-icon-note: url("/assets/sprites/classic/icon-note.png");
+  --spr-icon-pause: url("/assets/sprites/classic/icon-pause.png");
+  --spr-icon-play: url("/assets/sprites/classic/icon-play.png");
+  --spr-icon-prev: url("/assets/sprites/classic/icon-prev.png");
+  --spr-icon-queue: url("/assets/sprites/classic/icon-queue.png");
+  --spr-icon-remove: url("/assets/sprites/classic/icon-remove.png");
+  --spr-icon-repeat: url("/assets/sprites/classic/icon-repeat.png");
+  --spr-icon-repeat-one: url("/assets/sprites/classic/icon-repeat-one.png");
+  --spr-icon-shuffle: url("/assets/sprites/classic/icon-shuffle.png");
+  --spr-icon-sliders: url("/assets/sprites/classic/icon-sliders.png");
+  --spr-icon-star: url("/assets/sprites/classic/icon-star.png");
+  --spr-icon-up: url("/assets/sprites/classic/icon-up.png");
+  --spr-icon-vol-high: url("/assets/sprites/classic/icon-vol-high.png");
+  --spr-icon-vol-low: url("/assets/sprites/classic/icon-vol-low.png");
+  --spr-icon-vol-mute: url("/assets/sprites/classic/icon-vol-mute.png");
+  --spr-input-focus: url("/assets/sprites/classic/input-focus.png");
+  --spr-input-normal: url("/assets/sprites/classic/input-normal.png");
+  --spr-knob-download: url("/assets/sprites/classic/knob-download.png");
+  --spr-knob-music: url("/assets/sprites/classic/knob-music.png");
+  --spr-knob-music-beat: url("/assets/sprites/classic/knob-music-beat.png");
+  --spr-knob-music-drag: url("/assets/sprites/classic/knob-music-drag.png");
+  --spr-knob-volume: url("/assets/sprites/classic/knob-volume.png");
+  --spr-lace-6x3: url("/assets/sprites/classic/lace-6x3.png");
+  --spr-mascot-compact-back: url("/assets/sprites/classic/mascot-compact-back.png");
+  --spr-mascot-compact-body: url("/assets/sprites/classic/mascot-compact-body.png");
+  --spr-mascot-compact-ears: url("/assets/sprites/classic/mascot-compact-ears.png");
+  --spr-mascot-compact-front: url("/assets/sprites/classic/mascot-compact-front.png");
+  --spr-mascot-compact-hearts: url("/assets/sprites/classic/mascot-compact-hearts.png");
+  --spr-mascot-compact-sparks: url("/assets/sprites/classic/mascot-compact-sparks.png");
+  --spr-mascot-compact-tail: url("/assets/sprites/classic/mascot-compact-tail.png");
+  --spr-mascot-full-back: url("/assets/sprites/classic/mascot-full-back.png");
+  --spr-mascot-full-body: url("/assets/sprites/classic/mascot-full-body.png");
+  --spr-mascot-full-ears: url("/assets/sprites/classic/mascot-full-ears.png");
+  --spr-mascot-full-front: url("/assets/sprites/classic/mascot-full-front.png");
+  --spr-mascot-full-hearts: url("/assets/sprites/classic/mascot-full-hearts.png");
+  --spr-mascot-full-sparks: url("/assets/sprites/classic/mascot-full-sparks.png");
+  --spr-mascot-full-tail: url("/assets/sprites/classic/mascot-full-tail.png");
+  --spr-nav-heart: url("/assets/sprites/classic/nav-heart.png");
+  --spr-nav-heart-on: url("/assets/sprites/classic/nav-heart-on.png");
+  --spr-panel: url("/assets/sprites/classic/panel.png");
+  --spr-star-9: url("/assets/sprites/classic/star-9.png");
+  --spr-star-9-drag: url("/assets/sprites/classic/star-9-drag.png");
+  --spr-title-clouds: url("/assets/sprites/classic/title-clouds.png");
+  --spr-title-heart: url("/assets/sprites/classic/title-heart.png");
+  --spr-title-heart-s: url("/assets/sprites/classic/title-heart-s.png");
+  --spr-track: url("/assets/sprites/classic/track.png");
+  --spr-twinkle-5: url("/assets/sprites/classic/twinkle-5.png");
+  --spr-twinkle-7: url("/assets/sprites/classic/twinkle-7.png");
+  --spr-win-btn-hover: url("/assets/sprites/classic/win-btn-hover.png");
+  --spr-win-btn-normal: url("/assets/sprites/classic/win-btn-normal.png");
+  --spr-win-icon-close: url("/assets/sprites/classic/win-icon-close.png");
+  --spr-win-icon-max: url("/assets/sprites/classic/win-icon-max.png");
+  --spr-win-icon-min: url("/assets/sprites/classic/win-icon-min.png");
+  --spr-wing: url("/assets/sprites/classic/wing.png");
+}
+

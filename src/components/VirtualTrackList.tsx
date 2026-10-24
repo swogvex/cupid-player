@@ -1,22 +1,19 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef } from "react";
 import type { Track } from "../ipc/types";
+import { estimateRowHeight } from "../lib/rowHeight";
 import { TrackRow } from "./TrackRow";
 
 type Props = {
   tracks: Track[];
   onPlay: (track: Track) => void;
+  /** Set when the list is the content of a playlist. */
+  playlistId?: number;
   /** When this value changes the list scrolls back to the top (e.g. a new search). */
   resetKey?: string;
 };
 
-/** Row height is 10 logical px; --s is the integer scale written by scale.ts. */
-function estimateRowHeight(): number {
-  const s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--s"));
-  return Math.round(10 * (Number.isFinite(s) && s > 0 ? s : 2));
-}
-
-export function VirtualTrackList({ tracks, onPlay, resetKey }: Props) {
+export function VirtualTrackList({ tracks, onPlay, playlistId, resetKey }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
@@ -40,6 +37,7 @@ export function VirtualTrackList({ tracks, onPlay, resetKey }: Props) {
             <TrackRow
               key={item.key}
               track={tr}
+              playlistId={playlistId}
               index={item.index}
               total={tracks.length}
               rowRef={virtualizer.measureElement}

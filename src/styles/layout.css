@@ -655,3 +655,115 @@
     animation: none !important;
   }
 }
+
+/* ---------- Playlists UI (H8.6b) ---------- */
+.modal__title {
+  overflow-wrap: anywhere;
+}
+
+.view__empty {
+  display: grid;
+  gap: calc(var(--px) * 3);
+  justify-items: start;
+  align-content: start;
+}
+
+.modal__list {
+  max-height: calc(var(--px) * 90);
+  overflow-y: auto;
+  background: var(--panel-2);
+  border: calc(var(--px) * 1) solid var(--line);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.pl-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--px) * 3);
+}
+
+.pl-item .muted {
+  flex: none;
+}
+
+.picker__list {
+  height: min(calc(var(--px) * 100), 40vh);
+  overflow-y: auto;
+  background: var(--panel-2);
+  border: calc(var(--px) * 1) solid var(--line);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.picker__empty {
+  margin: 0;
+  padding: calc(var(--px) * 3);
+}
+
+.picker__rows {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.picker__item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.pick {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto minmax(0, 3fr) minmax(0, 2fr);
+  align-items: center;
+  gap: calc(var(--px) * 3);
+  padding: 0 calc(var(--px) * 3);
+  line-height: calc(var(--px) * 10);
+  cursor: pointer;
+}
+
+.pick:hover {
+  background: var(--panel);
+}
+
+.pick--disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.pick__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pick__box {
+  box-sizing: border-box;
+  width: calc(var(--px) * 7);
+  height: calc(var(--px) * 7);
+  background: var(--panel-2);
+  border: calc(var(--px) * 1) solid var(--ink);
+}
+
+.pick__input:checked + .pick__box {
+  background: var(--accent);
+}
+
+.pick__input:focus-visible + .pick__box {
+  outline: calc(var(--px) * 1) solid var(--accent);
+  outline-offset: calc(var(--px) * 1);
+}
+
+.picker__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--px) * 2);
+}
