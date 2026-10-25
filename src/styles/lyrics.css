@@ -9,20 +9,39 @@
   src: url("/assets/fonts/dotgothic16-japanese-400.woff2") format("woff2");
 }
 
-/* Hangul: Galmuri7 (OFL), an 8 px bitmap-style font. Our lyrics text is 8 logical px,
-   so it stays sharp at every integer scale. Only Hangul uses it. */
+/* Hangul: Galmuri9 (OFL), a 10 px bitmap-style font. It has more room per syllable than
+   the 8 px Galmuri7, so the strokes look lighter. Korean lyrics are drawn at 10 logical px
+   (see below) so every font pixel lands on whole screen pixels at each scale. */
 @font-face {
-  font-family: "Galmuri7";
+  font-family: "Galmuri9";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/assets/fonts/galmuri7.woff2") format("woff2");
+  src: url("/assets/fonts/galmuri9.woff2") format("woff2");
   unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7FF;
 }
 
 .lyrics__box,
 .lyrics__plain {
-  font-family: var(--font-pixel), "Galmuri7", "DotGothic16", sans-serif;
+  font-family: var(--font-pixel), "Galmuri9", "DotGothic16", sans-serif;
+}
+
+/* Korean songs: 10 px text for Galmuri9 (the view sets lang="ko" when it sees hangul). */
+.lyrics__box[lang="ko"],
+.lyrics__plain[lang="ko"] {
+  font-size: calc(var(--px) * 10);
+}
+
+.lyrics__box[lang="ko"] .lyric {
+  line-height: calc(var(--px) * 12);
+}
+
+.lyrics__box[lang="ko"] .lyric::before {
+  margin-top: calc(var(--px) * 3); /* keeps the marker centered on the taller line */
+}
+
+.lyrics__plain[lang="ko"] .lyrics__plain-text {
+  line-height: calc(var(--px) * 12);
 }
 
 /* Title icon: the theme's own heart-like motif (loaded after themeart.css on purpose). */
