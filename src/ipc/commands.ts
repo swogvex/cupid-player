@@ -4,6 +4,7 @@ import type {
   CacheCleared,
   CacheInfo,
   ImportStarted,
+  Lyrics,
   MonthStats,
   ParsedLink,
   Playlist,
@@ -115,6 +116,21 @@ export const getStats = (monthKey?: string) => invoke<MonthStats>("get_stats", {
 
 /** Months with listening time, newest first ("YYYY-MM"). The current month may be missing. */
 export const listStatMonths = () => invoke<string[]>("list_stat_months");
+
+/**
+ * Lyrics of a track: from the local cache, or from LRCLIB the first time (then cached).
+ * Rejects with "lyrics.*" codes ("lyrics.unavailable" = service down, try again later).
+ */
+export const getLyrics = (trackId: number, refresh = false) =>
+  invoke<Lyrics>("get_lyrics", { trackId, refresh });
+
+/** Saved lyrics shift in ms (> 0 shows the lyrics later); 0 if none. */
+export const getLyricsOffset = (trackId: number) =>
+  invoke<number>("get_lyrics_offset", { trackId });
+
+/** Saves the shift (Rust clamps it to ±10 s). Resolves with the value stored. */
+export const setLyricsOffset = (trackId: number, offsetMs: number) =>
+  invoke<number>("set_lyrics_offset", { trackId, offsetMs });
 
 /** Resizes the window to 352*n x 208*n. Resolves with the scale actually applied. */
 export function setWindowScale(n: number): Promise<number> {

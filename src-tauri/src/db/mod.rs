@@ -1,5 +1,6 @@
 //! SQLite access. Only Rust touches the database.
 
+pub mod lyrics;
 pub mod playlists;
 #[cfg(debug_assertions)]
 mod seed;
@@ -20,6 +21,8 @@ use crate::error::{AppError, AppResult};
 const MIGRATIONS: &[&str] = &[
     include_str!("schema.sql"),
     include_str!("002_playlist_tracks.sql"),
+    include_str!("003_lyrics.sql"),
+    include_str!("004_lyrics_offset.sql"),
 ];
 
 pub struct Database {
@@ -89,7 +92,7 @@ mod tests {
         let d = db();
         let conn = d.conn().unwrap();
         assert_eq!(user_version(&conn), MIGRATIONS.len() as i64);
-        for table in ["tracks", "playlists", "plays", "monthly_stats"] {
+        for table in ["tracks", "playlists", "plays", "monthly_stats", "lyrics"] {
             let n: i64 = conn
                 .query_row(
                     "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?1",

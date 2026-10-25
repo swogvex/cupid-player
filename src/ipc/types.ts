@@ -145,3 +145,19 @@ export interface MonthStats {
   /** true when the numbers come from the frozen monthly summary. */
   closed: boolean;
 }
+
+/** One synced lyric line. `ms` is when the line starts. `text` is empty for instrumental breaks. */
+export interface LyricsLine {
+  ms: number;
+  text: string;
+}
+
+export type LyricsStatus = 'synced' | 'plain' | 'instrumental' | 'not_found';
+
+/** Returned by get_lyrics. `lines` is filled for "synced", `plain` for "plain". */
+export interface Lyrics {
+  trackId: number;
+  status: LyricsStatus;
+  lines: LyricsLine[];
+  plain: string | null;
+}

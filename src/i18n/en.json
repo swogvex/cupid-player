@@ -90,16 +90,14 @@
       "db": "Database error"
     },
     "stats": {
-      "title": "Stats",
-      "minutes": "Minutes",
-      "topArtist": "Top artist",
-      "topSong": "Top song",
-      "topSongs": "Top songs",
-      "emptyMonth": "You haven't listened to anything this month yet",
-      "prevMonth": "Previous month",
-      "nextMonth": "Next month",
-      "plays_one": "{{count}} play",
-      "plays_other": "{{count}} plays"
+      "bad_month": "Invalid month",
+      "db": "Database error"
+    },
+    "lyrics": {
+      "unavailable": "Could not reach the lyrics service. Try again later",
+      "failed": "Could not read the lyrics service's response",
+      "db": "Database error",
+      "no_track": "Song not found"
     },
     "playlist": {
       "not_found": "Playlist not found",
@@ -163,7 +161,12 @@
     "minutes": "Minutes",
     "topArtist": "Top artist",
     "topSong": "Top song",
-    "topSongs": "Top songs"
+    "topSongs": "Top songs",
+    "emptyMonth": "You haven't listened to anything this month yet",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "plays_one": "{{count}} play",
+    "plays_other": "{{count}} plays"
   },
   "settings": {
     "title": "Settings",
@@ -195,6 +198,20 @@
     "minimize": "Minimize",
     "maximize": "Maximize",
     "close": "Close"
+  },
+  "lyrics": {
+    "title": "Lyrics",
+    "toggle": "Lyrics",
+    "loading": "Looking for the lyrics…",
+    "notFound": "No lyrics for this song",
+    "instrumental": "Instrumental",
+    "unsynced": "Unsynced lyrics",
+    "retry": "Retry",
+    "searchAgain": "Search again",
+    "backToLine": "Back to the current line",
+    "earlier": "Show the lyrics 0.5 s earlier",
+    "later": "Show the lyrics 0.5 s later",
+    "resetOffset": "Reset the shift"
   },
   "menu": {
     "label": "Song actions",

@@ -5,6 +5,7 @@ mod error;
 mod import;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod library;
+mod lyrics;
 mod paths;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod spotify;
@@ -102,6 +103,9 @@ pub fn run() {
             commands::update_play,
             commands::get_stats,
             commands::list_stat_months,
+            commands::get_lyrics,
+            commands::get_lyrics_offset,
+            commands::set_lyrics_offset,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -3,7 +3,7 @@ use tauri::{AppHandle, Manager, State};
 
 use crate::{
     db::{
-        Database, stats as history,
+        Database, lyrics as lyrics_store, stats as history,
         tracks::{self, Track, TrackFilter},
     },
     error::{AppError, AppResult},
@@ -14,6 +14,7 @@ use crate::{
         edit::{self, EditError, TagsInput},
         scan::{self, ScanError, ScanReport},
     },
+    lyrics::{self, LyricsError, LyricsPayload},
     paths::AppPaths,
     spotify::url::parse_spotify_url as parse_url,
     stats::{self, MonthStats},
@@ -386,6 +387,47 @@ pub async fn get_stats(
 pub async fn list_stat_months(db: State<'_, Database>) -> AppResult<Vec<String>> {
     let conn = db.conn()?;
     history::list_months(&conn).map_err(stats_err)
+}
+
+fn lyrics_err(e: LyricsError) -> AppError {
+    eprintln!("[lyrics] {e}");
+    coded(e.code())
+}
+
+/// Lyrics of a track: from the local cache, or from LRCLIB the first time (then cached).
+/// `refresh` forces a new lookup. Rejects with "lyrics.*" codes.
+#[tauri::command]
+pub async fn get_lyrics(
+    db: State<'_, Database>,
+    track_id: i64,
+    refresh: Option<bool>,
+) -> AppResult<LyricsPayload> {
+    lyrics::get_lyrics(&db, track_id, refresh.unwrap_or(false), chrono::Utc::now())
+        .await
+        .map_err(lyrics_err)
+}
+
+fn lyrics_db_err(e: AppError) -> AppError {
+    eprintln!("[lyrics] {e}");
+    coded("lyrics.db")
+}
+
+/// Saved lyrics shift of a track in ms (> 0 shows the lyrics later); 0 if none.
+#[tauri::command]
+pub async fn get_lyrics_offset(db: State<'_, Database>, track_id: i64) -> AppResult<i64> {
+    let conn = db.conn()?;
+    lyrics_store::get_offset(&conn, track_id).map_err(lyrics_db_err)
+}
+
+/// Saves the shift (clamped to ±10 s). Resolves with the value stored.
+#[tauri::command]
+pub async fn set_lyrics_offset(
+    db: State<'_, Database>,
+    track_id: i64,
+    offset_ms: i64,
+) -> AppResult<i64> {
+    let conn = db.conn()?;
+    lyrics_store::set_offset(&conn, track_id, offset_ms).map_err(lyrics_db_err)
 }
 
 #[cfg(test)]

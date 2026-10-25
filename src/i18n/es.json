@@ -90,16 +90,14 @@
       "db": "Error de la base de datos"
     },
     "stats": {
-      "title": "Estadísticas",
-      "minutes": "Minutos",
-      "topArtist": "Top artista",
-      "topSong": "Top canción",
-      "topSongs": "Top canciones",
-      "emptyMonth": "Aún no has escuchado nada este mes",
-      "prevMonth": "Mes anterior",
-      "nextMonth": "Mes siguiente",
-      "plays_one": "{{count}} reproducción",
-      "plays_other": "{{count}} reproducciones"
+      "bad_month": "Mes no válido",
+      "db": "Error de la base de datos"
+    },
+    "lyrics": {
+      "unavailable": "No se pudo contactar con el servicio de letras. Inténtalo más tarde",
+      "failed": "No se pudo leer la respuesta del servicio de letras",
+      "db": "Error de la base de datos",
+      "no_track": "No se encontró la canción"
     },
     "playlist": {
       "not_found": "No se encontró la playlist",
@@ -163,7 +161,12 @@
     "minutes": "Minutos",
     "topArtist": "Top artista",
     "topSong": "Top canción",
-    "topSongs": "Top canciones"
+    "topSongs": "Top canciones",
+    "emptyMonth": "Aún no has escuchado nada este mes",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "plays_one": "{{count}} reproducción",
+    "plays_other": "{{count}} reproducciones"
   },
   "settings": {
     "title": "Ajustes",
@@ -190,6 +193,20 @@
   },
   "ambient": {
     "toggle": "Vista corazón"
+  },
+  "lyrics": {
+    "title": "Letra",
+    "toggle": "Letra",
+    "loading": "Buscando la letra…",
+    "notFound": "No hay letra para esta canción",
+    "instrumental": "Instrumental",
+    "unsynced": "Letra sin sincronizar",
+    "retry": "Reintentar",
+    "searchAgain": "Buscar de nuevo",
+    "backToLine": "Volver a la línea actual",
+    "earlier": "Adelantar la letra 0,5 s",
+    "later": "Retrasar la letra 0,5 s",
+    "resetOffset": "Quitar el desfase"
   },
   "window": {
     "minimize": "Minimizar",

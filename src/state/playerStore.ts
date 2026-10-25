@@ -61,6 +61,8 @@ type PlayerState = {
   next: () => void;
   prev: () => void;
   seekRatio: (ratio: number) => void;
+  /** Jumps to an absolute position (seconds), e.g. when a lyric line is clicked. */
+  seekTo: (seconds: number) => void;
   seekBy: (seconds: number) => void;
   toggleShuffle: () => void;
   cycleRepeat: () => void;
@@ -164,6 +166,14 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
       const { duration } = get();
       if (duration <= 0) return;
       const pos = Math.min(1, Math.max(0, ratio)) * duration;
+      engine.seek(pos);
+      set({ position: pos });
+    },
+
+    seekTo: (seconds) => {
+      if (!get().queue[get().index] || !Number.isFinite(seconds)) return;
+      const { duration } = get();
+      const pos = Math.max(0, duration > 0 ? Math.min(duration, seconds) : seconds);
       engine.seek(pos);
       set({ position: pos });
     },

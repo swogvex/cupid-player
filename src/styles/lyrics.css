@@ -1,0 +1,196 @@
+/* H10 Lyrics view. Logical px multiplied by --px (defined on .shell). */
+
+/* Japanese glyphs: Pixelify Sans has none, so DotGothic16 (OFL) is the fallback. */
+@font-face {
+  font-family: "DotGothic16";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/dotgothic16-japanese-400.woff2") format("woff2");
+}
+
+/* Hangul: Galmuri7 (OFL), an 8 px bitmap-style font. Our lyrics text is 8 logical px,
+   so it stays sharp at every integer scale. Only Hangul uses it. */
+@font-face {
+  font-family: "Galmuri7";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/galmuri7.woff2") format("woff2");
+  unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7FF;
+}
+
+.lyrics__box,
+.lyrics__plain {
+  font-family: var(--font-pixel), "Galmuri7", "DotGothic16", sans-serif;
+}
+
+/* Title icon: the theme's own heart-like motif (loaded after themeart.css on purpose). */
+.content-panel[data-view="lyrics"] .view__title::before {
+  background-image: var(--spr-deco-heart);
+}
+
+.lyrics {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  container-type: size;
+}
+
+.lyrics__box {
+  position: relative; /* offsetParent of the lines: used to center the active one */
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  /* Room above and below so the first and last lines can reach the middle. */
+  padding-block: 30vh;
+  padding-block: 40cqh;
+}
+
+.lyric {
+  appearance: none;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--px) * 3);
+  width: 100%;
+  margin: 0;
+  padding: calc(var(--px) * 2) calc(var(--px) * 3);
+  border: 0;
+  background: none;
+  font: inherit;
+  line-height: calc(var(--px) * 10);
+  color: var(--ink-soft);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Marker slot: always reserved so the text never shifts; filled only on the active line. */
+.lyric::before {
+  content: "";
+  flex: none;
+  width: calc(var(--px) * 5);
+  height: calc(var(--px) * 5);
+  margin-top: calc(var(--px) * 2);
+  background: no-repeat center / 100% 100%;
+  image-rendering: pixelated;
+}
+
+.lyric__text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lyric:hover {
+  color: var(--ink);
+}
+
+.lyric.is-active {
+  color: var(--ink);
+  background: var(--panel-2);
+}
+
+.lyric.is-active::before {
+  background-image: var(--spr-nav-heart);
+}
+
+.lyric:focus-visible {
+  outline: calc(var(--px) * 1) solid var(--accent);
+  outline-offset: calc(var(--px) * -1);
+}
+
+/* Messages (loading, no lyrics, errors) */
+.lyrics__msg-box {
+  display: grid;
+  gap: calc(var(--px) * 3);
+  justify-items: start;
+  align-content: start;
+  padding: 0 calc(var(--px) * 3);
+}
+
+.lyrics__msg {
+  margin: 0;
+  line-height: calc(var(--px) * 10);
+  overflow-wrap: anywhere;
+}
+
+.lyrics__btn {
+  appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: calc(var(--px) * 1) calc(var(--px) * 4);
+  border: calc(var(--px) * 1) solid var(--ink);
+  background: var(--panel-2);
+  font: inherit;
+  line-height: calc(var(--px) * 10);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.lyrics__btn:hover:not(:disabled),
+.lyrics__btn:focus-visible {
+  background: var(--accent);
+  color: #fff;
+  outline: none;
+}
+
+.lyrics__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Header tools: shift buttons and "search again" */
+.lyrics__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(var(--px) * 2);
+  min-width: 0;
+  margin-left: auto;
+}
+
+.lyrics__btn--sm {
+  padding: 0 calc(var(--px) * 3);
+  white-space: nowrap;
+}
+
+.lyrics__offset {
+  min-width: calc(var(--px) * 26);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Back to the current line", floating over the bottom of the lyrics */
+.lyrics__back {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--px) * 3);
+  z-index: 2;
+  max-width: calc(100% - var(--px) * 8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Unsynced lyrics */
+.lyrics__plain {
+  padding: 0 calc(var(--px) * 3);
+}
+
+.lyrics__hint {
+  margin: 0 0 calc(var(--px) * 2);
+  line-height: calc(var(--px) * 10);
+}
+
+.lyrics__plain-text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: calc(var(--px) * 10);
+}
