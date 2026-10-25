@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { load, type Store } from "@tauri-apps/plugin-store";
-import { setAlwaysOnTop } from "../ipc/commands";
+import { setAlwaysOnTop, setCloseToTray } from "../ipc/commands";
 import { isLanguage, setLanguage as applyLanguage, type Language } from "../i18n";
 import { applyTheme, initialTheme, isTheme, type ThemeId } from "../lib/theme";
 
@@ -9,6 +9,7 @@ export type { Language };
 type SettingsState = {
   ready: boolean;
   alwaysOnTop: boolean;
+  closeToTray: boolean;
   language: Language;
   theme: ThemeId;
   /** 0..1. The audio engine (H6) plays at `muted ? 0 : volume`. */
@@ -16,6 +17,7 @@ type SettingsState = {
   muted: boolean;
   init: () => Promise<void>;
   setAlwaysOnTop: (value: boolean) => Promise<void>;
+  setCloseToTray: (value: boolean) => Promise<void>;
   setLanguage: (lang: Language) => Promise<void>;
   setTheme: (id: ThemeId) => Promise<void>;
   setVolume: (value: number) => void;
@@ -24,6 +26,7 @@ type SettingsState = {
 
 const DEFAULTS = {
   alwaysOnTop: false,
+  closeToTray: false,
   language: "es" as Language,
   theme: initialTheme(),
   volume: 0.5,
@@ -69,14 +72,16 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       try {
         store = await load("settings.json", { defaults: {} });
         const alwaysOnTop = asBool(await store.get("alwaysOnTop"), DEFAULTS.alwaysOnTop);
+        const closeToTray = asBool(await store.get("closeToTray"), DEFAULTS.closeToTray);
         const language = asLang(await store.get("language"));
         const theme = asTheme(await store.get("theme"));
         const volume = asVolume(await store.get("volume"));
         const muted = asBool(await store.get("muted"), DEFAULTS.muted);
-        set({ alwaysOnTop, language, theme, volume, muted });
+        set({ alwaysOnTop, closeToTray, language, theme, volume, muted });
         applyTheme(theme);
         await applyLanguage(language);
         await setAlwaysOnTop(alwaysOnTop);
+        await setCloseToTray(closeToTray);
       } catch (e) {
         console.error("settings: init failed, using defaults", e);
       } finally {
@@ -93,6 +98,16 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       await setAlwaysOnTop(value);
     } catch (e) {
       console.error("settings: could not set always-on-top", e);
+    }
+  },
+
+  setCloseToTray: async (value) => {
+    set({ closeToTray: value });
+    await persist("closeToTray", value);
+    try {
+      await setCloseToTray(value);
+    } catch (e) {
+      console.error("settings: could not set close-to-tray", e);
     }
   },
 

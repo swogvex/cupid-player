@@ -226,6 +226,18 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
       "f": 1,
       "r": 8
     },
+    "icon-lyrics": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics-on": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
     "icon-next": {
       "w": 9,
       "h": 9,
@@ -545,6 +557,12 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
       "r": 8
     },
     "win-icon-min": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-mini": {
       "w": 7,
       "h": 7,
       "f": 1,
@@ -732,6 +750,18 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
       "f": 1,
       "r": 8
     },
+    "icon-lyrics": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics-on": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
     "icon-next": {
       "w": 9,
       "h": 9,
@@ -1056,6 +1086,12 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
       "f": 1,
       "r": 8
     },
+    "win-icon-mini": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
     "wing": {
       "w": 14,
       "h": 14,
@@ -1235,6 +1271,18 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     "icon-list": {
       "w": 9,
       "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics-on": {
+      "w": 7,
+      "h": 7,
       "f": 1,
       "r": 8
     },
@@ -1562,6 +1610,12 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
       "f": 1,
       "r": 8
     },
+    "win-icon-mini": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
     "wing": {
       "w": 14,
       "h": 14,
@@ -1741,6 +1795,18 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     "icon-list": {
       "w": 9,
       "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics-on": {
+      "w": 7,
+      "h": 7,
       "f": 1,
       "r": 8
     },
@@ -2068,6 +2134,12 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
       "f": 1,
       "r": 8
     },
+    "win-icon-mini": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
     "wing": {
       "w": 14,
       "h": 14,
@@ -2247,6 +2319,18 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
     "icon-list": {
       "w": 9,
       "h": 9,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "icon-lyrics-on": {
+      "w": 7,
+      "h": 7,
       "f": 1,
       "r": 8
     },
@@ -2569,6 +2653,12 @@ export const SPRITES: Record<string, Record<string, { w: number; h: number; f: n
       "r": 8
     },
     "win-icon-min": {
+      "w": 7,
+      "h": 7,
+      "f": 1,
+      "r": 8
+    },
+    "win-icon-mini": {
       "w": 7,
       "h": 7,
       "f": 1,

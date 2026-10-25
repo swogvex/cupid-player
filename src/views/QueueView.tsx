@@ -11,7 +11,7 @@ export function QueueView() {
   const open = usePlayerStore((s) => s.queueOpen);
   const queue = usePlayerStore((s) => s.queue);
   const index = usePlayerStore((s) => s.index);
-  const { playAt, move, removeAt, clearQueue, setQueueOpen } = usePlayerStore.getState();
+  const { playAt, move, removeAt, setQueueOpen } = usePlayerStore.getState();
 
   useEffect(() => {
     if (!open) return;
@@ -27,9 +27,6 @@ export function QueueView() {
       <PixelPanel className="queue__panel">
         <div className="queue__head">
           <span>{t("queue.title")}</span>
-          <PixelButton variant="mini" aria-label={t("queue.clear")} onClick={clearQueue} disabled={queue.length < 2}>
-            <Sprite name="icon-remove" w={7} h={7} />
-          </PixelButton>
         </div>
         {queue.length === 0 ? (
           <p className="muted queue__empty">{t("queue.empty")}</p>

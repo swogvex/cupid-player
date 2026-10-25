@@ -81,20 +81,25 @@ export function PlaylistsView() {
       ) : playlists.length === 0 ? (
         <p className="muted">{t("playlists.empty")}</p>
       ) : (
-        <div className="cards view__scroll">
-          {playlists.map((p) => (
-            <PixelButton
-              key={p.id}
-              variant="nav"
-              data-marquee-host
-              onClick={() => openPlaylist(p.id)}
-              onContextMenu={(e) => openMenu(e, p.id)}
-            >
-              <Marquee className="card-text" text={p.name} />
-              <span className="card-text muted">{t("playlists.tracks", { count: p.trackCount })}</span>
-            </PixelButton>
-          ))}
-        </div>
+        <>
+          <div className="cards view__scroll">
+            {playlists.map((p) => (
+              <PixelButton
+                key={p.id}
+                variant="nav"
+                data-marquee-host
+                onClick={() => openPlaylist(p.id)}
+                onContextMenu={(e) => openMenu(e, p.id)}
+              >
+                <Marquee className="card-text" text={p.name} />
+                <span className="card-text muted">{t("playlists.tracks", { count: p.trackCount })}</span>
+              </PixelButton>
+            ))}
+          </div>
+          <p className="view__hint muted ellipsis" title={t("playlists.hint")}>
+            {t("playlists.hint")}
+          </p>
+        </>
       )}
     </section>
   );

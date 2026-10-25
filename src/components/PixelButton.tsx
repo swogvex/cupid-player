@@ -15,6 +15,7 @@ export function PixelButton({
   large = false,
   className = "",
   type = "button",
+  title,
   ...rest
 }: PixelButtonProps) {
   const cls = [
@@ -30,6 +31,8 @@ export function PixelButton({
     <button
       type={type}
       className={cls}
+      // Icon-only buttons get a tooltip for free: their aria-label.
+      title={title ?? rest["aria-label"]}
       aria-current={variant === "nav" && active ? "page" : undefined}
       {...rest}
     />

@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PixelButton } from "../components/PixelButton";
 import { LANGUAGES, type Language } from "../i18n";
-import { clearCache, getCacheInfo, openMusicFolder, scanFolder } from "../ipc/commands";
+import {
+  clearCache,
+  getCacheInfo,
+  openMusicFolder,
+  scanFolder,
+} from "../ipc/commands";
 import type { CacheInfo, ScanReport } from "../ipc/types";
 import { formatBytes } from "../lib/bytes";
 import { THEMES } from "../lib/theme";
@@ -11,7 +16,10 @@ import { useImportStore } from "../state/importStore";
 import { useLibraryStore } from "../state/libraryStore";
 import { useSettingsStore } from "../state/settingsStore";
 
-const LANGUAGE_NAMES: Record<Language, string> = { es: "Español", en: "English" };
+const LANGUAGE_NAMES: Record<Language, string> = {
+  es: "Español",
+  en: "English",
+};
 
 export function SettingsView() {
   const { t } = useTranslation();
@@ -22,7 +30,11 @@ export function SettingsView() {
   const setLanguage = useSettingsStore((s) => s.setLanguage);
   const setAlwaysOnTop = useSettingsStore((s) => s.setAlwaysOnTop);
   const setTheme = useSettingsStore((s) => s.setTheme);
-  const importing = useImportStore((s) => s.phase === "starting" || s.phase === "running");
+  const importing = useImportStore(
+    (s) => s.phase === "starting" || s.phase === "running",
+  );
+  const closeToTray = useSettingsStore((s) => s.closeToTray);
+  const setCloseToTray = useSettingsStore((s) => s.setCloseToTray);
 
   const [scanning, setScanning] = useState(false);
   const [scanMessage, setScanMessage] = useState<string | null>(null);
@@ -46,7 +58,8 @@ export function SettingsView() {
   const describe = (r: ScanReport): string => {
     if (r.found === 0) return t("scan.none");
     const parts = [t("scan.added", { count: r.added })];
-    if (r.duplicates > 0) parts.push(t("scan.duplicates", { count: r.duplicates }));
+    if (r.duplicates > 0)
+      parts.push(t("scan.duplicates", { count: r.duplicates }));
     if (r.failed > 0) parts.push(t("scan.failed", { count: r.failed }));
     if (r.truncated) parts.push(t("scan.truncated"));
     return parts.join(" · ");
@@ -81,7 +94,10 @@ export function SettingsView() {
       setCacheMessage(
         result.removed === 0
           ? t("cache.nothing")
-          : t("cache.cleared", { count: result.removed, size: formatBytes(result.freedBytes) }),
+          : t("cache.cleared", {
+              count: result.removed,
+              size: formatBytes(result.freedBytes),
+            }),
       );
       setCache(await getCacheInfo());
     } catch (e) {
@@ -102,7 +118,11 @@ export function SettingsView() {
       <div className="view__scroll settings-body">
         <div className="setting">
           <span>{t("settings.language")}</span>
-          <div className="btn-group" role="group" aria-label={t("settings.language")}>
+          <div
+            className="btn-group"
+            role="group"
+            aria-label={t("settings.language")}
+          >
             {LANGUAGES.map((lang) => (
               <PixelButton
                 key={lang}
@@ -116,31 +136,51 @@ export function SettingsView() {
           </div>
         </div>
 
-        <div className="setting">
-          <span>{t("settings.alwaysOnTop")}</span>
-          <PixelButton
-            active={alwaysOnTop}
-            aria-pressed={alwaysOnTop}
-            onClick={() => void setAlwaysOnTop(!alwaysOnTop)}
-          >
-            {alwaysOnTop ? t("common.on") : t("common.off")}
-          </PixelButton>
+        <div className="setting setting--stack">
+          <div className="setting">
+            <span>{t("settings.alwaysOnTop")}</span>
+            <PixelButton
+              active={alwaysOnTop}
+              aria-pressed={alwaysOnTop}
+              onClick={() => void setAlwaysOnTop(!alwaysOnTop)}
+            >
+              {alwaysOnTop ? t("common.on") : t("common.off")}
+            </PixelButton>
+          </div>
+          <span className="muted">{t("settings.alwaysOnTopHint")}</span>
+        </div>
+
+        <div className="setting setting--stack">
+          <div className="setting">
+            <span>{t("settings.closeToTray")}</span>
+            <PixelButton
+              active={closeToTray}
+              aria-pressed={closeToTray}
+              onClick={() => void setCloseToTray(!closeToTray)}
+            >
+              {closeToTray ? t("common.on") : t("common.off")}
+            </PixelButton>
+          </div>
+          <span className="muted">{t("settings.closeToTrayHint")}</span>
         </div>
 
         <div className="setting setting--stack">
           <div className="setting">
             <span>{t("settings.musicFolder")}</span>
-            <PixelButton onClick={openFolder}>{t("settings.openFolder")}</PixelButton>
+            <PixelButton onClick={openFolder}>
+              {t("settings.openFolder")}
+            </PixelButton>
           </div>
-          {folderMessage && (
-            <span role="alert">{folderMessage}</span>
-          )}
+          {folderMessage && <span role="alert">{folderMessage}</span>}
         </div>
 
         <div className="setting setting--stack">
           <div className="setting">
             <span>{t("settings.importFolder")}</span>
-            <PixelButton disabled={scanning || importing} onClick={() => void importFolder()}>
+            <PixelButton
+              disabled={scanning || importing}
+              onClick={() => void importFolder()}
+            >
               {scanning ? t("scan.running") : t("settings.chooseFolder")}
             </PixelButton>
           </div>
@@ -156,7 +196,9 @@ export function SettingsView() {
           <div className="setting">
             <span>{t("settings.cache")}</span>
             <PixelButton
-              disabled={clearing || importing || !cache || cache.reclaimableCount === 0}
+              disabled={
+                clearing || importing || !cache || cache.reclaimableCount === 0
+              }
               onClick={() => void clear()}
             >
               {t("settings.clearCache")}
@@ -180,7 +222,11 @@ export function SettingsView() {
 
         <div className="setting setting--stack">
           <span>{t("settings.theme")}</span>
-          <div className="theme-grid" role="group" aria-label={t("settings.theme")}>
+          <div
+            className="theme-grid"
+            role="group"
+            aria-label={t("settings.theme")}
+          >
             {THEMES.map((th) => (
               <PixelButton
                 key={th.id}
@@ -191,7 +237,11 @@ export function SettingsView() {
               >
                 <span className="swatches" aria-hidden="true">
                   {th.swatches.map((color, i) => (
-                    <i key={`${th.id}-${i}`} className="swatch" style={{ background: color }} />
+                    <i
+                      key={`${th.id}-${i}`}
+                      className="swatch"
+                      style={{ background: color }}
+                    />
                   ))}
                 </span>
                 <span className="ellipsis">{th.name}</span>

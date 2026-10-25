@@ -10,6 +10,8 @@ type MarqueeProps = {
   className?: string;
   /** Animate all the time. Otherwise it moves only while the row/host is hovered or focused. */
   always?: boolean;
+  /** Tooltip; defaults to the text itself. */
+  title?: string;
 };
 
 /**
@@ -17,7 +19,7 @@ type MarqueeProps = {
  * not fit, a smooth ping-pong scroll that reveals the whole text.
  * To trigger it from a whole row, put `data-marquee-host` on the row.
  */
-export function Marquee({ text, className = "", always = false }: MarqueeProps) {
+export function Marquee({ text, className = "", always = false, title }: MarqueeProps) {
   const boxRef = useRef<HTMLSpanElement>(null);
   const innerRef = useRef<HTMLSpanElement>(null);
 
@@ -45,7 +47,7 @@ export function Marquee({ text, className = "", always = false }: MarqueeProps) 
 
   const cls = ["marquee", always ? "marquee--always" : "", className].filter(Boolean).join(" ");
   return (
-    <span ref={boxRef} className={cls} title={text}>
+    <span ref={boxRef} className={cls} title={title ?? text}>
       <span ref={innerRef} className="marquee__inner">
         {text}
       </span>

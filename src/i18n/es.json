@@ -131,7 +131,6 @@
   "queue": {
     "title": "Cola",
     "empty": "La cola está vacía",
-    "clear": "Vaciar cola",
     "moveUp": "Subir",
     "moveDown": "Bajar",
     "remove": "Quitar de la cola"
@@ -154,7 +153,8 @@
     "empty": "Aún no hay playlists. Haz clic derecho para crear una.",
     "new": "Nueva",
     "emptyPlaylist": "Esta playlist está vacía",
-    "addSongs": "Añadir canciones…"
+    "addSongs": "Añadir canciones…",
+    "hint": "Clic derecho para crear o editar playlists"
   },
   "stats": {
     "title": "Estadísticas",
@@ -180,7 +180,10 @@
     "openFolder": "Abrir carpeta",
     "cache": "Caché",
     "clearCache": "Limpiar caché",
-    "cacheHint": "Borra portadas sin usar y archivos temporales. Tu música no se toca."
+    "cacheHint": "Borra portadas sin usar y archivos temporales. Tu música no se toca.",
+    "closeToTray": "Cerrar a la bandeja",
+    "closeToTrayHint": "Al cerrar la ventana, la música sigue sonando desde la bandeja del sistema.",
+    "alwaysOnTopHint": "Mantiene cupid player por encima de las demás ventanas, aunque estés usando otra aplicación."
   },
   "status": {
     "done": "Listo",
@@ -211,7 +214,15 @@
   "window": {
     "minimize": "Minimizar",
     "maximize": "Maximizar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "mini": "Mini modo",
+    "expand": "Volver a la ventana completa"
+  },
+  "tray": {
+    "show": "Mostrar",
+    "playPause": "Reproducir / Pausar",
+    "next": "Siguiente",
+    "quit": "Salir"
   },
   "menu": {
     "label": "Acciones de la canción",

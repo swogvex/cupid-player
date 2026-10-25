@@ -14,8 +14,10 @@ mod window;
 #[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod ytdlp;
 
+use std::sync::atomic::Ordering;
+
 use tauri::Manager;
-use tauri_plugin_window_state::StateFlags;
+use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -23,14 +25,10 @@ pub fn run() {
         // single-instance must be registered first.
         // Arguments are ignored on purpose: nothing from a second launch reaches the app.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            if let Some(w) = app.get_webview_window("main") {
-                let _ = w.unminimize();
-                let _ = w.show();
-                let _ = w.set_focus();
-            }
+            window::tray::show_main(app);
         }))
         .plugin(tauri_plugin_shell::init())
-        // Only remember position; size is governed by the integer scale.
+        // Remember position and size (the mini size is undone before exiting).
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_state_flags(StateFlags::POSITION | StateFlags::SIZE)
@@ -39,6 +37,26 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() != "main" {
+                    return;
+                }
+                let app = window.app_handle();
+                let to_tray = app
+                    .try_state::<window::tray::TrayState>()
+                    .is_some_and(|s| s.close_to_tray.load(Ordering::Relaxed));
+                if to_tray {
+                    api.prevent_close();
+                    let _ = window.hide();
+                    return;
+                }
+                // Really closing: undo the mini size and store the normal one.
+                if window::mini::leave_mini(app) {
+                    let _ = app.save_window_state(StateFlags::POSITION | StateFlags::SIZE);
+                }
+            }
+        })
         .setup(|app| {
             let paths = paths::AppPaths::resolve(app.handle())?;
             paths.ensure_dirs()?;
@@ -68,6 +86,9 @@ pub fn run() {
                 database.seed_dev_audio(&paths.singles_dir)?;
             }
 
+            let tray = window::tray::build(app.handle())?;
+            app.manage(tray);
+            app.manage(window::mini::MiniState::default());
             app.manage(import::runner::ImportManager::default());
             app.manage(paths);
             app.manage(database);
@@ -75,6 +96,9 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             window::scale::set_window_scale,
+            window::mini::set_mini_mode,
+            window::tray::set_close_to_tray,
+            window::tray::set_tray_labels,
             commands::list_tracks,
             commands::list_playlists,
             commands::list_playlist_members,

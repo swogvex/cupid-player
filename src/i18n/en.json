@@ -131,7 +131,6 @@
   "queue": {
     "title": "Queue",
     "empty": "The queue is empty",
-    "clear": "Clear queue",
     "moveUp": "Move up",
     "moveDown": "Move down",
     "remove": "Remove from queue"
@@ -154,7 +153,8 @@
     "empty": "No playlists yet. Right-click to create one.",
     "new": "New",
     "emptyPlaylist": "This playlist is empty",
-    "addSongs": "Add songs…"
+    "addSongs": "Add songs…",
+    "hint": "Right-click to create or edit playlists"
   },
   "stats": {
     "title": "Stats",
@@ -180,7 +180,10 @@
     "openFolder": "Open folder",
     "cache": "Cache",
     "clearCache": "Clear cache",
-    "cacheHint": "Removes unused covers and temporary files. Your music is never touched."
+    "cacheHint": "Removes unused covers and temporary files. Your music is never touched.",
+    "closeToTray": "Close to tray",
+    "closeToTrayHint": "When you close the window, the music keeps playing from the system tray.",
+    "alwaysOnTopHint": "Keeps cupid player above all other windows, even while you use another app."
   },
   "status": {
     "done": "Done",
@@ -197,7 +200,15 @@
   "window": {
     "minimize": "Minimize",
     "maximize": "Maximize",
-    "close": "Close"
+    "close": "Close",
+    "mini": "Mini player",
+    "expand": "Back to the full window"
+  },
+  "tray": {
+    "show": "Show",
+    "playPause": "Play / Pause",
+    "next": "Next",
+    "quit": "Quit"
   },
   "lyrics": {
     "title": "Lyrics",

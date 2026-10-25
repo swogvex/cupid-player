@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/commands";
 import { hasSprite } from "../lib/sprites";
+import { useMiniStore } from "../state/miniStore";
 import { useSettingsStore } from "../state/settingsStore";
 import { AnimSprite } from "./AnimSprite";
 import { Sprite } from "./Sprite";
@@ -18,6 +19,7 @@ function WinButton({ icon, label, onClick }: WinButtonProps) {
 export function TitleBar() {
   const { t } = useTranslation();
   const theme = useSettingsStore((s) => s.theme);
+  const toggleMini = useMiniStore((s) => s.toggle);
   const ownArt = hasSprite(theme, "title-heart");
 
   return (
@@ -64,6 +66,7 @@ export function TitleBar() {
       </div>
 
       <div className="titlebar__buttons">
+        <WinButton icon="win-icon-mini" label={t("window.mini")} onClick={() => void toggleMini()} />
         <WinButton icon="win-icon-min" label={t("window.minimize")} onClick={() => void minimizeWindow()} />
         <WinButton icon="win-icon-max" label={t("window.maximize")} onClick={() => void toggleMaximizeWindow()} />
         <WinButton icon="win-icon-close" label={t("window.close")} onClick={() => void closeWindow()} />

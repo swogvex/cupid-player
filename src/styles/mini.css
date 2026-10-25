@@ -1,0 +1,71 @@
+/* Mini player: 104x156 logical px at --s (fixed x2). All sizes in logical px.
+   Heights inside the panel (144): top 14 + cover 72 + text 18 + controls 24 + bar 11 = 139. */
+.mini-root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  /* The mini player lives outside .shell, so it sets its own text style. */
+  font-family: var(--font-pixel);
+  font-size: calc(var(--s) * 8px);
+  line-height: calc(var(--s) * 9px);
+  color: var(--ink);
+}
+.mini-root .mini {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+.mini__top {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-end;
+  gap: calc(var(--s) * 2px);
+  height: calc(var(--s) * 14px);
+}
+/* 72 px box = 1 px frame + the 30 px placeholder drawn at x2 (60 px). */
+.mini__cover {
+  box-sizing: border-box;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--s) * 72px);
+  height: calc(var(--s) * 72px);
+  overflow: hidden;
+  background: var(--panel-2);
+  border: calc(var(--s) * 1px) solid var(--line);
+}
+/* Lets the drag region (and the tooltip) receive the pointer instead of the children. */
+.mini__cover *,
+.mini__text * {
+  pointer-events: none;
+}
+.mini__cover .cover-art {
+  transform: scale(2);
+}
+.mini__text {
+  align-self: stretch;
+  min-width: 0;
+  height: calc(var(--s) * 18px);
+  overflow: hidden;
+  text-align: center;
+}
+.mini__text .marquee {
+  height: calc(var(--s) * 9px);
+}
+.mini__controls {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--s) * 4px);
+}
+.mini__bar {
+  align-self: stretch;
+}

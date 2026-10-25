@@ -132,6 +132,22 @@ export const getLyricsOffset = (trackId: number) =>
 export const setLyricsOffset = (trackId: number, offsetMs: number) =>
   invoke<number>("set_lyrics_offset", { trackId, offsetMs });
 
+/** Mirrors the "close to tray" setting for Rust (it decides on CloseRequested). */
+export const setCloseToTray = (value: boolean) => invoke<void>("set_close_to_tray", { value });
+
+export interface TrayLabels {
+  show: string;
+  playPause: string;
+  next: string;
+  quit: string;
+}
+
+/** Translates the native tray menu. */
+export const setTrayLabels = (labels: TrayLabels) => invoke<void>("set_tray_labels", { labels });
+
+/** Resizes the window to the mini player (on) or restores the normal size (off). */
+export const setMiniMode = (on: boolean) => invoke<void>("set_mini_mode", { on });
+
 /** Resizes the window to 352*n x 208*n. Resolves with the scale actually applied. */
 export function setWindowScale(n: number): Promise<number> {
   return invoke<number>("set_window_scale", { n });

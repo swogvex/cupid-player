@@ -45,6 +45,8 @@
   --spr-icon-download: url("/assets/sprites/pink/icon-download.png");
   --spr-icon-link: url("/assets/sprites/pink/icon-link.png");
   --spr-icon-list: url("/assets/sprites/pink/icon-list.png");
+  --spr-icon-lyrics: url("/assets/sprites/pink/icon-lyrics.png");
+  --spr-icon-lyrics-on: url("/assets/sprites/pink/icon-lyrics-on.png");
   --spr-icon-next: url("/assets/sprites/pink/icon-next.png");
   --spr-icon-note: url("/assets/sprites/pink/icon-note.png");
   --spr-icon-pause: url("/assets/sprites/pink/icon-pause.png");
@@ -99,6 +101,7 @@
   --spr-win-icon-close: url("/assets/sprites/pink/win-icon-close.png");
   --spr-win-icon-max: url("/assets/sprites/pink/win-icon-max.png");
   --spr-win-icon-min: url("/assets/sprites/pink/win-icon-min.png");
+  --spr-win-icon-mini: url("/assets/sprites/pink/win-icon-mini.png");
   --spr-wing: url("/assets/sprites/pink/wing.png");
 }
 
@@ -146,6 +149,8 @@
   --spr-icon-download: url("/assets/sprites/midnight/icon-download.png");
   --spr-icon-link: url("/assets/sprites/midnight/icon-link.png");
   --spr-icon-list: url("/assets/sprites/midnight/icon-list.png");
+  --spr-icon-lyrics: url("/assets/sprites/midnight/icon-lyrics.png");
+  --spr-icon-lyrics-on: url("/assets/sprites/midnight/icon-lyrics-on.png");
   --spr-icon-next: url("/assets/sprites/midnight/icon-next.png");
   --spr-icon-note: url("/assets/sprites/midnight/icon-note.png");
   --spr-icon-pause: url("/assets/sprites/midnight/icon-pause.png");
@@ -200,6 +205,7 @@
   --spr-win-icon-close: url("/assets/sprites/midnight/win-icon-close.png");
   --spr-win-icon-max: url("/assets/sprites/midnight/win-icon-max.png");
   --spr-win-icon-min: url("/assets/sprites/midnight/win-icon-min.png");
+  --spr-win-icon-mini: url("/assets/sprites/midnight/win-icon-mini.png");
   --spr-wing: url("/assets/sprites/midnight/wing.png");
 }
 
@@ -247,6 +253,8 @@
   --spr-icon-download: url("/assets/sprites/lavender/icon-download.png");
   --spr-icon-link: url("/assets/sprites/lavender/icon-link.png");
   --spr-icon-list: url("/assets/sprites/lavender/icon-list.png");
+  --spr-icon-lyrics: url("/assets/sprites/lavender/icon-lyrics.png");
+  --spr-icon-lyrics-on: url("/assets/sprites/lavender/icon-lyrics-on.png");
   --spr-icon-next: url("/assets/sprites/lavender/icon-next.png");
   --spr-icon-note: url("/assets/sprites/lavender/icon-note.png");
   --spr-icon-pause: url("/assets/sprites/lavender/icon-pause.png");
@@ -301,6 +309,7 @@
   --spr-win-icon-close: url("/assets/sprites/lavender/win-icon-close.png");
   --spr-win-icon-max: url("/assets/sprites/lavender/win-icon-max.png");
   --spr-win-icon-min: url("/assets/sprites/lavender/win-icon-min.png");
+  --spr-win-icon-mini: url("/assets/sprites/lavender/win-icon-mini.png");
   --spr-wing: url("/assets/sprites/lavender/wing.png");
 }
 
@@ -348,6 +357,8 @@
   --spr-icon-download: url("/assets/sprites/mint/icon-download.png");
   --spr-icon-link: url("/assets/sprites/mint/icon-link.png");
   --spr-icon-list: url("/assets/sprites/mint/icon-list.png");
+  --spr-icon-lyrics: url("/assets/sprites/mint/icon-lyrics.png");
+  --spr-icon-lyrics-on: url("/assets/sprites/mint/icon-lyrics-on.png");
   --spr-icon-next: url("/assets/sprites/mint/icon-next.png");
   --spr-icon-note: url("/assets/sprites/mint/icon-note.png");
   --spr-icon-pause: url("/assets/sprites/mint/icon-pause.png");
@@ -402,6 +413,7 @@
   --spr-win-icon-close: url("/assets/sprites/mint/win-icon-close.png");
   --spr-win-icon-max: url("/assets/sprites/mint/win-icon-max.png");
   --spr-win-icon-min: url("/assets/sprites/mint/win-icon-min.png");
+  --spr-win-icon-mini: url("/assets/sprites/mint/win-icon-mini.png");
   --spr-wing: url("/assets/sprites/mint/wing.png");
 }
 
@@ -449,6 +461,8 @@
   --spr-icon-download: url("/assets/sprites/classic/icon-download.png");
   --spr-icon-link: url("/assets/sprites/classic/icon-link.png");
   --spr-icon-list: url("/assets/sprites/classic/icon-list.png");
+  --spr-icon-lyrics: url("/assets/sprites/classic/icon-lyrics.png");
+  --spr-icon-lyrics-on: url("/assets/sprites/classic/icon-lyrics-on.png");
   --spr-icon-next: url("/assets/sprites/classic/icon-next.png");
   --spr-icon-note: url("/assets/sprites/classic/icon-note.png");
   --spr-icon-pause: url("/assets/sprites/classic/icon-pause.png");
@@ -503,6 +517,7 @@
   --spr-win-icon-close: url("/assets/sprites/classic/win-icon-close.png");
   --spr-win-icon-max: url("/assets/sprites/classic/win-icon-max.png");
   --spr-win-icon-min: url("/assets/sprites/classic/win-icon-min.png");
+  --spr-win-icon-mini: url("/assets/sprites/classic/win-icon-mini.png");
   --spr-wing: url("/assets/sprites/classic/wing.png");
 }
 

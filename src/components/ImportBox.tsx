@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { useTranslation } from "react-i18next";
 import { useSmoothProgress } from "../lib/useSmoothProgress";
 import { initImportEvents, useImportStore } from "../state/importStore";
+import { Marquee } from "./Marquee";
 import { PixelButton } from "./PixelButton";
 import { PixelInput } from "./PixelInput";
 import { Sprite } from "./Sprite";
@@ -65,7 +66,7 @@ export function ImportBox() {
   } else {
     status = t("import.idle");
   }
-  // The status line is short; the tooltip carries the longer explanation.
+  // The status line scrolls when it does not fit; the tooltip carries the longer explanation.
   const hint =
     phase === "done" && truncated && !cancelled ? `${status}. ${t("import.truncatedHint")}` : status;
 
@@ -74,7 +75,8 @@ export function ImportBox() {
       <div className="import__field">
         <Sprite name="icon-link" className="import__field-icon" />
         <PixelInput
-          placeholder={t("import.placeholder")}
+          // The placeholder is drawn by the marquee below (an input cannot scroll it).
+          placeholder=""
           aria-label={t("import.placeholder")}
           value={link}
           onChange={(e) => setLink(e.target.value)}
@@ -82,6 +84,11 @@ export function ImportBox() {
           autoComplete="off"
           spellCheck={false}
         />
+        {link === "" && (
+          <div className="import__ph" aria-hidden="true">
+            <Marquee text={t("import.placeholder")} always />
+          </div>
+        )}
       </div>
       <PixelButton
         className="import__btn"
@@ -115,8 +122,8 @@ export function ImportBox() {
           </div>
         )}
       </div>
-      <div className="import__status ellipsis" aria-live="polite" title={hint}>
-        {status}
+      <div className="import__status" aria-live="polite">
+        <Marquee text={status} title={hint} always />
       </div>
     </div>
   );

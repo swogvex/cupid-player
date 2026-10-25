@@ -1,0 +1,44 @@
+/* H11b polish. Logical px multiplied by --s. */
+
+/* Lyrics button: small round button (12x12 ctl sprite) in the corner of the content panel. */
+.content-panel .px-btn.lyrics-toggle {
+  position: absolute;
+  top: calc(var(--s) * 2px);
+  right: calc(var(--s) * 3px);
+  z-index: 2;
+  width: calc(var(--s) * 12px);
+  height: calc(var(--s) * 12px);
+}
+
+/* Room for that button in every view header. */
+.content-panel .view__head {
+  padding-right: calc(var(--s) * 18px);
+}
+
+/* Import field: the placeholder is a marquee laid over the empty input. */
+.import__ph {
+  position: absolute;
+  left: calc(var(--s) * 14px);
+  right: calc(var(--s) * 5px);
+  top: calc(var(--s) * 4px);
+  height: calc(var(--s) * 8px);
+  overflow: hidden;
+  font-size: calc(var(--s) * 8px);
+  line-height: calc(var(--s) * 8px);
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+
+.import__status {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Quiet hint at the bottom of Playlists. */
+.view__hint {
+  flex: none;
+  margin: 0;
+  line-height: calc(var(--s) * 10px);
+  text-align: center;
+  opacity: 0.55;
+}
