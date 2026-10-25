@@ -309,7 +309,7 @@ mod tests {
         assert!(get(&conn, 9999).expect("get").is_none());
     }
 
-    #[test]
+ #[test]
     fn all_import_statuses_are_accepted_by_the_schema() {
         let d = db();
         let conn = d.conn().expect("conn");
@@ -323,7 +323,8 @@ mod tests {
             TrackStatus::NeedsReview,
             TrackStatus::Failed,
         ] {
-            set_status(&conn, id, status.as_str()).expect(status.as_str());
+            set_status(&conn, id, status.as_str())
+                .unwrap_or_else(|_| panic!("{}", status.as_str()));
         }
     }
 
