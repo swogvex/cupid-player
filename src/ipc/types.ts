@@ -182,3 +182,9 @@ export interface Lyrics {
   lines: LyricsLine[];
   plain: string | null;
 }
+
+/** A newer version found on GitHub Releases. */
+export interface UpdateInfo {
+  version: string;
+  currentVersion: string;
+}

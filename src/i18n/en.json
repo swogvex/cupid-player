@@ -108,6 +108,15 @@
       "no_folder": "This playlist has no folder on disk",
       "db": "Could not access the database",
       "files_failed": "Some files could not be deleted. Are they in use?"
+    },
+    "updater": {
+      "unavailable": "Updates are not available in this version",
+      "check_failed": "Could not check for updates. Check your connection and try again",
+      "no_pending": "There is no update ready. Check again",
+      "install_failed": "Could not install the update. Try again later"
+    },
+    "donate": {
+      "open_failed": "Could not open the browser"
     }
   },
   "player": {
@@ -210,7 +219,10 @@
     "alwaysOnTopHint": "Keeps cupid player above other windows, even when you're using another app.",
     "logs": "Logs",
     "openLogs": "Open logs folder",
-    "logsHint": "Having issues? Contact support and attach the diagnostic log."
+    "logsHint": "Having issues? Contact support and attach the diagnostic log.",
+    "support": "Support the project",
+    "donate": "Buy me a coffee",
+    "donateHint": "Opens your browser on my Ko-fi page. Totally optional."
   },
   "status": {
     "done": "Completed",
@@ -349,5 +361,18 @@
     "already": "Already added",
     "none": "You don't have any playlists yet",
     "cancel": "Cancel"
+  },
+  "updater": {
+    "title": "Updates",
+    "version": "Version {{version}}",
+    "check": "Check for updates",
+    "checking": "Checking…",
+    "upToDate": "You have the latest version",
+    "available": "A new version is available: {{version}}",
+    "install": "Download and install",
+    "installing": "Installing…",
+    "installingHint": "cupid player will close to install the update and open again.",
+    "importBusy": "Finish or cancel the import before updating.",
+    "hint": "cupid player looks for news once a day. Nothing is installed without your confirmation."
   }
 }

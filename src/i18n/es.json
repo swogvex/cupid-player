@@ -108,6 +108,15 @@
       "no_folder": "Esta playlist no tiene carpeta en el disco",
       "db": "Error de la base de datos",
       "files_failed": "No se pudieron borrar algunos archivos (¿están en uso?)"
+    },
+    "updater": {
+      "unavailable": "Las actualizaciones no están disponibles en esta versión",
+      "check_failed": "No se pudo buscar actualizaciones. Revisa tu conexión e inténtalo de nuevo",
+      "no_pending": "No hay ninguna actualización preparada. Vuelve a buscar",
+      "install_failed": "No se pudo instalar la actualización. Inténtalo de nuevo más tarde"
+    },
+    "donate": {
+      "open_failed": "No se pudo abrir el navegador"
     }
   },
   "player": {
@@ -210,7 +219,10 @@
     "alwaysOnTopHint": "Mantiene cupid player por encima de las demás ventanas, incluso cuando usas otra aplicación.",
     "logs": "Registros",
     "openLogs": "Abrir carpeta de registros",
-    "logsHint": "¿Algo falla? Contacta con soporte y adjunta el registro de diagnóstico."
+    "logsHint": "¿Algo falla? Contacta con soporte y adjunta el registro de diagnóstico.",
+    "support": "Apoyar el proyecto",
+    "donate": "Invítame a un café",
+    "donateHint": "Se abrirá tu navegador en mi página de Ko-fi. Es totalmente opcional."
   },
   "status": {
     "done": "Completado",
@@ -349,5 +361,18 @@
     "already": "Ya está añadida",
     "none": "Todavía no tienes playlists",
     "cancel": "Cancelar"
+  },
+  "updater": {
+    "title": "Actualizaciones",
+    "version": "Versión {{version}}",
+    "check": "Buscar actualizaciones",
+    "checking": "Buscando…",
+    "upToDate": "Tienes la última versión",
+    "available": "Hay una nueva versión: {{version}}",
+    "install": "Descargar e instalar",
+    "installing": "Instalando…",
+    "installingHint": "cupid player se cerrará para instalar la actualización y volverá a abrirse.",
+    "importBusy": "Termina o cancela la importación antes de actualizar.",
+    "hint": "cupid player busca novedades una vez al día. Nada se instala sin que lo confirmes."
   }
 }

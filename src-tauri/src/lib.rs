@@ -3,10 +3,12 @@ mod db;
 mod error;
 mod import;
 mod library;
+mod links;
 mod lyrics;
 mod paths;
 mod spotify;
 mod stats;
+mod updater;
 mod window;
 mod ytdlp;
 
@@ -50,6 +52,7 @@ pub fn run() {
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             window::tray::show_main(app);
         }))
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(log_plugin())
         .plugin(tauri_plugin_shell::init())
         // Remember position and size (the mini size is undone before exiting).
@@ -114,6 +117,7 @@ pub fn run() {
             app.manage(tray);
             app.manage(window::mini::MiniState::default());
             app.manage(import::runner::ImportManager::default());
+            app.manage(updater::PendingUpdate::default());
             app.manage(paths);
             app.manage(database);
             Ok(())
@@ -122,6 +126,10 @@ pub fn run() {
             window::mini::set_mini_mode,
             window::tray::set_close_to_tray,
             window::tray::set_tray_labels,
+            updater::get_app_version,
+            updater::check_update,
+            updater::install_update,
+            links::open_donate_page,
             commands::list_tracks,
             commands::list_playlists,
             commands::list_playlist_members,

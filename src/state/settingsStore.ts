@@ -1,8 +1,13 @@
 import { create } from "zustand";
 import { load, type Store } from "@tauri-apps/plugin-store";
 import { setAlwaysOnTop, setCloseToTray } from "../ipc/commands";
-import { isLanguage, setLanguage as applyLanguage, type Language } from "../i18n";
+import {
+  isLanguage,
+  setLanguage as applyLanguage,
+  type Language,
+} from "../i18n";
 import { applyTheme, initialTheme, isTheme, type ThemeId } from "../lib/theme";
+import { useUpdaterStore } from "./updaterStore";
 
 export type { Language };
 
@@ -37,10 +42,13 @@ let store: Store | null = null;
 let initPromise: Promise<void> | null = null;
 let volumeTimer: number | undefined;
 
-const asBool = (v: unknown, fallback: boolean): boolean => (typeof v === "boolean" ? v : fallback);
-const asLang = (v: unknown): Language => (isLanguage(v) ? v : DEFAULTS.language);
+const asBool = (v: unknown, fallback: boolean): boolean =>
+  typeof v === "boolean" ? v : fallback;
+const asLang = (v: unknown): Language =>
+  isLanguage(v) ? v : DEFAULTS.language;
 const asTheme = (v: unknown): ThemeId => (isTheme(v) ? v : DEFAULTS.theme);
-const asVolume = (v: unknown): number => (typeof v === "number" && v >= 0 && v <= 1 ? v : DEFAULTS.volume);
+const asVolume = (v: unknown): number =>
+  typeof v === "number" && v >= 0 && v <= 1 ? v : DEFAULTS.volume;
 const clamp01 = (v: number): number => Math.min(1, Math.max(0, v));
 
 async function persist(key: string, value: unknown): Promise<void> {
@@ -71,8 +79,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     initPromise ??= (async () => {
       try {
         store = await load("settings.json", { defaults: {} });
-        const alwaysOnTop = asBool(await store.get("alwaysOnTop"), DEFAULTS.alwaysOnTop);
-        const closeToTray = asBool(await store.get("closeToTray"), DEFAULTS.closeToTray);
+        const alwaysOnTop = asBool(
+          await store.get("alwaysOnTop"),
+          DEFAULTS.alwaysOnTop,
+        );
+        const closeToTray = asBool(
+          await store.get("closeToTray"),
+          DEFAULTS.closeToTray,
+        );
         const language = asLang(await store.get("language"));
         const theme = asTheme(await store.get("theme"));
         const volume = asVolume(await store.get("volume"));
@@ -86,6 +100,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         console.error("settings: init failed, using defaults", e);
       } finally {
         set({ ready: true });
+        // Once-a-day update check (never installs anything on its own).
+        useUpdaterStore.getState().autoCheck();
       }
     })();
     return initPromise;
@@ -130,7 +146,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   toggleMuted: () => {
     const { muted, volume } = get();
-    if (muted || volume === 0) set({ muted: false, volume: volume === 0 ? 0.5 : volume });
+    if (muted || volume === 0)
+      set({ muted: false, volume: volume === 0 ? 0.5 : volume });
     else set({ muted: true });
     saveVolumeSoon(get);
   },

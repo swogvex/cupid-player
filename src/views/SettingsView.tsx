@@ -4,7 +4,9 @@ import { PixelButton } from "../components/PixelButton";
 import { LANGUAGES, type Language } from "../i18n";
 import {
   clearCache,
+  getAppVersion,
   getCacheInfo,
+  openDonatePage,
   openLogsFolder,
   openMusicFolder,
   scanFolder,
@@ -16,6 +18,7 @@ import { useErrorText } from "../lib/useErrorText";
 import { useImportStore } from "../state/importStore";
 import { useLibraryStore } from "../state/libraryStore";
 import { useSettingsStore } from "../state/settingsStore";
+import { useUpdaterStore } from "../state/updaterStore";
 
 const LANGUAGE_NAMES: Record<Language, string> = {
   es: "Español",
@@ -37,10 +40,18 @@ export function SettingsView() {
   const closeToTray = useSettingsStore((s) => s.closeToTray);
   const setCloseToTray = useSettingsStore((s) => s.setCloseToTray);
 
+  const updPhase = useUpdaterStore((s) => s.phase);
+  const updInfo = useUpdaterStore((s) => s.info);
+  const updError = useUpdaterStore((s) => s.error);
+  const checkForUpdates = useUpdaterStore((s) => s.check);
+  const installUpdateNow = useUpdaterStore((s) => s.install);
+
+  const [version, setVersion] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
   const [scanMessage, setScanMessage] = useState<string | null>(null);
   const [folderMessage, setFolderMessage] = useState<string | null>(null);
   const [logsMessage, setLogsMessage] = useState<string | null>(null);
+  const [donateMessage, setDonateMessage] = useState<string | null>(null);
   const [cache, setCache] = useState<CacheInfo | null>(null);
   const [clearing, setClearing] = useState(false);
   const [cacheMessage, setCacheMessage] = useState<string | null>(null);
@@ -50,6 +61,11 @@ export function SettingsView() {
     void getCacheInfo()
       .then((info) => {
         if (alive) setCache(info);
+      })
+      .catch(() => undefined);
+    void getAppVersion()
+      .then((v) => {
+        if (alive) setVersion(v);
       })
       .catch(() => undefined);
     return () => {
@@ -93,6 +109,11 @@ export function SettingsView() {
     void openLogsFolder().catch((e) => setLogsMessage(errorText(e)));
   };
 
+  const donate = () => {
+    setDonateMessage(null);
+    void openDonatePage().catch((e) => setDonateMessage(errorText(e)));
+  };
+
   const clear = async () => {
     setClearing(true);
     setCacheMessage(null);
@@ -113,6 +134,10 @@ export function SettingsView() {
       setClearing(false);
     }
   };
+
+  const updBusy = updPhase === "checking" || updPhase === "installing";
+  const updReady =
+    (updPhase === "available" || updPhase === "installing") && updInfo;
 
   return (
     <section className="view" aria-labelledby="view-settings">
@@ -194,6 +219,53 @@ export function SettingsView() {
 
         <div className="setting setting--stack">
           <div className="setting">
+            <span>{t("updater.title")}</span>
+            <PixelButton
+              disabled={updBusy}
+              onClick={() => void checkForUpdates()}
+            >
+              {updPhase === "checking"
+                ? t("updater.checking")
+                : t("updater.check")}
+            </PixelButton>
+          </div>
+          {version && (
+            <span className="muted">{t("updater.version", { version })}</span>
+          )}
+          {updPhase === "none" && (
+            <span role="status" aria-live="polite">
+              {t("updater.upToDate")}
+            </span>
+          )}
+          {updReady && (
+            <div className="setting">
+              <span role="status" aria-live="polite">
+                {t("updater.available", { version: updInfo.version })}
+              </span>
+              <PixelButton
+                disabled={updPhase === "installing" || importing}
+                onClick={() => void installUpdateNow()}
+              >
+                {updPhase === "installing"
+                  ? t("updater.installing")
+                  : t("updater.install")}
+              </PixelButton>
+            </div>
+          )}
+          {updPhase === "installing" && (
+            <span className="muted">{t("updater.installingHint")}</span>
+          )}
+          {updPhase === "available" && importing && (
+            <span className="muted">{t("updater.importBusy")}</span>
+          )}
+          {updError != null && (
+            <span role="alert">{errorText(updError)}</span>
+          )}
+          <span className="muted">{t("updater.hint")}</span>
+        </div>
+
+        <div className="setting setting--stack">
+          <div className="setting">
             <span>{t("settings.importFolder")}</span>
             <PixelButton
               disabled={scanning || importing}
@@ -266,6 +338,15 @@ export function SettingsView() {
               </PixelButton>
             ))}
           </div>
+        </div>
+
+        <div className="setting setting--stack">
+          <div className="setting">
+            <span>{t("settings.support")}</span>
+            <PixelButton onClick={donate}>{t("settings.donate")}</PixelButton>
+          </div>
+          <span className="muted">{t("settings.donateHint")}</span>
+          {donateMessage && <span role="alert">{donateMessage}</span>}
         </div>
       </div>
     </section>

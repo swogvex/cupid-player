@@ -12,6 +12,7 @@ import type {
   ScanReport,
   Track,
   TrackFilter,
+  UpdateInfo,
   Wrapped,
 } from "./types";
 
@@ -169,3 +170,14 @@ export const setWindowBackground = (rgb: [number, number, number]): Promise<void
   getCurrentWindow().setBackgroundColor(rgb);
 /** Opens the folder with the app's log files. */
 export const openLogsFolder = () => invoke<void>("open_logs_folder");
+/** Version of the installed app. */
+export const getAppVersion = () => invoke<string>("get_app_version");
+
+/** Looks for a newer version on GitHub. Resolves with null if up to date. Rejects with "updater.*" codes. */
+export const checkUpdate = () => invoke<UpdateInfo | null>("check_update");
+
+/** Downloads and installs the version found by checkUpdate (the app restarts). */
+export const installUpdate = () => invoke<void>("install_update");
+
+/** Opens the Ko-fi page in the system browser. */
+export const openDonatePage = () => invoke<void>("open_donate_page");
