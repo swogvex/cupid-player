@@ -1,0 +1,119 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+# Nothing is allowed by default; each job asks only for what it needs.
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Tag must match the app version
+        shell: pwsh
+        run: |
+          if ($env:TAG -notmatch '^v(\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$') {
+            throw "Tag '$($env:TAG)' is not vMAJOR.MINOR.PATCH"
+          }
+          $version = $Matches[1]
+          $pkg = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $conf = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          $cargo = [regex]::Match((Get-Content src-tauri/Cargo.toml -Raw), '(?m)^version = "([^"]+)"').Groups[1].Value
+          Write-Host "tag=$version package.json=$pkg tauri.conf.json=$conf Cargo.toml=$cargo"
+          if (($pkg -ne $version) -or ($conf -ne $version) -or ($cargo -ne $version)) {
+            throw "The versions in package.json, tauri.conf.json and Cargo.toml must all equal the tag"
+          }
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+          components: clippy
+
+      - uses: swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm assets:build
+      - run: pnpm sidecars:fetch
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      # The Rust build needs the frontend in dist/ and the sidecars in src-tauri/binaries/.
+      - run: pnpm build
+
+      # One command per step: in PowerShell only the last command decides the exit code.
+      - name: Clippy
+        working-directory: src-tauri
+        run: cargo clippy -- -D warnings
+      - name: Rust tests
+        working-directory: src-tauri
+        run: cargo test
+
+  release:
+    needs: checks
+    runs-on: windows-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+
+      - uses: swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm sidecars:fetch
+      - run: pnpm assets:build
+
+      - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'cupid player ${{ github.ref_name }}'
+          releaseBody: |
+            Instalador para Windows: descarga el archivo `cupid-player_..._x64-setup.exe`.
+
+            Windows puede mostrar "Windows protegió su PC" porque la app no lleva un certificado de pago. Pulsa "Más información" y después "Ejecutar de todas formas".
+          releaseDraft: true
+          prerelease: false
+          tauriScript: pnpm tauri
+
+      - name: SHA-256 of the installer
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter '*-setup.exe' | Select-Object -First 1
+          $line = "SHA-256 $($exe.Name): $((Get-FileHash $exe.FullName -Algorithm SHA256).Hash)"
+          Write-Host $line
+          $line | Out-File -Append -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
