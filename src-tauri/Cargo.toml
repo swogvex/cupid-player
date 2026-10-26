@@ -1,6 +1,6 @@
 [package]
 name = "cupid-player"
-version = "1.0.0"
+version = "1.0.1"
 description = "Cupid Player — a pixel-art music player"
 authors = ["swogvex"]
 edition = "2024"
