@@ -2,7 +2,7 @@
 export const THEMES = [
   {
     "id": "pink",
-    "name": "Cupid Pink",
+    "name": "Lovely",
     "swatches": [
       "#F9CFD8",
       "#E8609A",

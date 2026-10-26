@@ -1,7 +1,7 @@
 .....i.
 .iiiiii
-.i.i.i.
-.i.i.i.
-.i.i.i.
-.iiiii.
-.......
+i.yy.i.
+i..y..i
+.i.y..i
+iiiiii.
+.i.....

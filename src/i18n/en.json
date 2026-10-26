@@ -14,100 +14,100 @@
     "settings": "Settings"
   },
   "import": {
-    "placeholder": "Paste a link",
+    "placeholder": "Paste a Spotify link",
     "button": "Import",
     "cancel": "Cancel",
     "cancelling": "Cancelling…",
     "idle": "Waiting",
     "reading": "Reading link…",
     "progress": "Importing {{done}}/{{total}}",
-    "done": "Completed!",
+    "done": "Completed",
     "alreadyDone": "Already imported",
     "cancelled": "Import cancelled",
-    "needsReview_one": "1 track needs review",
-    "needsReview_other": "{{count}} tracks need review",
-    "failed_one": "1 track failed",
-    "failed_other": "{{count}} tracks failed",
-    "problems_one": "1 track with problems",
-    "problems_other": "{{count}} tracks with problems",
-    "truncated": "Only the first 100",
-    "truncatedHint": "Spotify only shows the first 100 songs of a playlist. If it has more, split it into parts."
+    "needsReview_one": "1 song needs review",
+    "needsReview_other": "{{count}} songs need review",
+    "failed_one": "1 song failed to import",
+    "failed_other": "{{count}} songs failed to import",
+    "problems_one": "1 song has issues",
+    "problems_other": "{{count}} songs have issues",
+    "truncated": "Showing only the first 100",
+    "truncatedHint": "Spotify only shows the first 100 songs in a playlist. If it contains more, import it in smaller batches."
   },
   "row": {
     "retry": "Retry"
   },
   "errors": {
-    "unknown": "Something went wrong",
+    "unknown": "An unexpected error occurred",
     "spotify_url": {
-      "empty": "Paste a link",
+      "empty": "Paste a Spotify link",
       "too_long": "The link is too long",
-      "bad_chars": "The link has invalid characters",
-      "not_a_url": "That is not a link",
-      "not_https": "The link must start with https",
+      "bad_chars": "The link contains invalid characters",
+      "not_a_url": "The entered text is not a valid link",
+      "not_https": "The link must start with https://",
       "bad_authority": "Invalid link",
-      "wrong_host": "Only open.spotify.com links",
-      "unsupported_kind": "Only songs and playlists",
-      "malformed_path": "Invalid Spotify link",
-      "bad_id": "Invalid Spotify link"
+      "wrong_host": "Only links from open.spotify.com are supported",
+      "unsupported_kind": "Only song and playlist links are supported",
+      "malformed_path": "The Spotify link path is invalid",
+      "bad_id": "The Spotify link ID is invalid"
     },
     "embed": {
-      "format_changed": "Spotify changed its format and it cannot be read",
-      "unexpected_type": "That link is not the expected type",
-      "no_tracks": "The list is empty or not public",
-      "network": "Cannot reach Spotify",
-      "timeout": "Spotify took too long",
-      "not_found": "Not found (is it public?)",
+      "format_changed": "Spotify has changed its format, so the link can no longer be read",
+      "unexpected_type": "The link is not the expected type",
+      "no_tracks": "The playlist is empty or not public",
+      "network": "Could not connect to Spotify",
+      "timeout": "Spotify took too long to respond",
+      "not_found": "Content not found. Is the playlist public?",
       "status": "Spotify returned an error",
-      "too_large": "Response too large"
+      "too_large": "Spotify's response is too large"
     },
     "import": {
-      "busy": "An import is already running",
-      "db": "Database error",
+      "busy": "Another import is already in progress",
+      "db": "Could not access the database",
       "io": "Could not access the files",
-      "unsafe_name": "Invalid folder name",
-      "not_found": "Track not found",
-      "not_retryable": "That track cannot be retried"
+      "unsafe_name": "The folder name is invalid",
+      "not_found": "Song not found",
+      "not_retryable": "This song's import cannot be retried"
     },
     "library": {
       "not_found": "Song not found",
-      "invalid_text": "Enter a title and an artist (200 characters max)",
-      "no_file": "The song has no file yet",
+      "invalid_text": "Enter a title and artist (up to 200 characters)",
+      "no_file": "This song does not have an audio file yet",
       "outside_music": "The file is outside the music folder",
-      "tags_failed": "Could not save the file's tags",
+      "tags_failed": "Could not save the audio file's tags",
       "cover_invalid": "Choose a JPG or PNG image",
-      "cover_too_large": "The image is larger than 2 MB",
-      "cover_failed": "Could not save the cover",
+      "cover_too_large": "The image exceeds the 2 MB limit",
+      "cover_failed": "Could not save the cover art",
       "io": "Could not access the files",
-      "db": "Database error",
-      "no_staged_cover": "There is no pending cover"
+      "db": "Could not access the database",
+      "no_staged_cover": "There is no cover art waiting to be saved"
     },
     "scan": {
-      "not_a_directory": "That is not a folder",
-      "db": "Database error",
+      "not_a_directory": "The selected path is not a folder",
+      "db": "Could not access the database",
       "io": "Could not access the files"
     },
     "cache": {
-      "db": "Database error"
+      "db": "Could not access the database"
     },
     "stats": {
       "bad_month": "Invalid month",
       "bad_year": "Invalid year",
-      "db": "Database error"
+      "db": "Could not load statistics"
     },
     "lyrics": {
-      "unavailable": "Could not reach the lyrics service. Try again later",
+      "unavailable": "Could not connect to the lyrics service. Try again later",
       "failed": "Could not read the lyrics service's response",
-      "db": "Database error",
+      "db": "Could not access the database",
       "no_track": "Song not found"
     },
     "playlist": {
       "not_found": "Playlist not found",
-      "invalid_name": "Enter a name (60 characters max)",
+      "invalid_name": "Enter a name (up to 60 characters)",
       "name_taken": "A playlist with that name already exists",
-      "too_many": "Too many songs at once",
+      "too_many": "Too many songs to process at once",
       "no_folder": "This playlist has no folder on disk",
-      "db": "Database error",
-      "files_failed": "Some files could not be deleted (are they in use?)"
+      "db": "Could not access the database",
+      "files_failed": "Some files could not be deleted. Are they in use?"
     }
   },
   "player": {
@@ -116,30 +116,30 @@
     "next": "Next",
     "play": "Play",
     "pause": "Pause",
-    "seek": "Seek",
+    "seek": "Playback position",
     "volume": "Volume",
     "mute": "Mute",
     "unmute": "Unmute",
-    "nothing": "Nothing playing",
+    "nothing": "Nothing is playing",
     "shuffle": "Shuffle",
-    "repeat": "Repeat: off",
-    "repeatAll": "Repeat: all",
-    "repeatOne": "Repeat: one",
-    "queue": "Play queue",
-    "nothingPlaying": "Nothing playing",
-    "cantPlay": "Can't play this file"
+    "repeat": "Repeat off",
+    "repeatAll": "Repeat all",
+    "repeatOne": "Repeat one",
+    "queue": "Playback queue",
+    "nothingPlaying": "Nothing is playing",
+    "cantPlay": "This song cannot be played"
   },
   "queue": {
-    "title": "Queue",
+    "title": "Playback queue",
     "empty": "The queue is empty",
-    "moveUp": "Move up",
-    "moveDown": "Move down",
+    "moveUp": "Move up in queue",
+    "moveDown": "Move down in queue",
     "remove": "Remove from queue"
   },
   "library": {
     "title": "Library",
     "search": "Search songs",
-    "empty": "No songs found",
+    "empty": "Your library is empty",
     "columns": {
       "title": "Title",
       "artist": "Artist",
@@ -151,41 +151,41 @@
     "title": "Playlists",
     "tracks_one": "{{count}} song",
     "tracks_other": "{{count}} songs",
-    "empty": "No playlists yet. Right-click to create one.",
-    "new": "New",
+    "empty": "You don't have any playlists yet. Right-click to create one.",
+    "new": "New playlist",
     "emptyPlaylist": "This playlist is empty",
     "addSongs": "Add songs…",
     "hint": "Right-click to create or edit playlists"
   },
   "stats": {
-    "title": "Stats",
-    "minutes": "Minutes",
+    "title": "Statistics",
+    "minutes": "Minutes listened",
     "topArtist": "Top artist",
     "topSong": "Top song",
     "topSongs": "Top songs",
-    "emptyMonth": "You haven't listened to anything this month yet",
+    "emptyMonth": "You haven't listened to any music this month yet",
     "prevMonth": "Previous month",
     "nextMonth": "Next month",
     "wrapped": "Wrapped {{year}}",
-    "wrappedDecember": "Wrapped {{year}}!",
+    "wrappedDecember": "Your {{year}} Wrapped!",
     "plays_one": "{{count}} play",
     "plays_other": "{{count}} plays"
   },
   "wrapped": {
     "title": "Wrapped",
     "introKicker": "Your year in music",
-    "introTitle": "Wrapped {{year}}",
-    "hint": "Use ← and → to move on",
+    "introTitle": "Your {{year}} Wrapped",
+    "hint": "Use ← and → to navigate",
     "minutesLabel": "Minutes listened",
-    "artistLabel": "Your artist of the year",
-    "songLabel": "Your song of the year",
-    "monthLabel": "Your most listened month",
+    "artistLabel": "Your top artist of the year",
+    "songLabel": "Your top song of the year",
+    "monthLabel": "Your most musical month",
     "topArtists": "Your top 5 artists",
     "topSongs": "Your top 5 songs",
-    "outroTitle": "That was your {{year}}!",
-    "outroText": "Thanks for listening",
+    "outroTitle": "That was your {{year}} in music!",
+    "outroText": "Thanks for listening with cupid player",
     "replay": "Watch again",
-    "empty": "You haven't listened to anything in {{year}} yet. When you do, your Wrapped will show up here.",
+    "empty": "You haven't listened to any music in {{year}} yet. Your Wrapped will appear here once you do.",
     "prev": "Previous slide",
     "next": "Next slide",
     "slide": "Slide {{n}} of {{total}}",
@@ -199,21 +199,21 @@
     "alwaysOnTop": "Always on top",
     "importFolder": "Import folder",
     "chooseFolder": "Choose folder…",
-    "importFolderHint": "Copies the audio of a folder into your library, without duplicates",
+    "importFolderHint": "Add audio from a folder to your library without duplicating songs",
     "musicFolder": "Music folder",
     "openFolder": "Open folder",
     "cache": "Cache",
     "clearCache": "Clear cache",
-    "cacheHint": "Removes unused covers and temporary files. Your music is never touched.",
-    "closeToTray": "Close to tray",
-    "closeToTrayHint": "When you close the window, the music keeps playing from the system tray.",
-    "alwaysOnTopHint": "Keeps cupid player above all other windows, even while you use another app.",
+    "cacheHint": "Removes unused cover art and temporary files. Your music won't be affected.",
+    "closeToTray": "Minimize to system tray on close",
+    "closeToTrayHint": "When you close the window, cupid player will keep playing music from the system tray.",
+    "alwaysOnTopHint": "Keeps cupid player above other windows, even when you're using another app.",
     "logs": "Logs",
     "openLogs": "Open logs folder",
-    "logsHint": "If something fails, you can send the most recent file in that folder to whoever is helping you."
+    "logsHint": "Having issues? Contact support and attach the diagnostic log."
   },
   "status": {
-    "done": "Done",
+    "done": "Completed",
     "queued": "Queued",
     "searching": "Searching",
     "downloading": "Downloading",
@@ -228,28 +228,28 @@
     "minimize": "Minimize",
     "maximize": "Maximize",
     "close": "Close",
-    "mini": "Mini player",
-    "expand": "Back to the full window"
+    "mini": "Mini mode",
+    "expand": "Return to full window"
   },
   "tray": {
-    "show": "Show",
+    "show": "Show window",
     "playPause": "Play / Pause",
-    "next": "Next",
-    "quit": "Quit"
+    "next": "Next song",
+    "quit": "Quit cupid player"
   },
   "lyrics": {
     "title": "Lyrics",
-    "toggle": "Lyrics",
-    "loading": "Looking for the lyrics…",
-    "notFound": "No lyrics for this song",
+    "toggle": "Show lyrics",
+    "loading": "Searching for lyrics…",
+    "notFound": "Lyrics not found for this song",
     "instrumental": "Instrumental",
     "unsynced": "Unsynced lyrics",
     "retry": "Retry",
     "searchAgain": "Search again",
-    "backToLine": "Back to the current line",
-    "earlier": "Show the lyrics 0.5 s earlier",
-    "later": "Show the lyrics 0.5 s later",
-    "resetOffset": "Reset the shift"
+    "backToLine": "Return to current line",
+    "earlier": "Move lyrics 0.5 s earlier",
+    "later": "Move lyrics 0.5 s later",
+    "resetOffset": "Reset sync offset"
   },
   "menu": {
     "label": "Song actions",
@@ -261,49 +261,49 @@
     "delete": "Delete…",
     "addToPlaylist": "Add to playlist…",
     "removeFromPlaylist": "Remove from playlist",
-    "deleteFromLibrary": "Delete from library…"
+    "deleteFromLibrary": "Remove from library…"
   },
   "edit": {
     "title": "Edit song",
     "fieldTitle": "Title",
     "fieldArtist": "Artist",
     "fieldAlbum": "Album",
-    "changeCover": "Change cover…",
-    "noFileForCover": "Available once the song is downloaded",
-    "save": "Save",
+    "changeCover": "Change cover art…",
+    "noFileForCover": "You can change the cover art once the song has been downloaded",
+    "save": "Save changes",
     "saving": "Saving…",
     "cancel": "Cancel",
-    "coverPending": "New cover: applied when you save"
+    "coverPending": "The new cover art will be applied when you save"
   },
   "delete": {
-    "title": "Delete song",
-    "message": "“{{title}}” will be removed from the library.",
-    "fileHint": "If you also delete the file, it cannot be recovered.",
+    "title": "Remove song",
+    "message": "“{{title}}” will be removed from your library.",
+    "fileHint": "If you also delete the audio file, you won't be able to recover it.",
     "cancel": "Cancel",
     "remove": "Remove",
-    "removeOnly": "Library only",
-    "removeFile": "Delete the file too"
+    "removeOnly": "Remove from library only",
+    "removeFile": "Delete audio file too"
   },
   "scan": {
-    "running": "Reading folder…",
-    "none": "No audio found in that folder",
-    "added_one": "1 song added",
-    "added_other": "{{count}} songs added",
-    "duplicates_one": "1 already there",
-    "duplicates_other": "{{count}} already there",
-    "failed_one": "1 could not be read",
-    "failed_other": "{{count}} could not be read",
-    "truncated": "Only the first 10,000 files were read"
+    "running": "Scanning folder…",
+    "none": "No audio files were found in this folder",
+    "added_one": "Added 1 song",
+    "added_other": "Added {{count}} songs",
+    "duplicates_one": "1 song is already in your library",
+    "duplicates_other": "{{count}} songs are already in your library",
+    "failed_one": "Could not read 1 file",
+    "failed_other": "Could not read {{count}} files",
+    "truncated": "Only the first 10,000 files were scanned"
   },
   "cache": {
-    "summary": "Covers: {{covers}} · Can be freed: {{free}}",
-    "nothing": "Nothing to clean",
-    "cleared_one": "1 file removed ({{size}})",
-    "cleared_other": "{{count}} files removed ({{size}})"
+    "summary": "Cover art: {{covers}} · Space recoverable: {{free}}",
+    "nothing": "Nothing to clean up",
+    "cleared_one": "Deleted 1 file ({{size}})",
+    "cleared_other": "Deleted {{count}} files ({{size}})"
   },
   "playlistMenu": {
     "label": "Playlist actions",
-    "new": "New playlist…",
+    "new": "Create playlist…",
     "play": "Play",
     "enqueue": "Add to queue",
     "addSongs": "Add songs…",
@@ -312,42 +312,42 @@
     "delete": "Delete playlist…"
   },
   "playlistName": {
-    "createTitle": "New playlist",
+    "createTitle": "Create playlist",
     "renameTitle": "Rename playlist",
     "label": "Name",
-    "create": "Create",
-    "save": "Save",
+    "create": "Create playlist",
+    "save": "Save changes",
     "saving": "Saving…",
     "cancel": "Cancel"
   },
   "playlistDelete": {
     "title": "Delete playlist",
-    "message": "The playlist “{{name}}” will be deleted. Its songs stay in your library.",
+    "message": "The playlist “{{name}}” will be deleted. Its songs will remain in your library.",
     "cancel": "Cancel",
-    "confirm": "Delete",
+    "confirm": "Delete playlist",
     "messageImported": "The playlist “{{name}}”, imported from Spotify, will be deleted.",
-    "hintKeep": "“Playlist only” keeps the songs and their files; the playlist cover and leftovers are removed.",
-    "hintFiles_one": "“Delete the files too” removes 1 song from the library (and from other playlists), its file and the folder.",
-    "hintFiles_other": "“Delete the files too” removes {{count}} songs from the library (and from other playlists), their files and the folder.",
+    "hintKeep": "“Playlist only” keeps the songs and their files. Only the playlist cover art and auxiliary files will be removed.",
+    "hintFiles_one": "“Delete files too” will remove 1 song from your library and other playlists, and delete its audio file and folder.",
+    "hintFiles_other": "“Delete files too” will remove {{count}} songs from your library and other playlists, and delete their audio files and folder.",
     "keep": "Playlist only",
-    "withFiles": "Delete the files too"
+    "withFiles": "Delete files too"
   },
   "picker": {
     "title": "Add songs",
     "search": "Search songs",
-    "empty": "No songs found",
-    "alreadyIn": "Already in the playlist",
+    "empty": "No songs available",
+    "alreadyIn": "Already in this playlist",
     "selectVisible": "Select visible",
-    "selected_one": "1 selected",
-    "selected_other": "{{count}} selected",
+    "selected_one": "1 song selected",
+    "selected_other": "{{count}} songs selected",
     "add": "Add ({{count}})",
     "cancel": "Cancel"
   },
   "addTo": {
     "title": "Add to a playlist",
-    "new": "New playlist…",
-    "already": "already there",
-    "none": "You have no playlists yet",
+    "new": "Create playlist…",
+    "already": "Already added",
+    "none": "You don't have any playlists yet",
     "cancel": "Cancel"
   }
 }

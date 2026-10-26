@@ -1,0 +1,11 @@
+[advisories]
+ignore = [
+  # paste: macro de compilación que trae lofty. No hay código suyo en el binario.
+  "RUSTSEC-2024-0436",
+  # Solo Linux (gtk/zbus). No se compilan en Windows (comprobado con cargo tree).
+  "RUSTSEC-2024-0370", # proc-macro-error
+  "RUSTSEC-2026-0371", # zbus_names
+  "RUSTSEC-2026-0370", # zvariant
+  "RUSTSEC-2026-0372", # zvariant_derive
+  "RUSTSEC-2024-0429", # glib
+]
