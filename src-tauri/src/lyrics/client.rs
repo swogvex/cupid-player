@@ -178,7 +178,10 @@ mod tests {
 
     #[test]
     fn prefers_the_closest_length() {
-        let r = vec![entry(Some(215.0), true, true), entry(Some(212.0), true, true)];
+        let r = vec![
+            entry(Some(215.0), true, true),
+            entry(Some(212.0), true, true),
+        ];
         assert_eq!(pick_best(r, Some(213.0)).unwrap().duration, Some(212.0));
     }
 
@@ -190,7 +193,10 @@ mod tests {
 
     #[test]
     fn prefers_synced_when_lengths_are_similar() {
-        let r = vec![entry(Some(213.0), false, true), entry(Some(214.5), true, true)];
+        let r = vec![
+            entry(Some(213.0), false, true),
+            entry(Some(214.5), true, true),
+        ];
         assert!(pick_best(r, Some(213.0)).unwrap().synced_lyrics.is_some());
     }
 
@@ -202,7 +208,10 @@ mod tests {
 
     #[test]
     fn without_our_length_takes_a_synced_entry() {
-        let r = vec![entry(Some(100.0), false, true), entry(Some(300.0), true, true)];
+        let r = vec![
+            entry(Some(100.0), false, true),
+            entry(Some(300.0), true, true),
+        ];
         assert!(pick_best(r, None).unwrap().synced_lyrics.is_some());
     }
 

@@ -42,3 +42,10 @@
   text-align: center;
   opacity: 0.55;
 }
+/* Queue scrollbar: same thin accent bar as the views (scrollbar-color is inherited, scrollbar-width is not) */
+.queue,
+.queue__panel,
+.queue__list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}

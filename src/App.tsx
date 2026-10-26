@@ -1,4 +1,4 @@
-import { useEffect, type ComponentType } from "react";
+import { useEffect, type ComponentType, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { MiniPlayer } from "./components/MiniPlayer";
 import { PixelPanel } from "./components/PixelPanel";
@@ -20,6 +20,7 @@ import { PlaylistsView } from "./views/PlaylistsView";
 import { QueueView } from "./views/QueueView";
 import { SettingsView } from "./views/SettingsView";
 import { StatsView } from "./views/StatsView";
+import { WrappedView } from "./views/WrappedView";
 import "./styles/themeart.css";
 import "./styles/lyrics.css";
 import { PixelButton } from "./components/PixelButton";
@@ -38,6 +39,7 @@ export default function App() {
   const language = useSettingsStore((s) => s.language);
   const view = useNavStore((s) => s.view);
   const lyricsOpen = useNavStore((s) => s.lyricsOpen);
+  const wrappedOpen = useNavStore((s) => s.wrappedOpen);
   const toggleLyrics = useNavStore((s) => s.toggleLyrics);
   const mini = useMiniStore((s) => s.mini);
   const ActiveView = VIEWS[view];
@@ -66,6 +68,17 @@ export default function App() {
 
   if (mini) return <MiniPlayer />;
 
+  // Lyrics win over the Wrapped; closing them returns to it.
+  let content: ReactNode = <ActiveView />;
+  let panelView: string = view;
+  if (lyricsOpen) {
+    content = <LyricsView />;
+    panelView = "lyrics";
+  } else if (wrappedOpen) {
+    content = <WrappedView />;
+    panelView = "wrapped";
+  }
+
   return (
     <div className="letterbox">
       <div className="frame">
@@ -73,7 +86,7 @@ export default function App() {
         <div className="shell">
           <Sidebar />
           <div className="main-col">
-            <PixelPanel className="content-panel" deco data-view={lyricsOpen ? "lyrics" : view}>
+            <PixelPanel className="content-panel" deco data-view={panelView}>
               {/* The heart opens the lyrics; Library/Playlists/Stats/Settings close them. */}
               <PixelButton
                 variant="mini"
@@ -85,7 +98,7 @@ export default function App() {
               >
                 <Sprite name={lyricsOpen ? "icon-lyrics-on" : "icon-lyrics"} w={7} h={7} />
               </PixelButton>
-              {lyricsOpen ? <LyricsView /> : <ActiveView />}
+              {content}
             </PixelPanel>
             <PlayerBar />
           </div>

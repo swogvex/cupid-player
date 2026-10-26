@@ -54,7 +54,6 @@ impl RunError {
 #[derive(Debug)]
 pub struct RunOutput {
     pub stdout: String,
-    pub stderr: String,
 }
 
 /// Last "ERROR" line of yt-dlp's stderr (or the last line), without control
@@ -171,7 +170,7 @@ pub async fn run_ytdlp(
             let stdout = String::from_utf8_lossy(&stdout).into_owned();
             let stderr = String::from_utf8_lossy(&stderr).into_owned();
             if code == Some(0) {
-                Ok(RunOutput { stdout, stderr })
+                Ok(RunOutput { stdout })
             } else {
                 Err(classify_failure(code, &stderr))
             }

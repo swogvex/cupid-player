@@ -195,7 +195,10 @@ mod tests {
 
     #[test]
     fn classifies_answers() {
-        assert_eq!(classify(&found(Some("[00:01.00]a"), Some("a"), false)).0, SYNCED);
+        assert_eq!(
+            classify(&found(Some("[00:01.00]a"), Some("a"), false)).0,
+            SYNCED
+        );
         assert_eq!(classify(&found(None, Some("a\nb"), false)).0, PLAIN);
         assert_eq!(classify(&found(Some("garbage"), Some("a"), false)).0, PLAIN);
         assert_eq!(classify(&found(None, None, true)).0, INSTRUMENTAL);

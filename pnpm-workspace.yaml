@@ -1,3 +1,2 @@
 minimumReleaseAge: 1440        # no instalar paquetes publicados hace menos de 24 h
-onlyBuiltDependencies:
-  - esbuild                    # solo estos paquetes pueden ejecutar scripts de instalación
+onlyBuiltDependencies: []      # ningún paquete puede ejecutar scripts de instalación

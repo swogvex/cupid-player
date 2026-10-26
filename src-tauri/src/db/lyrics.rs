@@ -36,7 +36,11 @@ pub fn track_key(conn: &Connection, track_id: i64) -> AppResult<Option<TrackKey>
         title,
         artist,
         album: album.filter(|a| !a.trim().is_empty()),
-        duration_secs: if ms > 0 { Some(ms as f64 / 1000.0) } else { None },
+        duration_secs: if ms > 0 {
+            Some(ms as f64 / 1000.0)
+        } else {
+            None
+        },
     }))
 }
 
@@ -140,7 +144,8 @@ mod tests {
         let conn = d.conn().unwrap();
         let id = track(&conn, None, 200_000);
         put(&conn, id, &stored("plain")).unwrap();
-        conn.execute("DELETE FROM tracks WHERE id = ?1", [id]).unwrap();
+        conn.execute("DELETE FROM tracks WHERE id = ?1", [id])
+            .unwrap();
         assert!(get(&conn, id).unwrap().is_none());
     }
 
@@ -166,7 +171,7 @@ mod tests {
         assert!(track_key(&conn, 9999).unwrap().is_none());
     }
 
-        #[test]
+    #[test]
     fn offset_defaults_to_zero_persists_and_survives_a_refresh() {
         let d = Database::open_in_memory().unwrap();
         let conn = d.conn().unwrap();

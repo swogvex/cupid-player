@@ -66,14 +66,15 @@ fn leave(window: &WebviewWindow, state: &MiniState) -> Result<bool, AppError> {
 /// Restores the normal size if the mini player is active. Returns true if it changed anything.
 /// Called before the app exits so `window-state` never stores the mini size.
 pub fn leave_mini(app: &AppHandle) -> bool {
-    let (Some(window), Some(state)) = (app.get_webview_window("main"), app.try_state::<MiniState>())
+    let (Some(window), Some(state)) =
+        (app.get_webview_window("main"), app.try_state::<MiniState>())
     else {
         return false;
     };
     match leave(&window, &state) {
         Ok(changed) => changed,
         Err(e) => {
-            eprintln!("[mini] could not restore the window: {e}");
+            log::warn!("[mini] could not restore the window: {e}");
             false
         }
     }

@@ -5,6 +5,7 @@ import { LANGUAGES, type Language } from "../i18n";
 import {
   clearCache,
   getCacheInfo,
+  openLogsFolder,
   openMusicFolder,
   scanFolder,
 } from "../ipc/commands";
@@ -39,6 +40,7 @@ export function SettingsView() {
   const [scanning, setScanning] = useState(false);
   const [scanMessage, setScanMessage] = useState<string | null>(null);
   const [folderMessage, setFolderMessage] = useState<string | null>(null);
+  const [logsMessage, setLogsMessage] = useState<string | null>(null);
   const [cache, setCache] = useState<CacheInfo | null>(null);
   const [clearing, setClearing] = useState(false);
   const [cacheMessage, setCacheMessage] = useState<string | null>(null);
@@ -84,6 +86,11 @@ export function SettingsView() {
   const openFolder = () => {
     setFolderMessage(null);
     void openMusicFolder().catch((e) => setFolderMessage(errorText(e)));
+  };
+
+  const openLogs = () => {
+    setLogsMessage(null);
+    void openLogsFolder().catch((e) => setLogsMessage(errorText(e)));
   };
 
   const clear = async () => {
@@ -172,6 +179,17 @@ export function SettingsView() {
             </PixelButton>
           </div>
           {folderMessage && <span role="alert">{folderMessage}</span>}
+        </div>
+
+        <div className="setting setting--stack">
+          <div className="setting">
+            <span>{t("settings.logs")}</span>
+            <PixelButton onClick={openLogs}>
+              {t("settings.openLogs")}
+            </PixelButton>
+          </div>
+          <span className="muted">{t("settings.logsHint")}</span>
+          {logsMessage && <span role="alert">{logsMessage}</span>}
         </div>
 
         <div className="setting setting--stack">

@@ -17,7 +17,7 @@ use crate::{
     lyrics::{self, LyricsError, LyricsPayload},
     paths::AppPaths,
     spotify::url::parse_spotify_url as parse_url,
-    stats::{self, MonthStats},
+    stats::{self, MonthStats, wrapped::Wrapped},
 };
 
 #[tauri::command]
@@ -48,27 +48,27 @@ fn coded(code: &str) -> AppError {
 }
 
 fn import_err(e: ImportError) -> AppError {
-    eprintln!("[import] {e}");
+    log::warn!("[import] {e}");
     coded(e.code())
 }
 
 fn edit_err(e: EditError) -> AppError {
-    eprintln!("[library] {e}");
+    log::warn!("[library] {e}");
     coded(e.code())
 }
 
 fn scan_err(e: ScanError) -> AppError {
-    eprintln!("[scan] {e}");
+    log::warn!("[scan] {e}");
     coded(e.code())
 }
 
 fn cache_err(e: CacheError) -> AppError {
-    eprintln!("[cache] {e}");
+    log::warn!("[cache] {e}");
     coded(e.code())
 }
 
 fn list_err(e: ListError) -> AppError {
-    eprintln!("[playlist] {e}");
+    log::warn!("[playlist] {e}");
     coded(e.code())
 }
 
@@ -196,7 +196,7 @@ pub async fn reveal_track(
         edit::locate(&conn, &paths.music_dir, track_id).map_err(edit_err)?
     };
     tauri_plugin_opener::reveal_item_in_dir(&file).map_err(|e| {
-        eprintln!("[library] reveal failed: {e}");
+        log::warn!("[library] reveal failed: {e}");
         coded("library.io")
     })
 }
@@ -257,7 +257,18 @@ pub async fn clear_cache(
 #[tauri::command]
 pub async fn open_music_folder(paths: State<'_, AppPaths>) -> AppResult<()> {
     tauri_plugin_opener::open_path(&paths.music_dir, None::<&str>).map_err(|e| {
-        eprintln!("[library] open folder failed: {e}");
+        log::warn!("[library] open folder failed: {e}");
+        coded("library.io")
+    })
+}
+
+/// Opens the folder with the app's log files in Explorer.
+#[tauri::command]
+pub async fn open_logs_folder(app: AppHandle) -> AppResult<()> {
+    let dir = app.path().app_log_dir()?;
+    std::fs::create_dir_all(&dir)?;
+    tauri_plugin_opener::open_path(&dir, None::<&str>).map_err(|e| {
+        log::warn!("[logs] open folder failed: {e}");
         coded("library.io")
     })
 }
@@ -333,7 +344,7 @@ pub async fn reveal_playlist(
         collections::playlist_dir(&conn, &paths.playlists_dir, playlist_id).map_err(list_err)?
     };
     tauri_plugin_opener::open_path(&dir, None::<&str>).map_err(|e| {
-        eprintln!("[library] open playlist folder failed: {e}");
+        log::warn!("[library] open playlist folder failed: {e}");
         coded("library.io")
     })
 }
@@ -347,7 +358,7 @@ fn stats_err(e: AppError) -> AppError {
     match e {
         AppError::Msg(code) if code.starts_with("stats.") => AppError::Msg(code),
         other => {
-            eprintln!("[stats] {other}");
+            log::warn!("[stats] {other}");
             coded("stats.db")
         }
     }
@@ -389,8 +400,16 @@ pub async fn list_stat_months(db: State<'_, Database>) -> AppResult<Vec<String>>
     history::list_months(&conn).map_err(stats_err)
 }
 
+/// Wrapped of a year (e.g. 2026, local time): the monthly summaries added up, with the
+/// open month computed live. `months` comes back empty if nothing was heard that year.
+#[tauri::command]
+pub async fn get_wrapped(db: State<'_, Database>, year: i32) -> AppResult<Wrapped> {
+    let conn = db.conn()?;
+    stats::wrapped::wrapped(&conn, year).map_err(stats_err)
+}
+
 fn lyrics_err(e: LyricsError) -> AppError {
-    eprintln!("[lyrics] {e}");
+    log::warn!("[lyrics] {e}");
     coded(e.code())
 }
 
@@ -408,7 +427,7 @@ pub async fn get_lyrics(
 }
 
 fn lyrics_db_err(e: AppError) -> AppError {
-    eprintln!("[lyrics] {e}");
+    log::warn!("[lyrics] {e}");
     coded("lyrics.db")
 }
 
@@ -440,6 +459,10 @@ mod tests {
         assert_eq!(
             code(AppError::Msg("stats.bad_month".into())),
             "stats.bad_month"
+        );
+        assert_eq!(
+            code(AppError::Msg("stats.bad_year".into())),
+            "stats.bad_year"
         );
         assert_eq!(
             code(AppError::Msg("database lock poisoned".into())),

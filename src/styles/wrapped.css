@@ -1,0 +1,171 @@
+/* Yearly Wrapped (H12.3). Logical px multiplied by --px (defined on .shell). */
+
+.wrapped:focus {
+  outline: none;
+}
+
+.wrapped__stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: calc(var(--px) * 2);
+}
+
+.wrapped__slide {
+  box-sizing: border-box;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--px) * 1);
+  padding: calc(var(--px) * 2) calc(var(--px) * 4);
+  overflow: hidden;
+  text-align: center;
+  line-height: calc(var(--px) * 10);
+  background: var(--panel-2);
+  border: calc(var(--px) * 1) solid var(--line);
+  /* Moves in whole logical pixels, in 3 steps: it stays pixel art. */
+  animation: wrapped-in 0.18s steps(3) both;
+}
+
+.wrapped__slide > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.wrapped__kicker {
+  color: var(--ink-soft);
+}
+
+.wrapped__big {
+  width: 100%;
+  font-size: calc(var(--px) * 16);
+  font-weight: 400;
+  line-height: calc(var(--px) * 20);
+  color: var(--accent);
+}
+
+.wrapped__rank {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wrapped__row {
+  display: grid;
+  grid-template-columns: calc(var(--px) * 6) minmax(0, 1fr) auto;
+  gap: calc(var(--px) * 3);
+  text-align: left;
+  line-height: calc(var(--px) * 10);
+}
+
+.wrapped__row--song {
+  grid-template-columns: calc(var(--px) * 6) minmax(0, 3fr) minmax(0, 2fr) auto;
+}
+
+.wrapped__row:hover {
+  background: var(--panel);
+}
+
+.wrapped__pos {
+  color: var(--accent);
+}
+
+.wrapped__time {
+  white-space: nowrap;
+}
+
+.wrapped__dots {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--px) * 2);
+  min-height: calc(var(--px) * 6);
+}
+
+.wrapped__dot {
+  appearance: none;
+  box-sizing: border-box;
+  width: calc(var(--px) * 5);
+  height: calc(var(--px) * 5);
+  margin: 0;
+  padding: 0;
+  background: var(--panel-2);
+  border: calc(var(--px) * 1) solid var(--ink-soft);
+  cursor: pointer;
+}
+
+.wrapped__dot[aria-current="true"] {
+  background: var(--accent);
+  border-color: var(--ink);
+}
+
+.wrapped__dot:focus-visible {
+  outline: calc(var(--px) * 1) solid var(--accent);
+  outline-offset: calc(var(--px) * 1);
+}
+
+@keyframes wrapped-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--px) * 6));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrapped__slide {
+    animation: none;
+  }
+}
+
+/* ---------- Link from Stats ---------- */
+.stats__subhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--px) * 3);
+  min-width: 0;
+}
+
+.wrapped-link {
+  appearance: none;
+  flex: none;
+  margin: 0;
+  padding: 0 calc(var(--px) * 2);
+  border: 0;
+  background: none;
+  font: inherit;
+  line-height: calc(var(--px) * 10);
+  white-space: nowrap;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.wrapped-link:hover {
+  color: var(--ink);
+}
+
+.wrapped-link:focus-visible {
+  outline: calc(var(--px) * 1) solid var(--accent);
+}
+
+/* December: filled, like an active button. Static on purpose (nothing animates at rest). */
+.wrapped-link--hot {
+  padding: 0 calc(var(--px) * 3);
+  background: var(--accent);
+  color: #fff;
+}
+
+.wrapped-link--hot:hover {
+  background: var(--accent-hi);
+  color: #fff;
+}

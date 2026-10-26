@@ -1,23 +1,46 @@
 mod commands;
 mod db;
 mod error;
-#[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod import;
-#[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod library;
 mod lyrics;
 mod paths;
-#[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod spotify;
 mod stats;
 mod window;
-#[allow(dead_code)] // temporal: se usa desde los comandos en 7.3.7
 mod ytdlp;
 
 use std::sync::atomic::Ordering;
 
+use log::LevelFilter;
 use tauri::Manager;
+use tauri_plugin_log::{RotationStrategy, Target, TargetKind};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
+
+/// Logs go to the app's log folder: 5 files of up to 1 MB. Dependencies only log warnings
+/// (at debug level reqwest/hyper print request URLs); our own code logs info, or debug in
+/// development, where stdout is also used.
+fn log_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    let ours = if cfg!(debug_assertions) {
+        LevelFilter::Debug
+    } else {
+        LevelFilter::Info
+    };
+    let mut targets = vec![Target::new(TargetKind::LogDir {
+        file_name: Some("cupid-player".into()),
+    })];
+    if cfg!(debug_assertions) {
+        targets.push(Target::new(TargetKind::Stdout));
+    }
+    tauri_plugin_log::Builder::new()
+        .clear_targets()
+        .targets(targets)
+        .level(LevelFilter::Warn)
+        .level_for("cupid_player_lib", ours)
+        .max_file_size(1_000_000)
+        .rotation_strategy(RotationStrategy::KeepSome(5))
+        .build()
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -27,6 +50,7 @@ pub fn run() {
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             window::tray::show_main(app);
         }))
+        .plugin(log_plugin())
         .plugin(tauri_plugin_shell::init())
         // Remember position and size (the mini size is undone before exiting).
         .plugin(
@@ -35,7 +59,6 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_store::Builder::new().build())
-        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
@@ -58,6 +81,7 @@ pub fn run() {
             }
         })
         .setup(|app| {
+            log::info!("cupid player {} started", env!("CARGO_PKG_VERSION"));
             let paths = paths::AppPaths::resolve(app.handle())?;
             paths.ensure_dirs()?;
             let database = db::Database::open(&paths.db_file)?;
@@ -68,15 +92,15 @@ pub fn run() {
                 // Tracks stored with duration 0 get the real length of their file (H8).
                 match library::edit::backfill_durations(&conn, &paths.music_dir) {
                     Ok(0) => {}
-                    Ok(n) => eprintln!("[library] fixed {n} missing durations"),
-                    Err(e) => eprintln!("[library] duration backfill failed: {e}"),
+                    Ok(n) => log::info!("[library] fixed {n} missing durations"),
+                    Err(e) => log::warn!("[library] duration backfill failed: {e}"),
                 }
                 // Freeze the summary of every finished month (also covers an app that stayed
                 // closed for months). A failure here must never stop the app from opening.
                 match stats::rollup::close_pending_months(&conn, chrono::Local::now()) {
                     Ok(months) if months.is_empty() => {}
-                    Ok(months) => eprintln!("[stats] closed months: {}", months.join(", ")),
-                    Err(e) => eprintln!("[stats] monthly close failed: {e}"),
+                    Ok(months) => log::info!("[stats] closed months: {}", months.join(", ")),
+                    Err(e) => log::warn!("[stats] monthly close failed: {e}"),
                 }
             }
 
@@ -95,7 +119,6 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            window::scale::set_window_scale,
             window::mini::set_mini_mode,
             window::tray::set_close_to_tray,
             window::tray::set_tray_labels,
@@ -123,10 +146,12 @@ pub fn run() {
             commands::get_cache_info,
             commands::clear_cache,
             commands::open_music_folder,
+            commands::open_logs_folder,
             commands::start_play,
             commands::update_play,
             commands::get_stats,
             commands::list_stat_months,
+            commands::get_wrapped,
             commands::get_lyrics,
             commands::get_lyrics_offset,
             commands::set_lyrics_offset,

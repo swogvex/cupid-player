@@ -431,14 +431,14 @@ async fn store_pending_playlist_cover(app: &AppHandle, pending: PendingCover) {
     let image = match fetch_image(&pending.url).await {
         Ok(image) => image,
         Err(e) => {
-            eprintln!("[import] playlist cover download failed: {e}");
+            log::warn!("[import] playlist cover download failed: {e}");
             return;
         }
     };
     let path = match store_playlist_cover(&pending.dest_dir, &image) {
         Ok(path) => path,
         Err(e) => {
-            eprintln!("[import] playlist cover could not be saved: {e}");
+            log::warn!("[import] playlist cover could not be saved: {e}");
             return;
         }
     };
@@ -534,8 +534,8 @@ impl AppProcessor {
         .await
         {
             Ok(Ok(())) => {}
-            Ok(Err(e)) => eprintln!("[import] could not write tags: {e}"),
-            Err(e) => eprintln!("[import] tagging task failed: {e}"),
+            Ok(Err(e)) => log::warn!("[import] could not write tags: {e}"),
+            Err(e) => log::warn!("[import] tagging task failed: {e}"),
         }
         if ctx.is_cancelled() {
             return;
@@ -547,9 +547,9 @@ impl AppProcessor {
         match fetch_image(&url).await {
             Ok(image) => match store_track_cover(&item.dest_dir, &item.stem, &image) {
                 Ok(path) => ctx.cover(path),
-                Err(e) => eprintln!("[import] cover could not be saved: {e}"),
+                Err(e) => log::warn!("[import] cover could not be saved: {e}"),
             },
-            Err(e) => eprintln!("[import] cover download failed: {e}"),
+            Err(e) => log::warn!("[import] cover download failed: {e}"),
         }
     }
 
@@ -582,10 +582,10 @@ fn persist(db: &Database, write: impl FnOnce(&Connection) -> AppResult<()>) {
     match db.conn() {
         Ok(conn) => {
             if let Err(e) = write(&conn) {
-                eprintln!("[import] database write failed: {e}");
+                log::warn!("[import] database write failed: {e}");
             }
         }
-        Err(e) => eprintln!("[import] database unavailable: {e}"),
+        Err(e) => log::warn!("[import] database unavailable: {e}"),
     }
 }
 
@@ -669,7 +669,7 @@ fn make_sink(
                     ItemOutcome::Failed { .. } | ItemOutcome::Cancelled => TrackStatus::Failed,
                 };
                 if let ItemOutcome::Failed { code } = &outcome {
-                    eprintln!("[import] track {id} failed: {code}");
+                    log::warn!("[import] track {id} failed: {code}");
                 }
                 match &outcome {
                     ItemOutcome::Done { path } => {

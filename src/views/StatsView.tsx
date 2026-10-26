@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { getStats, listStatMonths } from "../ipc/commands";
 import type { MonthStats } from "../ipc/types";
 import { currentMonthKey, formatListened, mergeMonths, monthLabel } from "../lib/stats";
+import { isDecember } from "../lib/wrapped";
+import { useNavStore } from "../state/navStore";
 
 /** The open month is re-read this often so the numbers move while music plays. */
 const REFRESH_MS = 15_000;
@@ -11,6 +13,7 @@ const DASH = "—";
 
 export function StatsView() {
   const { t, i18n } = useTranslation();
+  const openWrapped = useNavStore((s) => s.openWrapped);
   const [monthKey, setMonthKey] = useState(() => currentMonthKey());
   const [months, setMonths] = useState<string[]>(() => [currentMonthKey()]);
   const [stats, setStats] = useState<MonthStats | null>(null);
@@ -60,6 +63,8 @@ export function StatsView() {
   const topArtist = data?.topArtists[0]?.artist ?? DASH;
   const topSong = data?.topTracks[0]?.title ?? DASH;
   const locale = i18n.resolvedLanguage ?? i18n.language;
+  const thisYear = new Date().getFullYear();
+  const december = isDecember();
 
   return (
     <section className="view" aria-labelledby="view-stats">
@@ -108,7 +113,16 @@ export function StatsView() {
           <strong className="ellipsis">{topSong}</strong>
         </div>
       </div>
-      <h3 className="view__sub">{t("stats.topSongs")}</h3>
+      <div className="stats__subhead">
+        <h3 className="view__sub">{t("stats.topSongs")}</h3>
+        <button
+          type="button"
+          className={december ? "wrapped-link wrapped-link--hot" : "wrapped-link"}
+          onClick={openWrapped}
+        >
+          {t(december ? "stats.wrappedDecember" : "stats.wrapped", { year: thisYear })}
+        </button>
+      </div>
       {noListening ? (
         <p className="stats__empty muted">{t("stats.emptyMonth")}</p>
       ) : (

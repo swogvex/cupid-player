@@ -101,7 +101,15 @@ mod tests {
         assert_eq!(parse_stamp("00:01.123"), Some(1123));
         assert_eq!(parse_stamp("00:01,50"), Some(1500));
         assert_eq!(parse_stamp("03:25.10"), Some(205_100));
-        for bad in ["", "ar:Someone", "00:61.00", "00:01.1234", "1:2:3", "-1:00", "aa:bb"] {
+        for bad in [
+            "",
+            "ar:Someone",
+            "00:61.00",
+            "00:01.1234",
+            "1:2:3",
+            "-1:00",
+            "aa:bb",
+        ] {
             assert_eq!(parse_stamp(bad), None, "{bad:?}");
         }
     }
@@ -117,7 +125,11 @@ mod tests {
         let l = parse_lrc("[00:20.00][00:10.00]again\n[00:15.00]middle");
         assert_eq!(
             l,
-            vec![line(10_000, "again"), line(15_000, "middle"), line(20_000, "again")]
+            vec![
+                line(10_000, "again"),
+                line(15_000, "middle"),
+                line(20_000, "again")
+            ]
         );
     }
 

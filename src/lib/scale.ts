@@ -13,16 +13,10 @@ const TOLERANCE_PX = 2;
 
 let mode: ScaleMode = "full";
 
-/** The mini player has its own 176x64 design; call applyCssScale() after changing it. */
+/** The mini player has its own 104x156 design; call applyCssScale() after changing it. */
 export function setScaleMode(next: ScaleMode): void {
   mode = next;
 }
-
-/**
- * Only kept so ipc/commands.ts keeps compiling while set_window_scale exists.
- * It disappears together with that command (H13 cleanup).
- */
-export type Scale = 2 | 3 | 4;
 
 /** Largest integer scale at which the design still fits. Never below the mode's minimum. */
 export function fitScale(width: number, height: number, m: ScaleMode = mode): number {

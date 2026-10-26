@@ -309,7 +309,7 @@ mod tests {
         assert!(get(&conn, 9999).expect("get").is_none());
     }
 
- #[test]
+    #[test]
     fn all_import_statuses_are_accepted_by_the_schema() {
         let d = db();
         let conn = d.conn().expect("conn");

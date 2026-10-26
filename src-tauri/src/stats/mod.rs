@@ -1,6 +1,7 @@
-//! Listening statistics (H9).
+//! Listening statistics (H9) and the yearly Wrapped (H12).
 
 pub mod rollup;
+pub mod wrapped;
 
 use rusqlite::Connection;
 use serde::Serialize;

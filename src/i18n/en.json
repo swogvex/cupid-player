@@ -91,6 +91,7 @@
     },
     "stats": {
       "bad_month": "Invalid month",
+      "bad_year": "Invalid year",
       "db": "Database error"
     },
     "lyrics": {
@@ -165,8 +166,31 @@
     "emptyMonth": "You haven't listened to anything this month yet",
     "prevMonth": "Previous month",
     "nextMonth": "Next month",
+    "wrapped": "Wrapped {{year}}",
+    "wrappedDecember": "Wrapped {{year}}!",
     "plays_one": "{{count}} play",
     "plays_other": "{{count}} plays"
+  },
+  "wrapped": {
+    "title": "Wrapped",
+    "introKicker": "Your year in music",
+    "introTitle": "Wrapped {{year}}",
+    "hint": "Use ← and → to move on",
+    "minutesLabel": "Minutes listened",
+    "artistLabel": "Your artist of the year",
+    "songLabel": "Your song of the year",
+    "monthLabel": "Your most listened month",
+    "topArtists": "Your top 5 artists",
+    "topSongs": "Your top 5 songs",
+    "outroTitle": "That was your {{year}}!",
+    "outroText": "Thanks for listening",
+    "replay": "Watch again",
+    "empty": "You haven't listened to anything in {{year}} yet. When you do, your Wrapped will show up here.",
+    "prev": "Previous slide",
+    "next": "Next slide",
+    "slide": "Slide {{n}} of {{total}}",
+    "prevYear": "Previous year",
+    "nextYear": "Next year"
   },
   "settings": {
     "title": "Settings",
@@ -183,7 +207,10 @@
     "cacheHint": "Removes unused covers and temporary files. Your music is never touched.",
     "closeToTray": "Close to tray",
     "closeToTrayHint": "When you close the window, the music keeps playing from the system tray.",
-    "alwaysOnTopHint": "Keeps cupid player above all other windows, even while you use another app."
+    "alwaysOnTopHint": "Keeps cupid player above all other windows, even while you use another app.",
+    "logs": "Logs",
+    "openLogs": "Open logs folder",
+    "logsHint": "If something fails, you can send the most recent file in that folder to whoever is helping you."
   },
   "status": {
     "done": "Done",

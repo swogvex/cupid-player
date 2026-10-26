@@ -91,6 +91,7 @@
     },
     "stats": {
       "bad_month": "Mes no válido",
+      "bad_year": "Año no válido",
       "db": "Error de la base de datos"
     },
     "lyrics": {
@@ -165,8 +166,31 @@
     "emptyMonth": "Aún no has escuchado nada este mes",
     "prevMonth": "Mes anterior",
     "nextMonth": "Mes siguiente",
+    "wrapped": "Wrapped {{year}}",
+    "wrappedDecember": "¡Wrapped {{year}}!",
     "plays_one": "{{count}} reproducción",
     "plays_other": "{{count}} reproducciones"
+  },
+  "wrapped": {
+    "title": "Wrapped",
+    "introKicker": "Tu año en música",
+    "introTitle": "Wrapped {{year}}",
+    "hint": "Usa ← y → para avanzar",
+    "minutesLabel": "Minutos escuchados",
+    "artistLabel": "Tu artista del año",
+    "songLabel": "Tu canción del año",
+    "monthLabel": "Tu mes más escuchado",
+    "topArtists": "Tus 5 artistas",
+    "topSongs": "Tus 5 canciones",
+    "outroTitle": "¡Ese fue tu {{year}}!",
+    "outroText": "Gracias por escuchar",
+    "replay": "Ver otra vez",
+    "empty": "Aún no has escuchado nada en {{year}}. Cuando lo hagas, tu Wrapped aparecerá aquí.",
+    "prev": "Diapositiva anterior",
+    "next": "Diapositiva siguiente",
+    "slide": "Diapositiva {{n}} de {{total}}",
+    "prevYear": "Año anterior",
+    "nextYear": "Año siguiente"
   },
   "settings": {
     "title": "Ajustes",
@@ -183,7 +207,10 @@
     "cacheHint": "Borra portadas sin usar y archivos temporales. Tu música no se toca.",
     "closeToTray": "Cerrar a la bandeja",
     "closeToTrayHint": "Al cerrar la ventana, la música sigue sonando desde la bandeja del sistema.",
-    "alwaysOnTopHint": "Mantiene cupid player por encima de las demás ventanas, aunque estés usando otra aplicación."
+    "alwaysOnTopHint": "Mantiene cupid player por encima de las demás ventanas, aunque estés usando otra aplicación.",
+    "logs": "Registro (logs)",
+    "openLogs": "Abrir carpeta de logs",
+    "logsHint": "Si algo falla, puedes enviar el archivo más reciente de esa carpeta a quien te ayude."
   },
   "status": {
     "done": "Listo",

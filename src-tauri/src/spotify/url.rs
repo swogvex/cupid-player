@@ -31,11 +31,6 @@ pub struct SpotifyRef {
 }
 
 impl SpotifyRef {
-    /// Public page for the item, rebuilt from validated parts.
-    pub fn canonical_url(&self) -> String {
-        format!("https://{SPOTIFY_HOST}/{}/{}", self.kind.as_str(), self.id)
-    }
-
     /// Public embed page used to read metadata (no API key).
     pub fn embed_url(&self) -> String {
         format!(
@@ -185,14 +180,10 @@ mod tests {
     }
 
     #[test]
-    fn canonical_and_embed_urls_are_rebuilt() {
+    fn embed_url_is_rebuilt_from_validated_parts() {
         let t = ok(&format!(
             "https://open.spotify.com/intl-es/track/{TRACK}?si=zzz"
         ));
-        assert_eq!(
-            t.canonical_url(),
-            format!("https://open.spotify.com/track/{TRACK}")
-        );
         assert_eq!(
             t.embed_url(),
             format!("https://open.spotify.com/embed/track/{TRACK}")

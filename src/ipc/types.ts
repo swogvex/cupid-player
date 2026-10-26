@@ -146,6 +146,27 @@ export interface MonthStats {
   closed: boolean;
 }
 
+/** Minutes listened in one month of a Wrapped year. */
+export interface MonthTotal {
+  /** "YYYY-MM", local time. */
+  monthKey: string;
+  minutes: number;
+}
+
+/** Returned by get_wrapped. `months` empty = nothing was heard that year. */
+export interface Wrapped {
+  year: number;
+  /** Sum of the monthly minutes (each month is rounded, so it can be off by under 1 min per month). */
+  minutes: number;
+  /** Months with listening, oldest first. */
+  months: MonthTotal[];
+  /** Month with most minutes (the earliest on a tie). */
+  topMonth: MonthTotal | null;
+  /** Top 5, by seconds listened. */
+  topArtists: ArtistStat[];
+  topTracks: TrackStat[];
+}
+
 /** One synced lyric line. `ms` is when the line starts. `text` is empty for instrumental breaks. */
 export interface LyricsLine {
   ms: number;

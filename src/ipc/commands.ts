@@ -12,6 +12,7 @@ import type {
   ScanReport,
   Track,
   TrackFilter,
+  Wrapped,
 } from "./types";
 
 // Single entry point to Rust: components never call invoke() directly.
@@ -118,6 +119,12 @@ export const getStats = (monthKey?: string) => invoke<MonthStats>("get_stats", {
 export const listStatMonths = () => invoke<string[]>("list_stat_months");
 
 /**
+ * Wrapped of a year (local time): monthly summaries added up plus the open month.
+ * `months` is empty if nothing was heard that year. Rejects with "stats.*" codes.
+ */
+export const getWrapped = (year: number) => invoke<Wrapped>("get_wrapped", { year });
+
+/**
  * Lyrics of a track: from the local cache, or from LRCLIB the first time (then cached).
  * Rejects with "lyrics.*" codes ("lyrics.unavailable" = service down, try again later).
  */
@@ -148,11 +155,6 @@ export const setTrayLabels = (labels: TrayLabels) => invoke<void>("set_tray_labe
 /** Resizes the window to the mini player (on) or restores the normal size (off). */
 export const setMiniMode = (on: boolean) => invoke<void>("set_mini_mode", { on });
 
-/** Resizes the window to 352*n x 208*n. Resolves with the scale actually applied. */
-export function setWindowScale(n: number): Promise<number> {
-  return invoke<number>("set_window_scale", { n });
-}
-
 export const minimizeWindow = (): Promise<void> =>
   getCurrentWindow().minimize();
 export const toggleMaximizeWindow = (): Promise<void> =>
@@ -162,3 +164,8 @@ export const isWindowMaximized = (): Promise<boolean> =>
   getCurrentWindow().isMaximized();
 export const setAlwaysOnTop = (value: boolean): Promise<void> =>
   getCurrentWindow().setAlwaysOnTop(value);
+/** Paints the native window/webview background (what shows while the webview repaints on resize). */
+export const setWindowBackground = (rgb: [number, number, number]): Promise<void> =>
+  getCurrentWindow().setBackgroundColor(rgb);
+/** Opens the folder with the app's log files. */
+export const openLogsFolder = () => invoke<void>("open_logs_folder");

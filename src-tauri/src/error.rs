@@ -3,8 +3,6 @@ use serde::{Serialize, Serializer};
 /// Single error type for the whole backend.
 #[derive(Debug, thiserror::Error)]
 pub enum AppError {
-    #[error("invalid window scale: {0}")]
-    InvalidScale(u32),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
     #[error("database error: {0}")]
