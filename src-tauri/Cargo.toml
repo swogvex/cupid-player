@@ -3,6 +3,7 @@ name = "cupid-player"
 version = "1.0.1"
 description = "Cupid Player — a pixel-art music player"
 authors = ["swogvex"]
+license = "MIT"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
