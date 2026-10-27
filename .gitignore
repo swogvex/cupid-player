@@ -26,5 +26,4 @@ dist-ssr
 src-tauri/binaries/
 *.key
 
-perf\results.csv
 perf/results.csv
