@@ -168,6 +168,29 @@ pub fn find_by_spotify(
         .optional()?)
 }
 
+/// Rows with this Spotify id that belong to no playlist: singles, or what is left of a
+/// playlist deleted with "only the playlist" (D-116).
+pub fn list_orphans_by_spotify(conn: &Connection, spotify_id: &str) -> AppResult<Vec<Track>> {
+    let sql = format!(
+        "SELECT {COLUMNS} FROM tracks \
+         WHERE spotify_id = ?1 AND playlist_id IS NULL \
+         ORDER BY id"
+    );
+    let mut stmt = conn.prepare(&sql)?;
+    let rows = stmt.query_map([spotify_id], from_row)?;
+    Ok(rows.collect::<rusqlite::Result<Vec<_>>>()?)
+}
+
+/// Attaches an orphan row to a playlist. Does nothing if it already belongs to one.
+pub fn adopt(conn: &Connection, id: i64, playlist_id: i64, position: i64) -> AppResult<()> {
+    conn.execute(
+        "UPDATE tracks SET playlist_id = ?1, position = ?2 \
+         WHERE id = ?3 AND playlist_id IS NULL",
+        params![playlist_id, position, id],
+    )?;
+    Ok(())
+}
+
 pub fn set_status(conn: &Connection, id: i64, status: &str) -> AppResult<()> {
     conn.execute(
         "UPDATE tracks SET status = ?1 WHERE id = ?2",

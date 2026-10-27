@@ -195,6 +195,28 @@ fn number_items(items: &mut [WorkItem]) {
     }
 }
 
+/// Re-attaches a leftover of a deleted playlist (H15.2c). Only rows whose file lives in this
+/// playlist's folder, or that have no file yet, are taken: a single in `Singles\` is never moved.
+fn adopt_orphan(
+    conn: &Connection,
+    spotify_id: &str,
+    playlist_id: i64,
+    position: i64,
+    dest_dir: &Path,
+) -> AppResult<Option<Track>> {
+    let candidate = tracks::list_orphans_by_spotify(conn, spotify_id)?
+        .into_iter()
+        .find(|row| match row.file_path.as_deref() {
+            Some(p) => Path::new(p).starts_with(dest_dir),
+            None => true,
+        });
+    let Some(row) = candidate else {
+        return Ok(None);
+    };
+    tracks::adopt(conn, row.id, playlist_id, position)?;
+    tracks::get(conn, row.id)
+}
+
 pub fn prepare_playlist(
     db: &Database,
     paths: &AppPaths,
@@ -234,7 +256,11 @@ pub fn prepare_playlist(
             duplicates += 1;
             continue;
         }
-        let track_id = match tracks::find_by_spotify(&conn, &t.spotify_id, Some(playlist_id))? {
+        let existing = match tracks::find_by_spotify(&conn, &t.spotify_id, Some(playlist_id))? {
+            Some(row) => Some(row),
+            None => adopt_orphan(&conn, &t.spotify_id, playlist_id, i as i64 + 1, &dest_dir)?,
+        };
+        let track_id = match existing {
             Some(row) if is_complete(&row) => {
                 already_done += 1;
                 continue;
@@ -900,6 +926,73 @@ mod tests {
         std::fs::remove_file(&file).expect("remove file");
         let third = prepare_playlist(&db, &paths, &meta).expect("prepare third");
         assert_eq!((third.already_done, third.items.len()), (0, 2));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn reimport_after_deleting_the_playlist_adopts_the_old_rows() {
+        let db = Database::open_in_memory().expect("db");
+        let (paths, root) = temp_paths();
+        let meta = pl(
+            "Mix",
+            "pl1",
+            vec![tm("t1", "A", "One"), tm("t2", "B", "Two")],
+        );
+        let first = prepare_playlist(&db, &paths, &meta).expect("prepare");
+        let old_pid = first.playlist_id.expect("playlist id");
+
+        let file = first.items[0].dest_dir.join("01 - A - One.opus");
+        std::fs::write(&file, b"x").expect("write file");
+        {
+            let conn = db.conn().expect("conn");
+            tracks::set_done(&conn, first.items[0].track_id, &file.to_string_lossy())
+                .expect("done");
+            // "Only the playlist": the songs stay, without a playlist.
+            conn.execute(
+                "UPDATE tracks SET playlist_id = NULL WHERE playlist_id = ?1",
+                [old_pid],
+            )
+            .expect("orphan tracks");
+            conn.execute("DELETE FROM playlists WHERE id = ?1", [old_pid])
+                .expect("delete playlist");
+        }
+
+        let again = prepare_playlist(&db, &paths, &meta).expect("prepare again");
+        let new_pid = again.playlist_id.expect("new playlist id");
+        assert_eq!(again.already_done, 1);
+        assert_eq!(again.items.len(), 1);
+        assert_eq!(again.items[0].track_id, first.items[1].track_id);
+
+        let rows = list_tracks(&db, None);
+        assert_eq!(rows.len(), 2, "no duplicate rows");
+        assert!(rows.iter().all(|t| t.playlist_id == Some(new_pid)));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_single_is_not_taken_by_a_playlist_with_the_same_song() {
+        let db = Database::open_in_memory().expect("db");
+        let (paths, root) = temp_paths();
+        let detail = TrackDetail {
+            track: tm("t1", "A", "One"),
+            cover_url: None,
+        };
+        let single = prepare_single(&db, &paths, &detail).expect("single");
+        let file = paths.singles_dir.join("A - One.opus");
+        std::fs::write(&file, b"x").expect("write file");
+        {
+            let conn = db.conn().expect("conn");
+            tracks::set_done(&conn, single.items[0].track_id, &file.to_string_lossy())
+                .expect("done");
+        }
+
+        let p = prepare_playlist(&db, &paths, &pl("Mix", "pl1", vec![tm("t1", "A", "One")]))
+            .expect("prepare playlist");
+        assert_eq!(p.items.len(), 1, "the playlist gets its own copy");
+
+        let rows = list_tracks(&db, None);
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows.iter().filter(|t| t.playlist_id.is_none()).count(), 1);
         let _ = std::fs::remove_dir_all(&root);
     }
 
